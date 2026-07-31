@@ -248,7 +248,7 @@ PACKAGE_PROFILES: dict[str, dict[str, Any]] = {
                         "claim": (
                             "Packages a Codex Skill with validated name and "
                             "description frontmatter; manual Codex evidence "
-                            "is pending."
+                            "is published with the exact release."
                         ),
                     }
                 ],
@@ -400,7 +400,7 @@ PACKAGE_PROFILES: dict[str, dict[str, Any]] = {
                         "claim": (
                             "Packages a Codex Skill with validated name and "
                             "description frontmatter; manual Codex evidence "
-                            "is pending."
+                            "is published with the exact release."
                         ),
                     }
                 ],
@@ -555,7 +555,7 @@ PACKAGE_PROFILES: dict[str, dict[str, Any]] = {
                         "claim": (
                             "Packages a Codex Skill with validated name and "
                             "description frontmatter; manual Codex evidence "
-                            "is pending."
+                            "is published with the exact release."
                         ),
                     }
                 ],
@@ -709,7 +709,7 @@ PACKAGE_PROFILES: dict[str, dict[str, Any]] = {
                         "claim": (
                             "Packages a Codex Skill with validated name and "
                             "description frontmatter; manual Codex evidence "
-                            "is pending."
+                            "is published with the exact release."
                         ),
                     }
                 ],

@@ -193,6 +193,15 @@ class CatalogIntegrationTests(unittest.TestCase):
                     "manual-codex-evidence.json"
                 )
             )
+            skill_claims = [
+                item["claim"] for item in entry["badges"]["Skill"]["evidence"]
+            ]
+            self.assertFalse(
+                any("pending" in claim.lower() for claim in skill_claims)
+            )
+            self.assertTrue(
+                any("published" in claim.lower() for claim in skill_claims)
+            )
 
     def test_published_links_are_complete_https_urls(self) -> None:
         checked = catalog.load_json_strict(REPOSITORY_ROOT / catalog.CATALOG_PATH)

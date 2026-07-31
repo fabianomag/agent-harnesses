@@ -81,7 +81,7 @@
             {
               "method": "structural",
               "path": "packages/project-harness/skills/project-harness/SKILL.md",
-              "claim": "Packages a Codex Skill with validated name and description frontmatter; manual Codex evidence is pending."
+              "claim": "Packages a Codex Skill with validated name and description frontmatter; manual Codex evidence is published with the exact release."
             }
           ]
         },
@@ -277,7 +277,7 @@
             {
               "method": "structural",
               "path": "packages/workspace-coordination/SKILL.md",
-              "claim": "Packages a Codex Skill with validated name and description frontmatter; manual Codex evidence is pending."
+              "claim": "Packages a Codex Skill with validated name and description frontmatter; manual Codex evidence is published with the exact release."
             }
           ]
         },
@@ -477,7 +477,7 @@
             {
               "method": "structural",
               "path": "packages/cross-project/SKILL.md",
-              "claim": "Packages a Codex Skill with validated name and description frontmatter; manual Codex evidence is pending."
+              "claim": "Packages a Codex Skill with validated name and description frontmatter; manual Codex evidence is published with the exact release."
             }
           ]
         },
@@ -678,7 +678,7 @@
             {
               "method": "structural",
               "path": "packages/orchestration/SKILL.md",
-              "claim": "Packages a Codex Skill with validated name and description frontmatter; manual Codex evidence is pending."
+              "claim": "Packages a Codex Skill with validated name and description frontmatter; manual Codex evidence is published with the exact release."
             }
           ]
         },
