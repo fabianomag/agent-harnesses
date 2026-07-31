@@ -2,11 +2,11 @@
 
 ## Supported versions
 
-There are no published releases or supported release lines yet. The catalog
-separates locally implemented artifacts from publication status. Every
-immutable documentation, prompt, source, release, and interactive-diagram link
-is `unpublished` with no URL. The catalog is not a release, support, or
-published-evaluation declaration.
+The published release lines are `project-harness` `0.1.0`,
+`workspace-coordination` `0.1.0`, `cross-project` `0.1.1`, and
+`orchestration` `0.1.0`. Each release binds its documentation, source, install
+bundle, and evidence to an immutable tag. Publication does not extend the
+platform and recovery claims documented by each package.
 
 ## Local safety boundary
 
@@ -53,14 +53,12 @@ They never print the external input path, pattern, match, or source excerpt.
 
 ## Reporting
 
-GitHub private vulnerability reporting is a pre-publication gate. It cannot be
-enabled while this repository remains private; it will be enabled immediately
-after the repository becomes public and before any tag or release is created.
-Once the repository Security > Advisories page shows **Report a
-vulnerability**, use that form for a private report.
+GitHub private vulnerability reporting is a publication gate and must be
+enabled before any tag or release is created.
 
-Until that private form is available, do not submit sensitive vulnerability
-details. Never place a credential, token, private identifier, deny pattern,
-private or absolute local path, full log, or sensitive reproduction in a public
-issue. The Installation Report Issue Form is not a security channel. A public
-issue is appropriate only for a fully synthetic, non-sensitive reproduction.
+Use [Report a vulnerability](https://github.com/fabianomag/agent-harnesses/security/advisories/new)
+for a private GitHub security advisory. Never place a credential, token,
+private identifier, deny pattern, private or absolute local path, full log, or
+sensitive reproduction in a public issue. The Installation Report Issue Form
+is not a security channel. A public issue is appropriate only for a fully
+synthetic, non-sensitive reproduction.

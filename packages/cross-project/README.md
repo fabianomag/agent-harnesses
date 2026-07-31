@@ -2,7 +2,7 @@
 
 - Package ID: `cross-project`
 - Version: `0.1.1`
-- Artifact status: implemented, unpublished
+- Artifact status: implemented, published
 - Runtime: Python 3.10 or newer, standard library only
 
 ## Purpose
@@ -175,22 +175,24 @@ package version and commit.
 
 ## Version and immutable links
 
-Version `0.1.1` is implemented locally and remains unpublished. It is a
-pre-release hardening patch over the earlier local `0.1.0` package state.
+Version `0.1.1` is published from the immutable `cross-project-v0.1.1`
+release tag. It is a hardening patch over the earlier local `0.1.0` package
+state; no `0.1.0` release is claimed.
 
-- Immutable documentation URL: unpublished; no URL exists.
-- Immutable install prompt: unpublished; no prompt is claimed.
-- Immutable source URL: unpublished; no URL exists.
-- Release URL: unpublished; no URL exists.
+- Immutable documentation URL: https://github.com/fabianomag/agent-harnesses/blob/cross-project-v0.1.1/packages/cross-project/README.md
+- Immutable install prompt: `Install this harness for me: https://github.com/fabianomag/agent-harnesses/releases/download/cross-project-v0.1.1/cross-project-0.1.1.zip`
+- Immutable source URL: https://github.com/fabianomag/agent-harnesses/tree/cross-project-v0.1.1/packages/cross-project
+- Release URL: https://github.com/fabianomag/agent-harnesses/releases/tag/cross-project-v0.1.1
+- Installation report: https://github.com/fabianomag/agent-harnesses/issues/new?template=installation-report.yml
 
-Do not substitute a mutable branch URL for any of these fields.
+Do not substitute a mutable branch URL for the version-bound fields.
 
 ## Diagrams
 
 - Graph ID: `cross-project-flow`
 - Source-tree spec: `graphs/cross-project.graph.json`
 - Source-tree static asset: `assets/cross-project.svg`
-- Interactive diagram: unpublished; no URL exists.
+- Interactive diagram: https://fabianomag.vercel.app/artifacts/agent-harnesses
 
 The static graph represents: named target → manifest → structural sync → front
 state → local owner → transversal reflection.

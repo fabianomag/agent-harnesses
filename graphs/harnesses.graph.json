@@ -1,6 +1,7 @@
 {
   "schemaVersion": 1,
   "source": "catalog/harnesses.json",
+  "interactiveDiagram": "https://fabianomag.vercel.app/artifacts/agent-harnesses",
   "meaning": "Collection membership only; no dependency or ranking.",
   "nodes": [
     {
@@ -15,7 +16,7 @@
       "version": "0.1.0",
       "artifactStatus": {
         "implementation": "implemented",
-        "publication": "unpublished"
+        "publication": "published"
       }
     },
     {
@@ -25,7 +26,7 @@
       "version": "0.1.0",
       "artifactStatus": {
         "implementation": "implemented",
-        "publication": "unpublished"
+        "publication": "published"
       }
     },
     {
@@ -35,7 +36,7 @@
       "version": "0.1.1",
       "artifactStatus": {
         "implementation": "implemented",
-        "publication": "unpublished"
+        "publication": "published"
       }
     },
     {
@@ -45,7 +46,7 @@
       "version": "0.1.0",
       "artifactStatus": {
         "implementation": "implemented",
-        "publication": "unpublished"
+        "publication": "published"
       }
     }
   ],

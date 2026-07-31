@@ -307,16 +307,21 @@
         }
       }
     },
-    "unpublishedLink": {
+    "publishedLink": {
       "type": "object",
       "additionalProperties": false,
       "required": [
-        "status"
+        "status",
+        "url"
       ],
       "properties": {
         "status": {
           "type": "string",
-          "const": "unpublished"
+          "const": "published"
+        },
+        "url": {
+          "type": "string",
+          "pattern": "^https://[^\\s]+$"
         }
       }
     },
@@ -416,7 +421,7 @@
             },
             "publication": {
               "type": "string",
-              "const": "unpublished"
+              "const": "published"
             }
           }
         },
@@ -582,19 +587,19 @@
           ],
           "properties": {
             "documentation": {
-              "$ref": "#/$defs/unpublishedLink"
+              "$ref": "#/$defs/publishedLink"
             },
             "prompt": {
-              "$ref": "#/$defs/unpublishedLink"
+              "$ref": "#/$defs/publishedLink"
             },
             "source": {
-              "$ref": "#/$defs/unpublishedLink"
+              "$ref": "#/$defs/publishedLink"
             },
             "release": {
-              "$ref": "#/$defs/unpublishedLink"
+              "$ref": "#/$defs/publishedLink"
             },
             "interactiveDiagram": {
-              "$ref": "#/$defs/unpublishedLink"
+              "$ref": "#/$defs/publishedLink"
             }
           }
         },

@@ -2,7 +2,7 @@
 
 - Package ID: `orchestration`
 - Version: `0.1.0`
-- Artifact status: implemented, unpublished
+- Artifact status: implemented, published
 - Runtime: Python 3.10 or newer, standard library only
 
 ## Purpose
@@ -207,21 +207,23 @@ package version and commit.
 
 ## Version and immutable links
 
-Version `0.1.0` is implemented locally and remains unpublished.
+Version `0.1.0` is published from the immutable `orchestration-v0.1.0`
+release tag.
 
-- Immutable documentation URL: unpublished; no URL exists.
-- Immutable install prompt: unpublished; no prompt is claimed.
-- Immutable source URL: unpublished; no URL exists.
-- Release URL: unpublished; no URL exists.
+- Immutable documentation URL: https://github.com/fabianomag/agent-harnesses/blob/orchestration-v0.1.0/packages/orchestration/README.md
+- Immutable install prompt: `Install this harness for me: https://github.com/fabianomag/agent-harnesses/releases/download/orchestration-v0.1.0/orchestration-0.1.0.zip`
+- Immutable source URL: https://github.com/fabianomag/agent-harnesses/tree/orchestration-v0.1.0/packages/orchestration
+- Release URL: https://github.com/fabianomag/agent-harnesses/releases/tag/orchestration-v0.1.0
+- Installation report: https://github.com/fabianomag/agent-harnesses/issues/new?template=installation-report.yml
 
-Do not substitute a mutable branch URL for any of these fields.
+Do not substitute a mutable branch URL for the version-bound fields.
 
 ## Diagrams
 
 - Graph ID: `orchestration-flow`
 - Source-tree spec: `graphs/orchestration.graph.json`
 - Source-tree static asset: `assets/orchestration.svg`
-- Interactive diagram: unpublished; no URL exists.
+- Interactive diagram: https://fabianomag.vercel.app/artifacts/agent-harnesses
 
 The static graph represents: strategic opening → registry validation → dry-run
 → transactional apply/rollback → pending reflection → verified sync.

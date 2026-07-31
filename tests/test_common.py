@@ -102,7 +102,7 @@ class CatalogIntegrationTests(unittest.TestCase):
             ],
         )
         self.assertEqual(
-            ["unpublished"] * 4,
+            ["published"] * 4,
             [
                 entry["artifactStatus"]["publication"]
                 for entry in checked["packages"]
@@ -185,7 +185,7 @@ class CatalogIntegrationTests(unittest.TestCase):
                 ),
             )
 
-    def test_immutable_links_are_unpublished_without_urls(self) -> None:
+    def test_published_links_are_complete_https_urls(self) -> None:
         checked = catalog.load_json_strict(REPOSITORY_ROOT / catalog.CATALOG_PATH)
         expected_kinds = {
             "documentation",
@@ -197,8 +197,16 @@ class CatalogIntegrationTests(unittest.TestCase):
         for entry in checked["packages"]:
             self.assertEqual(expected_kinds, set(entry["immutableLinks"]))
             for link in entry["immutableLinks"].values():
-                self.assertEqual({"status": "unpublished"}, link)
-                self.assertNotIn("url", link)
+                self.assertEqual("published", link["status"])
+                self.assertTrue(link["url"].startswith("https://"))
+            self.assertEqual(
+                catalog.INTERACTIVE_DIAGRAM_URL,
+                entry["immutableLinks"]["interactiveDiagram"]["url"],
+            )
+            prompt_url = entry["immutableLinks"]["prompt"]["url"]
+            self.assertIn(entry["id"], prompt_url)
+            self.assertIn(entry["version"], prompt_url)
+            self.assertTrue(prompt_url.endswith(".zip"))
 
     def test_catalog_schema_enforces_exact_packages_badges_and_link_state(
         self,
@@ -253,10 +261,7 @@ class CatalogIntegrationTests(unittest.TestCase):
             schema,
             artifact="synthetic-catalog.json",
         )
-        self.assertIn(
-            "SCHEMA_ADDITIONAL_PROPERTY",
-            {issue.code for issue in url_issues},
-        )
+        self.assertIn("SCHEMA_PATTERN", {issue.code for issue in url_issues})
 
     def test_generated_graph_expresses_membership_without_package_edges(self) -> None:
         graph = json.loads(
@@ -265,6 +270,10 @@ class CatalogIntegrationTests(unittest.TestCase):
             )
         )
         package_ids = set(catalog.PACKAGE_ORDER)
+        self.assertEqual(
+            catalog.INTERACTIVE_DIAGRAM_URL,
+            graph["interactiveDiagram"],
+        )
         self.assertEqual(
             {
                 ("agent-harnesses", package_id, "contains")
@@ -342,6 +351,10 @@ class CatalogIntegrationTests(unittest.TestCase):
             self.assertEqual(
                 entry["artifactStatus"],
                 graph["package"]["artifactStatus"],
+            )
+            self.assertEqual(
+                catalog.INTERACTIVE_DIAGRAM_URL,
+                graph["source"]["interactiveDiagram"],
             )
             self.assertEqual(
                 expected_labels[entry["id"]],
@@ -494,7 +507,7 @@ class CatalogIntegrationTests(unittest.TestCase):
             "Version",
             "Docs",
             "Interactive",
-            "Unpublished; no URL",
+            catalog.INTERACTIVE_DIAGRAM_URL,
         ):
             self.assertIn(phrase, root_readme)
 
@@ -519,11 +532,8 @@ class CatalogIntegrationTests(unittest.TestCase):
             for section in required_sections:
                 self.assertIn(section, readme, f"{package_id}: {section}")
             self.assertIn("Manual Codex — pending", readme)
-            self.assertIn(
-                "Interactive diagram: unpublished; no URL exists.",
-                readme,
-            )
-            self.assertIn("Immutable install prompt: unpublished", readme)
+            self.assertIn(catalog.INTERACTIVE_DIAGRAM_URL, readme)
+            self.assertIn("Install this harness for me: https://", readme)
 
         self.assertIn("## Agent compatibility", root_readme)
         self.assertIn("Codex", root_readme)

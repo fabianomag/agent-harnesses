@@ -47,7 +47,7 @@
       "license": "MIT",
       "artifactStatus": {
         "implementation": "implemented",
-        "publication": "unpublished"
+        "publication": "published"
       },
       "manifest": "packages/project-harness/harness.package.json",
       "purpose": "Preserve durable context and a resumable work cycle inside one explicitly selected local project.",
@@ -159,19 +159,24 @@
       },
       "immutableLinks": {
         "documentation": {
-          "status": "unpublished"
+          "status": "published",
+          "url": "https://github.com/fabianomag/agent-harnesses/blob/project-harness-v0.1.0/packages/project-harness/README.md"
         },
         "prompt": {
-          "status": "unpublished"
+          "status": "published",
+          "url": "https://github.com/fabianomag/agent-harnesses/releases/download/project-harness-v0.1.0/project-harness-0.1.0.zip"
         },
         "source": {
-          "status": "unpublished"
+          "status": "published",
+          "url": "https://github.com/fabianomag/agent-harnesses/tree/project-harness-v0.1.0/packages/project-harness"
         },
         "release": {
-          "status": "unpublished"
+          "status": "published",
+          "url": "https://github.com/fabianomag/agent-harnesses/releases/tag/project-harness-v0.1.0"
         },
         "interactiveDiagram": {
-          "status": "unpublished"
+          "status": "published",
+          "url": "https://fabianomag.vercel.app/artifacts/agent-harnesses"
         }
       },
       "evidence": {
@@ -203,7 +208,7 @@
       "files": [
         {
           "path": "README.md",
-          "sha256": "1e7d855ce40ccf6005d53e9cc22c58ab7d2972cc617f2aa71f6c8051c4a7f66f"
+          "sha256": "c094d6b0349579d0265afd9bc7cd53bf11f1fbbd591647bd9b089dcc7ae11995"
         },
         {
           "path": "harness.package.json",
@@ -234,7 +239,7 @@
       "license": "MIT",
       "artifactStatus": {
         "implementation": "implemented",
-        "publication": "unpublished"
+        "publication": "published"
       },
       "manifest": "packages/workspace-coordination/harness.package.json",
       "purpose": "Coordinate explicitly registered autonomous child folders inside one containing workspace while preserving child-local ownership.",
@@ -341,19 +346,24 @@
       },
       "immutableLinks": {
         "documentation": {
-          "status": "unpublished"
+          "status": "published",
+          "url": "https://github.com/fabianomag/agent-harnesses/blob/workspace-coordination-v0.1.0/packages/workspace-coordination/README.md"
         },
         "prompt": {
-          "status": "unpublished"
+          "status": "published",
+          "url": "https://github.com/fabianomag/agent-harnesses/releases/download/workspace-coordination-v0.1.0/workspace-coordination-0.1.0.zip"
         },
         "source": {
-          "status": "unpublished"
+          "status": "published",
+          "url": "https://github.com/fabianomag/agent-harnesses/tree/workspace-coordination-v0.1.0/packages/workspace-coordination"
         },
         "release": {
-          "status": "unpublished"
+          "status": "published",
+          "url": "https://github.com/fabianomag/agent-harnesses/releases/tag/workspace-coordination-v0.1.0"
         },
         "interactiveDiagram": {
-          "status": "unpublished"
+          "status": "published",
+          "url": "https://fabianomag.vercel.app/artifacts/agent-harnesses"
         }
       },
       "evidence": {
@@ -386,7 +396,7 @@
       "files": [
         {
           "path": "README.md",
-          "sha256": "03d28ed7b0d9942d704d81db3b405a3c434415001e3d6c2c3db614a31bffa1fb"
+          "sha256": "a7db36b7a7c40279408e68bd3519cee4e304ae3206d5dfccc5dd86a6f0bb2932"
         },
         {
           "path": "SKILL.md",
@@ -425,7 +435,7 @@
       "license": "MIT",
       "artifactStatus": {
         "implementation": "implemented",
-        "publication": "unpublished"
+        "publication": "published"
       },
       "manifest": "packages/cross-project/harness.package.json",
       "purpose": "Coordinate explicit named projects through canonical transversal state, structural sync, and bounded reflection.",
@@ -537,19 +547,24 @@
       },
       "immutableLinks": {
         "documentation": {
-          "status": "unpublished"
+          "status": "published",
+          "url": "https://github.com/fabianomag/agent-harnesses/blob/cross-project-v0.1.1/packages/cross-project/README.md"
         },
         "prompt": {
-          "status": "unpublished"
+          "status": "published",
+          "url": "https://github.com/fabianomag/agent-harnesses/releases/download/cross-project-v0.1.1/cross-project-0.1.1.zip"
         },
         "source": {
-          "status": "unpublished"
+          "status": "published",
+          "url": "https://github.com/fabianomag/agent-harnesses/tree/cross-project-v0.1.1/packages/cross-project"
         },
         "release": {
-          "status": "unpublished"
+          "status": "published",
+          "url": "https://github.com/fabianomag/agent-harnesses/releases/tag/cross-project-v0.1.1"
         },
         "interactiveDiagram": {
-          "status": "unpublished"
+          "status": "published",
+          "url": "https://fabianomag.vercel.app/artifacts/agent-harnesses"
         }
       },
       "evidence": {
@@ -582,7 +597,7 @@
       "files": [
         {
           "path": "README.md",
-          "sha256": "570b3f2c7000d211c126008bb546c7fca174d0d037d0db5ceb4dfe0330444940"
+          "sha256": "81f0af88d0a127faef963e53e9c5322a9937e350a1df8b411c1e31af7ccbaed2"
         },
         {
           "path": "SKILL.md",
@@ -617,7 +632,7 @@
       "license": "MIT",
       "artifactStatus": {
         "implementation": "implemented",
-        "publication": "unpublished"
+        "publication": "published"
       },
       "manifest": "packages/orchestration/harness.package.json",
       "purpose": "Operate a transactional local control plane with a strict registry, explicit lifecycle records, recovery, and structural sync.",
@@ -729,19 +744,24 @@
       },
       "immutableLinks": {
         "documentation": {
-          "status": "unpublished"
+          "status": "published",
+          "url": "https://github.com/fabianomag/agent-harnesses/blob/orchestration-v0.1.0/packages/orchestration/README.md"
         },
         "prompt": {
-          "status": "unpublished"
+          "status": "published",
+          "url": "https://github.com/fabianomag/agent-harnesses/releases/download/orchestration-v0.1.0/orchestration-0.1.0.zip"
         },
         "source": {
-          "status": "unpublished"
+          "status": "published",
+          "url": "https://github.com/fabianomag/agent-harnesses/tree/orchestration-v0.1.0/packages/orchestration"
         },
         "release": {
-          "status": "unpublished"
+          "status": "published",
+          "url": "https://github.com/fabianomag/agent-harnesses/releases/tag/orchestration-v0.1.0"
         },
         "interactiveDiagram": {
-          "status": "unpublished"
+          "status": "published",
+          "url": "https://fabianomag.vercel.app/artifacts/agent-harnesses"
         }
       },
       "evidence": {
@@ -775,7 +795,7 @@
       "files": [
         {
           "path": "README.md",
-          "sha256": "e2f601845c2dd4b783cebdaea3f2422931542f759725a557b81afbf430012d7e"
+          "sha256": "2905ca76d2f7e23b7a50183dfda6a100a94060718ce33b0dde187c2de9a75dee"
         },
         {
           "path": "SKILL.md",

@@ -7,13 +7,14 @@
     "version": "0.1.1",
     "artifactStatus": {
       "implementation": "implemented",
-      "publication": "unpublished"
+      "publication": "published"
     }
   },
   "source": {
     "catalog": "catalog/harnesses.json",
     "spec": "graphs/cross-project.graph.json",
-    "staticAsset": "assets/cross-project.svg"
+    "staticAsset": "assets/cross-project.svg",
+    "interactiveDiagram": "https://fabianomag.vercel.app/artifacts/agent-harnesses"
   },
   "purpose": "Coordinate explicit named projects through canonical transversal state, structural sync, and bounded reflection.",
   "meaning": "Package-specific conceptual flow. Edges show operating sequence, not package ranking or dependency.",

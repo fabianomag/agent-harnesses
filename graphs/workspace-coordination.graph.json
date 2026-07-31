@@ -7,13 +7,14 @@
     "version": "0.1.0",
     "artifactStatus": {
       "implementation": "implemented",
-      "publication": "unpublished"
+      "publication": "published"
     }
   },
   "source": {
     "catalog": "catalog/harnesses.json",
     "spec": "graphs/workspace-coordination.graph.json",
-    "staticAsset": "assets/workspace-coordination.svg"
+    "staticAsset": "assets/workspace-coordination.svg",
+    "interactiveDiagram": "https://fabianomag.vercel.app/artifacts/agent-harnesses"
   },
   "purpose": "Coordinate explicitly registered autonomous child folders inside one containing workspace while preserving child-local ownership.",
   "meaning": "Package-specific conceptual flow. Edges show operating sequence, not package ranking or dependency.",

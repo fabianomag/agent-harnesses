@@ -2,7 +2,7 @@
 
 - Package ID: `project-harness`
 - Version: `0.1.0`
-- Artifact status: implemented, unpublished
+- Artifact status: implemented, published
 - Runtime: Python 3.10 or newer, standard library only
 
 ## Purpose
@@ -191,21 +191,23 @@ package version and commit.
 
 ## Version and immutable links
 
-Version `0.1.0` is implemented locally and remains unpublished.
+Version `0.1.0` is published from the immutable
+`project-harness-v0.1.0` release tag.
 
-- Immutable documentation URL: unpublished; no URL exists.
-- Immutable install prompt: unpublished; no prompt is claimed.
-- Immutable source URL: unpublished; no URL exists.
-- Release URL: unpublished; no URL exists.
+- Immutable documentation URL: https://github.com/fabianomag/agent-harnesses/blob/project-harness-v0.1.0/packages/project-harness/README.md
+- Immutable install prompt: `Install this harness for me: https://github.com/fabianomag/agent-harnesses/releases/download/project-harness-v0.1.0/project-harness-0.1.0.zip`
+- Immutable source URL: https://github.com/fabianomag/agent-harnesses/tree/project-harness-v0.1.0/packages/project-harness
+- Release URL: https://github.com/fabianomag/agent-harnesses/releases/tag/project-harness-v0.1.0
+- Installation report: https://github.com/fabianomag/agent-harnesses/issues/new?template=installation-report.yml
 
-Do not substitute a mutable branch URL for any of these fields.
+Do not substitute a mutable branch URL for the version-bound fields.
 
 ## Diagrams
 
 - Graph ID: `project-harness-flow`
 - Source-tree spec: `graphs/project-harness.graph.json`
 - Source-tree static asset: `assets/project-harness.svg`
-- Interactive diagram: unpublished; no URL exists.
+- Interactive diagram: https://fabianomag.vercel.app/artifacts/agent-harnesses
 
 The static graph represents: skill trigger → initializer → local context → work
 cycle → finalizer → durable next.

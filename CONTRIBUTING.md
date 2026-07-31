@@ -41,9 +41,10 @@ badge evidence, limitations, graph IDs, and every graph diff. The collection
 graph expresses membership only. Each package graph expresses only its
 cataloged operating flow; do not turn complexity into a quality ranking.
 
-Immutable documentation, prompt, source, release, and interactive-diagram links
-remain structured as `unpublished` with no URL until an exact public release
-exists. Never substitute a mutable branch URL.
+Immutable documentation, prompt, source, and release links must name the exact
+published tag or release asset. The interactive-diagram link names the stable
+public collection page. Never substitute a mutable branch URL for a
+version-bound field.
 
 ## Required checks
 

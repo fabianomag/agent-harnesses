@@ -13,6 +13,7 @@
     .heading { fill: #111827; font: 600 18px ui-sans-serif, system-ui, sans-serif; }
     .step { fill: #111827; font: 600 15px ui-sans-serif, system-ui, sans-serif; }
     .meta { fill: #475569; font: 13px ui-monospace, SFMono-Regular, monospace; }
+    .link { fill: #1d4ed8; font: 600 13px ui-sans-serif, system-ui, sans-serif; text-decoration: underline; }
   </style>
   <text class="heading" x="40" y="38">Orchestration Harness conceptual flow</text>
   <text class="meta" x="40" y="66">orchestration · graph orchestration-flow</text>
@@ -64,5 +65,8 @@
       <tspan x="1360" dy="0">Verified sync</tspan>
     </text>
   </g>
-  <text class="meta" x="40" y="320">0.1.0 · implemented · unpublished</text>
+  <text class="meta" x="40" y="320">0.1.0 · implemented · published</text>
+  <a href="https://fabianomag.vercel.app/artifacts/agent-harnesses" aria-label="Open the interactive Orchestration Harness diagram">
+    <text class="link" x="40" y="345">Interactive diagram</text>
+  </a>
 </svg>

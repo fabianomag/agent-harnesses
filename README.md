@@ -11,15 +11,15 @@ choices, not maturity levels and not a quality ranking.
 ## Choose by boundary
 
 Complexity describes the operational surface, not which package is better.
-`implemented` means a package runtime exists in this source tree; it does not
-mean published, Codex-verified, release-supported, or proven on every platform.
+`implemented` means a package runtime exists in this source tree. Publication
+does not by itself mean Codex-verified or proven on every platform.
 
 | Package | Problem | Complexity | Use when | Do not use when | Main difference | Version | Docs | Interactive |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Project Harness (`project-harness`) | One project loses durable context between work blocks | Low to intermediate | One explicit project needs context, checkpoints, closeout, and a durable next action | Coordination must cross project roots | Smallest executable project-local lifecycle | `0.1.0` | [README](packages/project-harness/README.md) | Unpublished; no URL |
-| Workspace Coordination Harness (`workspace-coordination`) | A containing workspace needs a small map without copying child-local state | Intermediate | Autonomous child folders share one coordinator and governance boundary | Projects are independent roots, or one project is the whole scope | Coordinator index plus child-local ownership; single writer in `0.1.0` | `0.1.0` | [README](packages/workspace-coordination/README.md) | Unpublished; no URL |
-| Cross-Project Harness (`cross-project`) | Named independent projects need deterministic transversal state and handoffs | High | One selected root coordinates named fronts while implementation remains local | A contained child index is enough, or journaled Master recovery is required | Canonical cross-project manifest, structural sync, and bounded reflection | `0.1.1` | [README](packages/cross-project/README.md) | Unpublished; no URL |
-| Orchestration Harness (`orchestration`) | A local control plane needs registry consistency, validated mutations, and recovery | Advanced | A strict Master registry, explicit lifecycle, transactions, and recovery are justified | The goal is to dispatch agents, execute projects, or manage one simple project | Transactional control plane with journaled recovery; it does not call a model or execute projects | `0.1.0` | [README](packages/orchestration/README.md) | Unpublished; no URL |
+| Project Harness (`project-harness`) | One project loses durable context between work blocks | Low to intermediate | One explicit project needs context, checkpoints, closeout, and a durable next action | Coordination must cross project roots | Smallest executable project-local lifecycle | `0.1.0` | [README](packages/project-harness/README.md) | [Open](https://fabianomag.vercel.app/artifacts/agent-harnesses) |
+| Workspace Coordination Harness (`workspace-coordination`) | A containing workspace needs a small map without copying child-local state | Intermediate | Autonomous child folders share one coordinator and governance boundary | Projects are independent roots, or one project is the whole scope | Coordinator index plus child-local ownership; single writer in `0.1.0` | `0.1.0` | [README](packages/workspace-coordination/README.md) | [Open](https://fabianomag.vercel.app/artifacts/agent-harnesses) |
+| Cross-Project Harness (`cross-project`) | Named independent projects need deterministic transversal state and handoffs | High | One selected root coordinates named fronts while implementation remains local | A contained child index is enough, or journaled Master recovery is required | Canonical cross-project manifest, structural sync, and bounded reflection | `0.1.1` | [README](packages/cross-project/README.md) | [Open](https://fabianomag.vercel.app/artifacts/agent-harnesses) |
+| Orchestration Harness (`orchestration`) | A local control plane needs registry consistency, validated mutations, and recovery | Advanced | A strict Master registry, explicit lifecycle, transactions, and recovery are justified | The goal is to dispatch agents, execute projects, or manage one simple project | Transactional control plane with journaled recovery; it does not call a model or execute projects | `0.1.0` | [README](packages/orchestration/README.md) | [Open](https://fabianomag.vercel.app/artifacts/agent-harnesses) |
 
 ## Catalog, badges, and diagrams
 
@@ -40,7 +40,8 @@ Badges are evidence dimensions:
 Their exact levels are `absent`, `basic`, `partial`, `strong`, and `verified`.
 Levels describe evidence strength for one dimension, not overall package
 quality. `verified` requires repeatable evaluations of the exact published
-version. No local unpublished package claims that level.
+version. No package claims that level before its public walkthrough evidence
+is attached to the immutable release.
 
 Each package has a distinct generated graph spec and static SVG:
 
@@ -55,11 +56,32 @@ The optional [collection graph](graphs/harnesses.graph.json) and
 [collection SVG](assets/harnesses.svg) show membership only. They do not assert
 dependency, progression, or preference.
 
-The interactive experience, immutable documentation URLs, immutable install
-prompts, source URLs, and release URLs are all explicitly `unpublished`.
-No public URL is provided or implied before a versioned release exists.
+The [interactive experience](https://fabianomag.vercel.app/artifacts/agent-harnesses)
+and every version-bound documentation, install, source, and release URL are
+published explicitly in the catalog. Release tags and assets are protected by
+GitHub Immutable Releases; the interactive URL is the stable collection page.
 
-## Install one exact package
+## Install from one immutable URL
+
+Copy exactly one prompt. Each URL downloads a package-selected, self-contained
+release bundle with this source tree, the common installer/verifier, manifests,
+documentation, and the selected package's First use instructions.
+
+```text
+Install this harness for me: https://github.com/fabianomag/agent-harnesses/releases/download/project-harness-v0.1.0/project-harness-0.1.0.zip
+Install this harness for me: https://github.com/fabianomag/agent-harnesses/releases/download/workspace-coordination-v0.1.0/workspace-coordination-0.1.0.zip
+Install this harness for me: https://github.com/fabianomag/agent-harnesses/releases/download/cross-project-v0.1.1/cross-project-0.1.1.zip
+Install this harness for me: https://github.com/fabianomag/agent-harnesses/releases/download/orchestration-v0.1.0/orchestration-0.1.0.zip
+```
+
+The receiving agent must read [INSTALL_FROM_RELEASE.md](INSTALL_FROM_RELEASE.md),
+preview the exact no-overwrite installation, apply only after the preview,
+verify the installed bytes, and explain the selected package's First use.
+Release-page asset metadata and the adjacent `SHA256SUMS` asset carry the
+authoritative archive checksum; the checksum is deliberately outside the
+archive it authenticates.
+
+## Install one exact package from a source tree
 
 Python 3.10 or newer is required. Package implementations and common tools use
 only the Python standard library.

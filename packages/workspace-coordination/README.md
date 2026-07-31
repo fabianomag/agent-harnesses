@@ -2,7 +2,7 @@
 
 - Package ID: `workspace-coordination`
 - Version: `0.1.0`
-- Artifact status: implemented, unpublished
+- Artifact status: implemented, published
 - Runtime: Python 3.10 or newer, standard library only
 
 ## Purpose
@@ -194,21 +194,23 @@ package version and commit.
 
 ## Version and immutable links
 
-Version `0.1.0` is implemented locally and remains unpublished.
+Version `0.1.0` is published from the immutable
+`workspace-coordination-v0.1.0` release tag.
 
-- Immutable documentation URL: unpublished; no URL exists.
-- Immutable install prompt: unpublished; no prompt is claimed.
-- Immutable source URL: unpublished; no URL exists.
-- Release URL: unpublished; no URL exists.
+- Immutable documentation URL: https://github.com/fabianomag/agent-harnesses/blob/workspace-coordination-v0.1.0/packages/workspace-coordination/README.md
+- Immutable install prompt: `Install this harness for me: https://github.com/fabianomag/agent-harnesses/releases/download/workspace-coordination-v0.1.0/workspace-coordination-0.1.0.zip`
+- Immutable source URL: https://github.com/fabianomag/agent-harnesses/tree/workspace-coordination-v0.1.0/packages/workspace-coordination
+- Release URL: https://github.com/fabianomag/agent-harnesses/releases/tag/workspace-coordination-v0.1.0
+- Installation report: https://github.com/fabianomag/agent-harnesses/issues/new?template=installation-report.yml
 
-Do not substitute a mutable branch URL for any of these fields.
+Do not substitute a mutable branch URL for the version-bound fields.
 
 ## Diagrams
 
 - Graph ID: `workspace-coordination-flow`
 - Source-tree spec: `graphs/workspace-coordination.graph.json`
 - Source-tree static asset: `assets/workspace-coordination.svg`
-- Interactive diagram: unpublished; no URL exists.
+- Interactive diagram: https://fabianomag.vercel.app/artifacts/agent-harnesses
 
 The static graph represents: workspace coordinator → child index → shared
 boundary/governance → child-local owner → reflection.

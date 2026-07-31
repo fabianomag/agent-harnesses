@@ -33,6 +33,10 @@ GRAPH_ASSET_PATH = Path("assets/harnesses.svg")
 CATALOG_SCHEMA_REFERENCE = "../schemas/harness-catalog.schema.json"
 RECEIPT_NAME = ".harness-package-receipt.json"
 COMMON_LICENSE_NAME = "LICENSE"
+PUBLIC_REPOSITORY_URL = "https://github.com/fabianomag/agent-harnesses"
+INTERACTIVE_DIAGRAM_URL = (
+    "https://fabianomag.vercel.app/artifacts/agent-harnesses"
+)
 BADGE_NAMES = ("Context", "Skill", "Harness", "Loop", "Guardrails")
 BADGE_LEVELS = ("absent", "basic", "partial", "strong", "verified")
 SKILL_PATHS = {
@@ -1037,13 +1041,43 @@ def _graph_descriptor(package_id: str) -> dict[str, Any]:
     }
 
 
-def _unpublished_immutable_links() -> dict[str, dict[str, str]]:
+def _release_tag(package_id: str, version: str) -> str:
+    return f"{package_id}-v{version}"
+
+
+def _published_immutable_links(
+    package_id: str,
+    version: str,
+) -> dict[str, dict[str, str]]:
+    tag = _release_tag(package_id, version)
+    release_url = f"{PUBLIC_REPOSITORY_URL}/releases/tag/{tag}"
+    install_url = (
+        f"{PUBLIC_REPOSITORY_URL}/releases/download/{tag}/"
+        f"{package_id}-{version}.zip"
+    )
     return {
-        "documentation": {"status": "unpublished"},
-        "prompt": {"status": "unpublished"},
-        "source": {"status": "unpublished"},
-        "release": {"status": "unpublished"},
-        "interactiveDiagram": {"status": "unpublished"},
+        "documentation": {
+            "status": "published",
+            "url": (
+                f"{PUBLIC_REPOSITORY_URL}/blob/{tag}/packages/"
+                f"{package_id}/README.md"
+            ),
+        },
+        "prompt": {
+            "status": "published",
+            "url": install_url,
+        },
+        "source": {
+            "status": "published",
+            "url": (
+                f"{PUBLIC_REPOSITORY_URL}/tree/{tag}/packages/{package_id}"
+            ),
+        },
+        "release": {"status": "published", "url": release_url},
+        "interactiveDiagram": {
+            "status": "published",
+            "url": INTERACTIVE_DIAGRAM_URL,
+        },
     }
 
 
@@ -1156,7 +1190,7 @@ def expected_catalog(repository_root: Path) -> dict[str, Any]:
                 "license": manifest["license"],
                 "artifactStatus": {
                     "implementation": manifest["status"],
-                    "publication": "unpublished",
+                    "publication": "published",
                 },
                 "manifest": manifest_path.relative_to(repository_root).as_posix(),
                 "purpose": profile["purpose"],
@@ -1166,7 +1200,10 @@ def expected_catalog(repository_root: Path) -> dict[str, Any]:
                 "badges": profile["badges"],
                 "limitations": profile["limitations"],
                 "graph": _graph_descriptor(package_id),
-                "immutableLinks": _unpublished_immutable_links(),
+                "immutableLinks": _published_immutable_links(
+                    package_id,
+                    manifest["version"],
+                ),
                 "evidence": profile["evidence"],
                 "files": _file_inventory(package_root),
             }
@@ -1230,6 +1267,7 @@ def expected_graph_spec(catalog_value: dict[str, Any]) -> dict[str, Any]:
     return {
         "schemaVersion": 1,
         "source": CATALOG_PATH.as_posix(),
+        "interactiveDiagram": INTERACTIVE_DIAGRAM_URL,
         "meaning": "Collection membership only; no dependency or ranking.",
         "nodes": [
             {
@@ -1284,6 +1322,10 @@ def expected_graph_svg(catalog_value: dict[str, Any]) -> bytes:
             "    .meta { fill: #475569; font: 13px ui-monospace, "
             "SFMono-Regular, monospace; }"
         ),
+        (
+            "    .link { fill: #1d4ed8; font: 600 13px ui-sans-serif, "
+            "system-ui, sans-serif; text-decoration: underline; }"
+        ),
         "  </style>",
         (
             f'  <rect class="surface" x="{root_x}" y="{root_y}" '
@@ -1336,7 +1378,16 @@ def expected_graph_svg(catalog_value: dict[str, Any]) -> bytes:
             )
         )
 
-    lines.append("</svg>")
+    interactive_url = html.escape(INTERACTIVE_DIAGRAM_URL, quote=True)
+    lines.extend(
+        (
+            f'  <a href="{interactive_url}" aria-label="Open the interactive '
+            'Agent Harnesses diagram">',
+            '    <text class="link" x="40" y="545">Interactive diagram</text>',
+            "  </a>",
+            "</svg>",
+        )
+    )
     return ("\n".join(lines) + "\n").encode("utf-8")
 
 
@@ -1375,6 +1426,9 @@ def expected_package_graph_spec(entry: dict[str, Any]) -> dict[str, Any]:
             "catalog": CATALOG_PATH.as_posix(),
             "spec": graph["spec"],
             "staticAsset": graph["staticAsset"],
+            "interactiveDiagram": entry["immutableLinks"][
+                "interactiveDiagram"
+            ]["url"],
         },
         "purpose": entry["purpose"],
         "meaning": (
@@ -1466,6 +1520,10 @@ def expected_package_graph_svg(graph_spec: dict[str, Any]) -> bytes:
             "    .meta { fill: #475569; font: 13px ui-monospace, "
             "SFMono-Regular, monospace; }"
         ),
+        (
+            "    .link { fill: #1d4ed8; font: 600 13px ui-sans-serif, "
+            "system-ui, sans-serif; text-decoration: underline; }"
+        ),
         "  </style>",
         f'  <text class="heading" x="{margin}" y="38">{title}</text>',
         (
@@ -1513,9 +1571,18 @@ def expected_package_graph_svg(graph_spec: dict[str, Any]) -> bytes:
             )
         lines.extend(("    </text>", "  </g>"))
 
+    interactive_url = html.escape(
+        str(graph_spec["source"]["interactiveDiagram"]),
+        quote=True,
+    )
     lines.extend(
         (
             f'  <text class="meta" x="{margin}" y="320">{footer}</text>',
+            f'  <a href="{interactive_url}" aria-label="Open the interactive '
+            f'{html.escape(str(package["displayName"]), quote=True)} diagram">',
+            f'    <text class="link" x="{margin}" y="345">'
+            "Interactive diagram</text>",
+            "  </a>",
             "</svg>",
         )
     )
