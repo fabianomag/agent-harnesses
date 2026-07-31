@@ -325,6 +325,76 @@
         }
       }
     },
+    "publishedDocumentationLink": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/publishedLink"
+        },
+        {
+          "properties": {
+            "url": {
+              "pattern": "^https://github\\.com/fabianomag/agent-harnesses/blob/[a-z][a-z0-9-]*-v[0-9]+\\.[0-9]+\\.[0-9]+/packages/[a-z][a-z0-9-]*/README\\.md$"
+            }
+          }
+        }
+      ]
+    },
+    "publishedPromptLink": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/publishedLink"
+        },
+        {
+          "properties": {
+            "url": {
+              "pattern": "^https://github\\.com/fabianomag/agent-harnesses/releases/download/[a-z][a-z0-9-]*-v[0-9]+\\.[0-9]+\\.[0-9]+/[a-z][a-z0-9-]*-[0-9]+\\.[0-9]+\\.[0-9]+\\.zip$"
+            }
+          }
+        }
+      ]
+    },
+    "publishedSourceLink": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/publishedLink"
+        },
+        {
+          "properties": {
+            "url": {
+              "pattern": "^https://github\\.com/fabianomag/agent-harnesses/tree/[a-z][a-z0-9-]*-v[0-9]+\\.[0-9]+\\.[0-9]+/packages/[a-z][a-z0-9-]*$"
+            }
+          }
+        }
+      ]
+    },
+    "publishedReleaseLink": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/publishedLink"
+        },
+        {
+          "properties": {
+            "url": {
+              "pattern": "^https://github\\.com/fabianomag/agent-harnesses/releases/tag/[a-z][a-z0-9-]*-v[0-9]+\\.[0-9]+\\.[0-9]+$"
+            }
+          }
+        }
+      ]
+    },
+    "publishedInteractiveLink": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/publishedLink"
+        },
+        {
+          "properties": {
+            "url": {
+              "const": "https://fabianomag.vercel.app/artifacts/agent-harnesses"
+            }
+          }
+        }
+      ]
+    },
     "flowStep": {
       "type": "object",
       "additionalProperties": false,
@@ -587,19 +657,19 @@
           ],
           "properties": {
             "documentation": {
-              "$ref": "#/$defs/publishedLink"
+              "$ref": "#/$defs/publishedDocumentationLink"
             },
             "prompt": {
-              "$ref": "#/$defs/publishedLink"
+              "$ref": "#/$defs/publishedPromptLink"
             },
             "source": {
-              "$ref": "#/$defs/publishedLink"
+              "$ref": "#/$defs/publishedSourceLink"
             },
             "release": {
-              "$ref": "#/$defs/publishedLink"
+              "$ref": "#/$defs/publishedReleaseLink"
             },
             "interactiveDiagram": {
-              "$ref": "#/$defs/publishedLink"
+              "$ref": "#/$defs/publishedInteractiveLink"
             }
           }
         },
@@ -687,6 +757,48 @@
             "displayName": {
               "const": "Project Harness"
             },
+            "version": {
+              "const": "0.1.0"
+            },
+            "immutableLinks": {
+              "properties": {
+                "documentation": {
+                  "properties": {
+                    "url": {
+                      "const": "https://github.com/fabianomag/agent-harnesses/blob/project-harness-v0.1.0/packages/project-harness/README.md"
+                    }
+                  }
+                },
+                "prompt": {
+                  "properties": {
+                    "url": {
+                      "const": "https://github.com/fabianomag/agent-harnesses/releases/download/project-harness-v0.1.0/project-harness-0.1.0.zip"
+                    }
+                  }
+                },
+                "source": {
+                  "properties": {
+                    "url": {
+                      "const": "https://github.com/fabianomag/agent-harnesses/tree/project-harness-v0.1.0/packages/project-harness"
+                    }
+                  }
+                },
+                "release": {
+                  "properties": {
+                    "url": {
+                      "const": "https://github.com/fabianomag/agent-harnesses/releases/tag/project-harness-v0.1.0"
+                    }
+                  }
+                },
+                "interactiveDiagram": {
+                  "properties": {
+                    "url": {
+                      "const": "https://fabianomag.vercel.app/artifacts/agent-harnesses"
+                    }
+                  }
+                }
+              }
+            },
             "manifest": {
               "const": "packages/project-harness/harness.package.json"
             },
@@ -719,6 +831,48 @@
             },
             "displayName": {
               "const": "Workspace Coordination Harness"
+            },
+            "version": {
+              "const": "0.1.0"
+            },
+            "immutableLinks": {
+              "properties": {
+                "documentation": {
+                  "properties": {
+                    "url": {
+                      "const": "https://github.com/fabianomag/agent-harnesses/blob/workspace-coordination-v0.1.0/packages/workspace-coordination/README.md"
+                    }
+                  }
+                },
+                "prompt": {
+                  "properties": {
+                    "url": {
+                      "const": "https://github.com/fabianomag/agent-harnesses/releases/download/workspace-coordination-v0.1.0/workspace-coordination-0.1.0.zip"
+                    }
+                  }
+                },
+                "source": {
+                  "properties": {
+                    "url": {
+                      "const": "https://github.com/fabianomag/agent-harnesses/tree/workspace-coordination-v0.1.0/packages/workspace-coordination"
+                    }
+                  }
+                },
+                "release": {
+                  "properties": {
+                    "url": {
+                      "const": "https://github.com/fabianomag/agent-harnesses/releases/tag/workspace-coordination-v0.1.0"
+                    }
+                  }
+                },
+                "interactiveDiagram": {
+                  "properties": {
+                    "url": {
+                      "const": "https://fabianomag.vercel.app/artifacts/agent-harnesses"
+                    }
+                  }
+                }
+              }
             },
             "manifest": {
               "const": "packages/workspace-coordination/harness.package.json"
@@ -753,6 +907,48 @@
             "displayName": {
               "const": "Cross-Project Harness"
             },
+            "version": {
+              "const": "0.1.1"
+            },
+            "immutableLinks": {
+              "properties": {
+                "documentation": {
+                  "properties": {
+                    "url": {
+                      "const": "https://github.com/fabianomag/agent-harnesses/blob/cross-project-v0.1.1/packages/cross-project/README.md"
+                    }
+                  }
+                },
+                "prompt": {
+                  "properties": {
+                    "url": {
+                      "const": "https://github.com/fabianomag/agent-harnesses/releases/download/cross-project-v0.1.1/cross-project-0.1.1.zip"
+                    }
+                  }
+                },
+                "source": {
+                  "properties": {
+                    "url": {
+                      "const": "https://github.com/fabianomag/agent-harnesses/tree/cross-project-v0.1.1/packages/cross-project"
+                    }
+                  }
+                },
+                "release": {
+                  "properties": {
+                    "url": {
+                      "const": "https://github.com/fabianomag/agent-harnesses/releases/tag/cross-project-v0.1.1"
+                    }
+                  }
+                },
+                "interactiveDiagram": {
+                  "properties": {
+                    "url": {
+                      "const": "https://fabianomag.vercel.app/artifacts/agent-harnesses"
+                    }
+                  }
+                }
+              }
+            },
             "manifest": {
               "const": "packages/cross-project/harness.package.json"
             },
@@ -785,6 +981,48 @@
             },
             "displayName": {
               "const": "Orchestration Harness"
+            },
+            "version": {
+              "const": "0.1.0"
+            },
+            "immutableLinks": {
+              "properties": {
+                "documentation": {
+                  "properties": {
+                    "url": {
+                      "const": "https://github.com/fabianomag/agent-harnesses/blob/orchestration-v0.1.0/packages/orchestration/README.md"
+                    }
+                  }
+                },
+                "prompt": {
+                  "properties": {
+                    "url": {
+                      "const": "https://github.com/fabianomag/agent-harnesses/releases/download/orchestration-v0.1.0/orchestration-0.1.0.zip"
+                    }
+                  }
+                },
+                "source": {
+                  "properties": {
+                    "url": {
+                      "const": "https://github.com/fabianomag/agent-harnesses/tree/orchestration-v0.1.0/packages/orchestration"
+                    }
+                  }
+                },
+                "release": {
+                  "properties": {
+                    "url": {
+                      "const": "https://github.com/fabianomag/agent-harnesses/releases/tag/orchestration-v0.1.0"
+                    }
+                  }
+                },
+                "interactiveDiagram": {
+                  "properties": {
+                    "url": {
+                      "const": "https://fabianomag.vercel.app/artifacts/agent-harnesses"
+                    }
+                  }
+                }
+              }
             },
             "manifest": {
               "const": "packages/orchestration/harness.package.json"

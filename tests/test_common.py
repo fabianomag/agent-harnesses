@@ -254,14 +254,53 @@ class CatalogIntegrationTests(unittest.TestCase):
             {issue.code for issue in wrong_order_issues},
         )
 
-        invented_url = json.loads(json.dumps(checked))
-        invented_url["packages"][0]["immutableLinks"]["prompt"]["url"] = "synthetic"
-        url_issues = validate.validate_schema_instance(
-            invented_url,
+        mutable_urls = {
+            "documentation": (
+                "https://github.com/fabianomag/agent-harnesses/blob/main/"
+                "packages/project-harness/README.md"
+            ),
+            "prompt": (
+                "https://github.com/fabianomag/agent-harnesses/releases/"
+                "latest/download/project-harness-0.1.0.zip"
+            ),
+            "source": (
+                "https://github.com/fabianomag/agent-harnesses/tree/main/"
+                "packages/project-harness"
+            ),
+            "release": (
+                "https://github.com/fabianomag/agent-harnesses/releases/latest"
+            ),
+            "interactiveDiagram": "https://example.invalid/latest",
+        }
+        for link_name, mutable_url in mutable_urls.items():
+            with self.subTest(link_name=link_name):
+                mutant = json.loads(json.dumps(checked))
+                mutant["packages"][0]["immutableLinks"][link_name][
+                    "url"
+                ] = mutable_url
+                url_issues = validate.validate_schema_instance(
+                    mutant,
+                    schema,
+                    artifact="synthetic-catalog.json",
+                )
+                self.assertTrue(
+                    {"SCHEMA_PATTERN", "SCHEMA_CONST"}
+                    & {issue.code for issue in url_issues},
+                )
+
+        mismatched = json.loads(json.dumps(checked))
+        mismatched["packages"][0]["immutableLinks"]["prompt"]["url"] = (
+            checked["packages"][1]["immutableLinks"]["prompt"]["url"]
+        )
+        mismatch_issues = validate.validate_schema_instance(
+            mismatched,
             schema,
             artifact="synthetic-catalog.json",
         )
-        self.assertIn("SCHEMA_PATTERN", {issue.code for issue in url_issues})
+        self.assertIn(
+            "SCHEMA_CONST",
+            {issue.code for issue in mismatch_issues},
+        )
 
     def test_generated_graph_expresses_membership_without_package_edges(self) -> None:
         graph = json.loads(
