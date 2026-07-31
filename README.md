@@ -205,14 +205,13 @@ Continue with the documented focus, digest, record, and closeout commands.
 
 ## Agent compatibility
 
-Codex is compatible with the packaged Skill and CLI contracts. Its manual
-verification remains pending until repeatable walkthrough evidence is bound to
-the exact public package version and commit.
+Codex is compatible with the packaged Skill and CLI contracts. Fresh manual
+walkthrough evidence is bound to each exact release bundle and candidate commit
+in that release's immutable `manual-codex-evidence.json` asset.
 
 Other agent environments are compatible at the explicit CLI and Markdown
-contract boundary, but their agent-specific integrations are unverified. Only
-Codex manual evidence can support a future `verified` agent claim in this
-catalog; no current package makes that claim.
+contract boundary, but their agent-specific integrations are unverified. The
+Codex verification claim does not extend to those other environments.
 
 ## Local verification
 

@@ -185,8 +185,9 @@ catchable later failure.
   repeatable package tests over synthetic two-child fixtures.
 - **Structural — defined:** common installed-copy and repository validation
   procedures are present; this README does not self-attest a result.
-- **Manual Codex — pending:** the next candidate requires a fresh Workspace
-  Coordination walkthrough. Earlier walkthrough results are not inherited.
+- **Manual Codex — verified:** a fresh Workspace Coordination walkthrough
+  passed for this exact release bundle and candidate. The immutable evidence
+  is [published with the release](https://github.com/fabianomag/agent-harnesses/releases/download/workspace-coordination-v0.1.0/manual-codex-evidence.json).
 
 The local runner does not execute manual evidence. Publishable results must
 come from a release manifest or evidence asset bound to the exact published

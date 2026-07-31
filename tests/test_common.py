@@ -127,7 +127,7 @@ class CatalogIntegrationTests(unittest.TestCase):
         self.assertFalse(checked["evolutionModel"]["ranking"])
         compatibility = checked["agentCompatibility"]
         self.assertEqual("compatible", compatibility["codex"]["status"])
-        self.assertEqual("pending", compatibility["codex"]["verification"])
+        self.assertEqual("verified", compatibility["codex"]["verification"])
         self.assertTrue(compatibility["codex"]["verifiedEligible"])
         self.assertEqual(
             "compatible",
@@ -178,11 +178,20 @@ class CatalogIntegrationTests(unittest.TestCase):
                 ),
             )
             self.assertEqual(
-                ("manual-codex", "pending"),
+                ("manual-codex", "verified"),
                 (
                     entry["evidence"]["manualCodex"]["method"],
                     entry["evidence"]["manualCodex"]["status"],
                 ),
+            )
+            manual_publication = entry["evidence"]["manualCodex"][
+                "publication"
+            ]
+            self.assertEqual("published", manual_publication["status"])
+            self.assertTrue(
+                manual_publication["url"].endswith(
+                    "manual-codex-evidence.json"
+                )
             )
 
     def test_published_links_are_complete_https_urls(self) -> None:
@@ -300,6 +309,23 @@ class CatalogIntegrationTests(unittest.TestCase):
         self.assertIn(
             "SCHEMA_CONST",
             {issue.code for issue in mismatch_issues},
+        )
+
+        mutable_evidence = json.loads(json.dumps(checked))
+        mutable_evidence["packages"][0]["evidence"]["manualCodex"][
+            "publication"
+        ]["url"] = (
+            "https://github.com/fabianomag/agent-harnesses/releases/latest/"
+            "download/manual-codex-evidence.json"
+        )
+        evidence_issues = validate.validate_schema_instance(
+            mutable_evidence,
+            schema,
+            artifact="synthetic-catalog.json",
+        )
+        self.assertTrue(
+            {"SCHEMA_PATTERN", "SCHEMA_CONST"}
+            & {issue.code for issue in evidence_issues},
         )
 
     def test_generated_graph_expresses_membership_without_package_edges(self) -> None:
@@ -570,7 +596,7 @@ class CatalogIntegrationTests(unittest.TestCase):
             ).read_text(encoding="utf-8")
             for section in required_sections:
                 self.assertIn(section, readme, f"{package_id}: {section}")
-            self.assertIn("Manual Codex — pending", readme)
+            self.assertIn("Manual Codex — verified", readme)
             self.assertIn(catalog.INTERACTIVE_DIAGRAM_URL, readme)
             self.assertIn("Install this harness for me: https://", readme)
 

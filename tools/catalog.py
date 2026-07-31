@@ -1081,6 +1081,30 @@ def _published_immutable_links(
     }
 
 
+def _published_manual_evidence(
+    package_id: str,
+    version: str,
+    evidence: dict[str, Any],
+) -> dict[str, Any]:
+    published = copy.deepcopy(evidence)
+    tag = _release_tag(package_id, version)
+    manual = published["manualCodex"]
+    manual["status"] = "verified"
+    manual["description"] = (
+        "A fresh Codex walkthrough passed against the exact release bundle; "
+        "the immutable evidence asset binds the candidate commit, archive "
+        "digest, installation cycle, and First use result."
+    )
+    manual["publication"] = {
+        "status": "published",
+        "url": (
+            f"{PUBLIC_REPOSITORY_URL}/releases/download/{tag}/"
+            "manual-codex-evidence.json"
+        ),
+    }
+    return published
+
+
 def _agent_compatibility() -> dict[str, Any]:
     return {
         "description": (
@@ -1089,12 +1113,12 @@ def _agent_compatibility() -> dict[str, Any]:
         ),
         "codex": {
             "status": "compatible",
-            "verification": "pending",
+            "verification": "verified",
             "verifiedEligible": True,
             "scope": (
                 "Packaged Codex Skills plus explicit CLI and Markdown "
-                "contracts; exact published-version walkthrough evidence is "
-                "pending."
+                "contracts; fresh walkthrough evidence is bound to every "
+                "exact immutable release bundle."
             ),
         },
         "otherAgents": {
@@ -1204,7 +1228,11 @@ def expected_catalog(repository_root: Path) -> dict[str, Any]:
                     package_id,
                     manifest["version"],
                 ),
-                "evidence": profile["evidence"],
+                "evidence": _published_manual_evidence(
+                    package_id,
+                    manifest["version"],
+                    profile["evidence"],
+                ),
                 "files": _file_inventory(package_root),
             }
         )

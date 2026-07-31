@@ -198,8 +198,9 @@ python3 -B hq.py --root <workspace> --json repair-panel --apply
 - **Structural — defined:** `scripts/verify_package.py` and
   `scripts/structural_check.py` provide repeatable package and isolated-cycle
   checks.
-- **Manual Codex — pending:** the next candidate requires a fresh Orchestration
-  walkthrough. Earlier walkthrough results are not inherited.
+- **Manual Codex — verified:** a fresh Orchestration walkthrough passed for
+  this exact release bundle and candidate. The immutable evidence is
+  [published with the release](https://github.com/fabianomag/agent-harnesses/releases/download/orchestration-v0.1.0/manual-codex-evidence.json).
 
 The local runner does not execute manual evidence. Publishable results must
 come from a release manifest or evidence asset bound to the exact published

@@ -165,9 +165,9 @@ The package intentionally has no automatic crash-recovery command.
   snapshots, physical-path acceptance, and the reflection lifecycle.
 - **Structural — defined:** common installed-copy and repository validation
   procedures are present; this README does not self-attest a result.
-- **Manual Codex — pending:** `tests/manual_walkthrough.sh` is a procedure, not
-  proof of execution. The next candidate requires a fresh Cross-Project
-  walkthrough.
+- **Manual Codex — verified:** a fresh Cross-Project walkthrough passed for
+  this exact release bundle and candidate. The immutable evidence is
+  [published with the release](https://github.com/fabianomag/agent-harnesses/releases/download/cross-project-v0.1.1/manual-codex-evidence.json).
 
 The local runner does not execute manual evidence. Publishable results must
 come from a release manifest or evidence asset bound to the exact published

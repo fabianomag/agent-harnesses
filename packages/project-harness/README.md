@@ -182,8 +182,9 @@ A process or machine stop cannot make a multi-file batch globally atomic:
   package tests. This README does not self-attest a candidate-bound result.
 - **Structural — defined:** `tests/validate_generated_fixture.py` checks an
   isolated generated project.
-- **Manual Codex — pending:** the next candidate requires a fresh Project
-  Harness walkthrough. Earlier walkthrough results are not inherited.
+- **Manual Codex — verified:** a fresh Project Harness walkthrough passed for
+  this exact release bundle and candidate. The immutable evidence is
+  [published with the release](https://github.com/fabianomag/agent-harnesses/releases/download/project-harness-v0.1.0/manual-codex-evidence.json).
 
 The local runner does not execute manual evidence. Publishable results must
 come from a release manifest or evidence asset bound to the exact published

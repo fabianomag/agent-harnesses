@@ -28,9 +28,9 @@
     "description": "Agent compatibility is separate from package capability badges and from published-version verification.",
     "codex": {
       "status": "compatible",
-      "verification": "pending",
+      "verification": "verified",
       "verifiedEligible": true,
-      "scope": "Packaged Codex Skills plus explicit CLI and Markdown contracts; exact published-version walkthrough evidence is pending."
+      "scope": "Packaged Codex Skills plus explicit CLI and Markdown contracts; fresh walkthrough evidence is bound to every exact immutable release bundle."
     },
     "otherAgents": {
       "status": "compatible",
@@ -198,17 +198,21 @@
         },
         "manualCodex": {
           "method": "manual-codex",
-          "status": "pending",
+          "status": "verified",
           "references": [
             "packages/project-harness/README.md"
           ],
-          "description": "A fresh Project Harness walkthrough must be executed against the next candidate; no manual result is claimed here."
+          "description": "A fresh Codex walkthrough passed against the exact release bundle; the immutable evidence asset binds the candidate commit, archive digest, installation cycle, and First use result.",
+          "publication": {
+            "status": "published",
+            "url": "https://github.com/fabianomag/agent-harnesses/releases/download/project-harness-v0.1.0/manual-codex-evidence.json"
+          }
         }
       },
       "files": [
         {
           "path": "README.md",
-          "sha256": "c094d6b0349579d0265afd9bc7cd53bf11f1fbbd591647bd9b089dcc7ae11995"
+          "sha256": "754a1d7472a7c742f7375daebfa71f8d10f00620d61feea0190496b1d45d271c"
         },
         {
           "path": "harness.package.json",
@@ -386,17 +390,21 @@
         },
         "manualCodex": {
           "method": "manual-codex",
-          "status": "pending",
+          "status": "verified",
           "references": [
             "packages/workspace-coordination/README.md"
           ],
-          "description": "A fresh Workspace Coordination walkthrough must be executed against the next candidate; no manual result is claimed here."
+          "description": "A fresh Codex walkthrough passed against the exact release bundle; the immutable evidence asset binds the candidate commit, archive digest, installation cycle, and First use result.",
+          "publication": {
+            "status": "published",
+            "url": "https://github.com/fabianomag/agent-harnesses/releases/download/workspace-coordination-v0.1.0/manual-codex-evidence.json"
+          }
         }
       },
       "files": [
         {
           "path": "README.md",
-          "sha256": "a7db36b7a7c40279408e68bd3519cee4e304ae3206d5dfccc5dd86a6f0bb2932"
+          "sha256": "617eb0c787544f9fd36eee56c6fc46cca2310fc473eaeb2895167e2a6b98242f"
         },
         {
           "path": "SKILL.md",
@@ -587,17 +595,21 @@
         },
         "manualCodex": {
           "method": "manual-codex",
-          "status": "pending",
+          "status": "verified",
           "references": [
             "packages/cross-project/tests/manual_walkthrough.sh"
           ],
-          "description": "A fresh Cross-Project walkthrough must be executed against the next candidate; the procedure is not evidence of execution."
+          "description": "A fresh Codex walkthrough passed against the exact release bundle; the immutable evidence asset binds the candidate commit, archive digest, installation cycle, and First use result.",
+          "publication": {
+            "status": "published",
+            "url": "https://github.com/fabianomag/agent-harnesses/releases/download/cross-project-v0.1.1/manual-codex-evidence.json"
+          }
         }
       },
       "files": [
         {
           "path": "README.md",
-          "sha256": "81f0af88d0a127faef963e53e9c5322a9937e350a1df8b411c1e31af7ccbaed2"
+          "sha256": "d9651a4dfde882f1fbb05d6d5050e6617cefb4107c71f9582652f02c27041d76"
         },
         {
           "path": "SKILL.md",
@@ -785,17 +797,21 @@
         },
         "manualCodex": {
           "method": "manual-codex",
-          "status": "pending",
+          "status": "verified",
           "references": [
             "packages/orchestration/README.md"
           ],
-          "description": "A fresh Orchestration walkthrough must be executed against the next candidate; no manual result is claimed here."
+          "description": "A fresh Codex walkthrough passed against the exact release bundle; the immutable evidence asset binds the candidate commit, archive digest, installation cycle, and First use result.",
+          "publication": {
+            "status": "published",
+            "url": "https://github.com/fabianomag/agent-harnesses/releases/download/orchestration-v0.1.0/manual-codex-evidence.json"
+          }
         }
       },
       "files": [
         {
           "path": "README.md",
-          "sha256": "2905ca76d2f7e23b7a50183dfda6a100a94060718ce33b0dde187c2de9a75dee"
+          "sha256": "688dad4806e5f7e81a8a666b84b25ce21a286154ffc107cce983353a789c16bf"
         },
         {
           "path": "SKILL.md",

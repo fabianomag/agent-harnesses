@@ -290,7 +290,8 @@
           "type": "string",
           "enum": [
             "defined",
-            "pending"
+            "pending",
+            "verified"
           ]
         },
         "references": {
@@ -304,6 +305,9 @@
         "description": {
           "type": "string",
           "minLength": 1
+        },
+        "publication": {
+          "$ref": "#/$defs/publishedEvidenceLink"
         }
       }
     },
@@ -334,6 +338,20 @@
           "properties": {
             "url": {
               "pattern": "^https://github\\.com/fabianomag/agent-harnesses/blob/[a-z][a-z0-9-]*-v[0-9]+\\.[0-9]+\\.[0-9]+/packages/[a-z][a-z0-9-]*/README\\.md$"
+            }
+          }
+        }
+      ]
+    },
+    "publishedEvidenceLink": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/publishedLink"
+        },
+        {
+          "properties": {
+            "url": {
+              "pattern": "^https://github\\.com/fabianomag/agent-harnesses/releases/download/[a-z][a-z0-9-]*-v[0-9]+\\.[0-9]+\\.[0-9]+/manual-codex-evidence\\.json$"
             }
           }
         }
@@ -722,12 +740,15 @@
                   "$ref": "#/$defs/evidenceMethod"
                 },
                 {
+                  "required": [
+                    "publication"
+                  ],
                   "properties": {
                     "method": {
                       "const": "manual-codex"
                     },
                     "status": {
-                      "const": "pending"
+                      "const": "verified"
                     }
                   }
                 }
@@ -794,6 +815,21 @@
                   "properties": {
                     "url": {
                       "const": "https://fabianomag.vercel.app/artifacts/agent-harnesses"
+                    }
+                  }
+                }
+              }
+            },
+            "evidence": {
+              "properties": {
+                "manualCodex": {
+                  "properties": {
+                    "publication": {
+                      "properties": {
+                        "url": {
+                          "const": "https://github.com/fabianomag/agent-harnesses/releases/download/project-harness-v0.1.0/manual-codex-evidence.json"
+                        }
+                      }
                     }
                   }
                 }
@@ -874,6 +910,21 @@
                 }
               }
             },
+            "evidence": {
+              "properties": {
+                "manualCodex": {
+                  "properties": {
+                    "publication": {
+                      "properties": {
+                        "url": {
+                          "const": "https://github.com/fabianomag/agent-harnesses/releases/download/workspace-coordination-v0.1.0/manual-codex-evidence.json"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
             "manifest": {
               "const": "packages/workspace-coordination/harness.package.json"
             },
@@ -949,6 +1000,21 @@
                 }
               }
             },
+            "evidence": {
+              "properties": {
+                "manualCodex": {
+                  "properties": {
+                    "publication": {
+                      "properties": {
+                        "url": {
+                          "const": "https://github.com/fabianomag/agent-harnesses/releases/download/cross-project-v0.1.1/manual-codex-evidence.json"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
             "manifest": {
               "const": "packages/cross-project/harness.package.json"
             },
@@ -1019,6 +1085,21 @@
                   "properties": {
                     "url": {
                       "const": "https://fabianomag.vercel.app/artifacts/agent-harnesses"
+                    }
+                  }
+                }
+              }
+            },
+            "evidence": {
+              "properties": {
+                "manualCodex": {
+                  "properties": {
+                    "publication": {
+                      "properties": {
+                        "url": {
+                          "const": "https://github.com/fabianomag/agent-harnesses/releases/download/orchestration-v0.1.0/manual-codex-evidence.json"
+                        }
+                      }
                     }
                   }
                 }
