@@ -77,5 +77,18 @@ Optional private deny patterns must come from a file outside the repository.
 The file, its patterns, and matching content must never be echoed, copied into
 fixtures, or committed.
 
+## Optional installation reports
+
+An installation report is always user-reviewed and manually submitted. Start
+with the copyable draft prompt in the root README; no repository tool opens,
+transmits, creates, or submits an issue. The Installation Report Issue Form is
+only a fallback after review.
+
+Keep reports minimal and synthetic. Include only the exact package ID and
+version, phase, result, OS family, Python major.minor, and a short synthetic
+summary. Never include secrets, credentials, tokens, private identifiers,
+private or absolute local paths, full logs, or sensitive attachments. Do not
+use an installation report for a vulnerability.
+
 Remote changes, tags, releases, deployments, and publication require separate
 authorization.

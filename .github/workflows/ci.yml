@@ -1,0 +1,90 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+env:
+  PYTHONNOUSERSITE: "1"
+  PYTHONDONTWRITEBYTECODE: "1"
+  PYTHONUTF8: "1"
+
+jobs:
+  common:
+    name: Common / ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+          - windows-latest
+    steps:
+      - name: Preserve LF checkout bytes
+        run: git config --global core.autocrlf false
+      - name: Check out repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: "3.10"
+      - name: Check deterministic common artifacts
+        run: python -B tools/build_common.py --check
+      - name: Validate public repository contracts
+        run: python -B tools/validate.py
+      - name: Run common unit and integration tests
+        run: python -B -m unittest discover -s tests -v
+      - name: Check whitespace
+        run: git diff --check
+
+  packages:
+    name: Package / ${{ matrix.package }} / ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+          - windows-latest
+        package:
+          - project-harness
+          - workspace-coordination
+          - cross-project
+          - orchestration
+    steps:
+      - name: Preserve LF checkout bytes
+        run: git config --global core.autocrlf false
+      - name: Check out repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: "3.10"
+      - name: Test Project Harness
+        if: matrix.package == 'project-harness'
+        run: |
+          python -B -m unittest discover -s packages/project-harness/tests -v
+          python -B packages/project-harness/tests/validate_generated_fixture.py
+      - name: Test Workspace Coordination Harness
+        if: matrix.package == 'workspace-coordination'
+        run: python -B -m unittest discover -s packages/workspace-coordination/tests -v
+      - name: Test Cross-Project Harness
+        if: matrix.package == 'cross-project'
+        run: python -B packages/cross-project/tests/test_cross_project.py
+      - name: Test Orchestration Harness
+        if: matrix.package == 'orchestration'
+        run: |
+          python -B -m unittest discover -s packages/orchestration/tests -v
+          python -B packages/orchestration/scripts/verify_package.py
+          python -B packages/orchestration/scripts/structural_check.py

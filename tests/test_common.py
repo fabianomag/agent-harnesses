@@ -512,6 +512,54 @@ class CatalogIntegrationTests(unittest.TestCase):
             )
             self.assertIn("Immutable install prompt: unpublished", readme)
 
+        self.assertIn("## Agent compatibility", root_readme)
+        self.assertIn("Codex", root_readme)
+        self.assertIn("integrations are unverified", root_readme)
+        self.assertIn("## Optional installation report", root_readme)
+        self.assertLess(
+            root_readme.index("Draft a short installation report"),
+            root_readme.index("Installation Report Issue Form"),
+        )
+        self.assertIn("Do not create or submit an issue", root_readme)
+        for forbidden_content in (
+            "secrets",
+            "private or absolute local paths",
+            "full logs",
+        ):
+            self.assertIn(forbidden_content, root_readme)
+
+        issue_form = (
+            REPOSITORY_ROOT
+            / ".github"
+            / "ISSUE_TEMPLATE"
+            / "installation-report.yml"
+        ).read_text(encoding="utf-8")
+        for package_id in catalog.PACKAGE_ORDER:
+            self.assertIn(f"- {package_id}", issue_form)
+        for safe_phrase in (
+            "private identifiers",
+            "private paths and absolute local paths",
+            "full logs",
+            "synthetic, minimal reproduction details",
+        ):
+            self.assertIn(safe_phrase, issue_form)
+
+        workflow = (
+            REPOSITORY_ROOT / ".github" / "workflows" / "ci.yml"
+        ).read_text(encoding="utf-8")
+        for os_label in ("ubuntu-latest", "macos-latest", "windows-latest"):
+            self.assertIn(f"- {os_label}", workflow)
+        for package_id in catalog.PACKAGE_ORDER:
+            self.assertIn(f"- {package_id}", workflow)
+        self.assertNotIn("continue-on-error", workflow)
+        self.assertNotIn("manual_walkthrough", workflow)
+        self.assertIn("persist-credentials: false", workflow)
+
+        attributes = (REPOSITORY_ROOT / ".gitattributes").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("* text=auto eol=lf", attributes)
+
     def test_security_policy_matches_common_installer_contract(self) -> None:
         policy = (REPOSITORY_ROOT / "SECURITY.md").read_text(encoding="utf-8")
         local_heading = "## Local safety boundary"
@@ -554,6 +602,15 @@ class CatalogIntegrationTests(unittest.TestCase):
         )
         for claim in obsolete_claims:
             self.assertNotIn(claim, normalized)
+
+        reporting = " ".join(policy.split("## Reporting", maxsplit=1)[1].split())
+        self.assertIn("private vulnerability reporting", reporting)
+        self.assertIn("before any tag or release", reporting)
+        self.assertIn("Report a vulnerability", reporting)
+        self.assertIn(
+            "Installation Report Issue Form is not a security channel",
+            reporting,
+        )
 
     def test_root_readme_matches_common_installer_attempt_states(self) -> None:
         readme = (REPOSITORY_ROOT / "README.md").read_text(encoding="utf-8")

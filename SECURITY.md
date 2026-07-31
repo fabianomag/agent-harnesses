@@ -53,8 +53,14 @@ They never print the external input path, pattern, match, or source excerpt.
 
 ## Reporting
 
-No private reporting address is published yet. Do not place a credential,
-private identifier, deny pattern, private path, or sensitive reproduction in a
-public issue. A public report is appropriate only when it can be reproduced
-entirely with synthetic data and contains no sensitive content. A private
-reporting route must be documented before the first release.
+GitHub private vulnerability reporting is a pre-publication gate. It cannot be
+enabled while this repository remains private; it will be enabled immediately
+after the repository becomes public and before any tag or release is created.
+Once the repository Security > Advisories page shows **Report a
+vulnerability**, use that form for a private report.
+
+Until that private form is available, do not submit sensitive vulnerability
+details. Never place a credential, token, private identifier, deny pattern,
+private or absolute local path, full log, or sensitive reproduction in a public
+issue. The Installation Report Issue Form is not a security channel. A public
+issue is appropriate only for a fully synthetic, non-sensitive reproduction.

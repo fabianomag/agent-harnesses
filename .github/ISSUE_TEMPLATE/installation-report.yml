@@ -1,0 +1,86 @@
+name: Installation Report
+description: Share a minimal synthetic result after reviewing it locally.
+title: "[installation report] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This optional form is for a short installation result, not a security report or a support dump. Review every field before submitting. Never include secrets, tokens, private identifiers, private or absolute local paths, full logs, or attachments containing sensitive data.
+  - type: dropdown
+    id: package
+    attributes:
+      label: Package ID
+      options:
+        - project-harness
+        - workspace-coordination
+        - cross-project
+        - orchestration
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Exact package version
+      placeholder: 0.1.0
+    validations:
+      required: true
+  - type: dropdown
+    id: phase
+    attributes:
+      label: Phase
+      options:
+        - dry-run
+        - install
+        - verify
+        - first-use
+    validations:
+      required: true
+  - type: dropdown
+    id: result
+    attributes:
+      label: Result
+      options:
+        - succeeded
+        - failed safely
+        - unclear
+    validations:
+      required: true
+  - type: dropdown
+    id: os
+    attributes:
+      label: OS family
+      options:
+        - Linux
+        - macOS
+        - Windows
+        - Other or undisclosed
+    validations:
+      required: true
+  - type: input
+    id: python
+    attributes:
+      label: Python major.minor
+      placeholder: "3.10"
+    validations:
+      required: true
+  - type: textarea
+    id: summary
+    attributes:
+      label: Short synthetic summary
+      description: Describe only the bounded result and a synthetic error category if needed.
+      placeholder: The exact dry-run completed with zero writes.
+    validations:
+      required: true
+  - type: checkboxes
+    id: safe-content
+    attributes:
+      label: Safety review
+      options:
+        - label: I removed secrets, credentials, tokens, and private identifiers.
+          required: true
+        - label: I removed private paths and absolute local paths.
+          required: true
+        - label: I am not submitting full logs or sensitive attachments.
+          required: true
+        - label: This report uses only synthetic, minimal reproduction details.
+          required: true

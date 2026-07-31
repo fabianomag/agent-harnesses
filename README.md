@@ -181,6 +181,17 @@ python3 -B local-harness-packages/orchestration-0.1.0/hq.py --root example-orche
 
 Continue with the documented focus, digest, record, and closeout commands.
 
+## Agent compatibility
+
+Codex is compatible with the packaged Skill and CLI contracts. Its manual
+verification remains pending until repeatable walkthrough evidence is bound to
+the exact public package version and commit.
+
+Other agent environments are compatible at the explicit CLI and Markdown
+contract boundary, but their agent-specific integrations are unverified. Only
+Codex manual evidence can support a future `verified` agent claim in this
+catalog; no current package makes that claim.
+
 ## Local verification
 
 Run the complete automated and structural integration suite:
@@ -201,5 +212,27 @@ python3 -B tools/validate.py --private-pattern-file OUTSIDE_REPOSITORY
 
 The validator reports generic codes and locations. It never prints the
 external patterns, matching content, source excerpts, or external input path.
+
+## Optional installation report
+
+First, copy this prompt into your local agent session. It asks for a draft only:
+
+```text
+Draft a short installation report for my review. Do not create or submit an issue.
+Package ID: <one exact catalog ID>
+Package version: <exact version>
+Phase: <dry-run | install | verify | first-use>
+Result: <succeeded | failed safely | unclear>
+OS family: <Linux | macOS | Windows | other or undisclosed>
+Python: <major.minor>
+Synthetic summary: <one bounded sentence>
+Exclude secrets, credentials, tokens, private identifiers, private or absolute local paths, full logs, and sensitive attachments.
+```
+
+Review and edit the draft yourself. No repository tool opens, transmits,
+creates, or submits a report. If you then choose to share it, use the
+[Installation Report Issue Form](.github/ISSUE_TEMPLATE/installation-report.yml)
+as a fallback. It is not a security channel. Report vulnerabilities only
+through the private route described in [SECURITY.md](SECURITY.md).
 
 Copyright is held by Fabiano Magalhães. See [LICENSE](LICENSE).
