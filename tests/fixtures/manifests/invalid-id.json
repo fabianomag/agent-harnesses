@@ -1,0 +1,10 @@
+{
+  "$schema": "../../schemas/harness-package.schema.json",
+  "schemaVersion": 1,
+  "id": "Synthetic Harness",
+  "displayName": "Synthetic Harness",
+  "version": "1.2.3",
+  "license": "MIT",
+  "status": "contract-only",
+  "readme": "README.md"
+}

@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 1,
+  "id": "cross-project-flow",
+  "package": {
+    "id": "cross-project",
+    "displayName": "Cross-Project Harness",
+    "version": "0.1.1",
+    "artifactStatus": {
+      "implementation": "implemented",
+      "publication": "unpublished"
+    }
+  },
+  "source": {
+    "catalog": "catalog/harnesses.json",
+    "spec": "graphs/cross-project.graph.json",
+    "staticAsset": "assets/cross-project.svg"
+  },
+  "purpose": "Coordinate explicit named projects through canonical transversal state, structural sync, and bounded reflection.",
+  "meaning": "Package-specific conceptual flow. Edges show operating sequence, not package ranking or dependency.",
+  "nodes": [
+    {
+      "id": "named-target",
+      "kind": "flow-step",
+      "position": 1,
+      "label": "Named target",
+      "description": "Select one explicitly named project front."
+    },
+    {
+      "id": "manifest",
+      "kind": "flow-step",
+      "position": 2,
+      "label": "Manifest",
+      "description": "Read the canonical root-relative coordination authority."
+    },
+    {
+      "id": "structural-sync",
+      "kind": "flow-step",
+      "position": 3,
+      "label": "Structural sync",
+      "description": "Validate structure and generated projections without repair."
+    },
+    {
+      "id": "front-state",
+      "kind": "flow-step",
+      "position": 4,
+      "label": "Front state",
+      "description": "Route the smallest live coordination checkpoint."
+    },
+    {
+      "id": "local-owner",
+      "kind": "flow-step",
+      "position": 5,
+      "label": "Local owner",
+      "description": "Keep dense implementation state inside the selected project."
+    },
+    {
+      "id": "transversal-reflection",
+      "kind": "flow-step",
+      "position": 6,
+      "label": "Transversal reflection",
+      "description": "Record the explicit cross-project handoff and resumption trigger."
+    }
+  ],
+  "edges": [
+    {
+      "from": "named-target",
+      "to": "manifest",
+      "kind": "next"
+    },
+    {
+      "from": "manifest",
+      "to": "structural-sync",
+      "kind": "next"
+    },
+    {
+      "from": "structural-sync",
+      "to": "front-state",
+      "kind": "next"
+    },
+    {
+      "from": "front-state",
+      "to": "local-owner",
+      "kind": "next"
+    },
+    {
+      "from": "local-owner",
+      "to": "transversal-reflection",
+      "kind": "next"
+    }
+  ]
+}

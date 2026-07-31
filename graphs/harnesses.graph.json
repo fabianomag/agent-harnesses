@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "source": "catalog/harnesses.json",
+  "meaning": "Collection membership only; no dependency or ranking.",
+  "nodes": [
+    {
+      "id": "agent-harnesses",
+      "kind": "collection",
+      "label": "Agent Harnesses"
+    },
+    {
+      "id": "project-harness",
+      "kind": "package",
+      "label": "Project Harness",
+      "version": "0.1.0",
+      "artifactStatus": {
+        "implementation": "implemented",
+        "publication": "unpublished"
+      }
+    },
+    {
+      "id": "workspace-coordination",
+      "kind": "package",
+      "label": "Workspace Coordination Harness",
+      "version": "0.1.0",
+      "artifactStatus": {
+        "implementation": "implemented",
+        "publication": "unpublished"
+      }
+    },
+    {
+      "id": "cross-project",
+      "kind": "package",
+      "label": "Cross-Project Harness",
+      "version": "0.1.1",
+      "artifactStatus": {
+        "implementation": "implemented",
+        "publication": "unpublished"
+      }
+    },
+    {
+      "id": "orchestration",
+      "kind": "package",
+      "label": "Orchestration Harness",
+      "version": "0.1.0",
+      "artifactStatus": {
+        "implementation": "implemented",
+        "publication": "unpublished"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "agent-harnesses",
+      "to": "project-harness",
+      "kind": "contains"
+    },
+    {
+      "from": "agent-harnesses",
+      "to": "workspace-coordination",
+      "kind": "contains"
+    },
+    {
+      "from": "agent-harnesses",
+      "to": "cross-project",
+      "kind": "contains"
+    },
+    {
+      "from": "agent-harnesses",
+      "to": "orchestration",
+      "kind": "contains"
+    }
+  ]
+}

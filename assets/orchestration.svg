@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1610" height="350" viewBox="0 0 1610 350" role="img" aria-labelledby="title description" data-graph-id="orchestration-flow" data-package-id="orchestration">
+  <title id="title">Orchestration Harness conceptual flow</title>
+  <desc id="description">Strategic opening then Registry validation then Dry-run then Transactional apply / rollback then Pending reflection then Verified sync. This is an operating sequence, not a ranking.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#64748b"/>
+    </marker>
+  </defs>
+  <style>
+    .surface { fill: #ffffff; stroke: #1f2937; stroke-width: 2; }
+    .edge { fill: none; stroke: #64748b; stroke-width: 2; marker-end: url(#arrow); }
+    .heading { fill: #111827; font: 600 18px ui-sans-serif, system-ui, sans-serif; }
+    .step { fill: #111827; font: 600 15px ui-sans-serif, system-ui, sans-serif; }
+    .meta { fill: #475569; font: 13px ui-monospace, SFMono-Regular, monospace; }
+  </style>
+  <text class="heading" x="40" y="38">Orchestration Harness conceptual flow</text>
+  <text class="meta" x="40" y="66">orchestration · graph orchestration-flow</text>
+  <path class="edge" d="M 270 190 L 292 190"/>
+  <path class="edge" d="M 530 190 L 552 190"/>
+  <path class="edge" d="M 790 190 L 812 190"/>
+  <path class="edge" d="M 1050 190 L 1072 190"/>
+  <path class="edge" d="M 1310 190 L 1332 190"/>
+  <g aria-label="Step 1: Strategic opening. Open the Master control plane without mutation.">
+    <rect class="surface" x="40" y="115" width="230" height="150" rx="14"/>
+    <text class="meta" x="60" y="145">Step 1</text>
+    <text class="step" x="60" y="185">
+      <tspan x="60" dy="0">Strategic opening</tspan>
+    </text>
+  </g>
+  <g aria-label="Step 2: Registry validation. Validate the canonical registry and front boundaries.">
+    <rect class="surface" x="300" y="115" width="230" height="150" rx="14"/>
+    <text class="meta" x="320" y="145">Step 2</text>
+    <text class="step" x="320" y="185">
+      <tspan x="320" dy="0">Registry validation</tspan>
+    </text>
+  </g>
+  <g aria-label="Step 3: Dry-run. Preview the exact transactional mutation.">
+    <rect class="surface" x="560" y="115" width="230" height="150" rx="14"/>
+    <text class="meta" x="580" y="145">Step 3</text>
+    <text class="step" x="580" y="185">
+      <tspan x="580" dy="0">Dry-run</tspan>
+    </text>
+  </g>
+  <g aria-label="Step 4: Transactional apply / rollback. Apply through a journal or recover verified prior bytes.">
+    <rect class="surface" x="820" y="115" width="230" height="150" rx="14"/>
+    <text class="meta" x="840" y="145">Step 4</text>
+    <text class="step" x="840" y="185">
+      <tspan x="840" dy="0">Transactional apply /</tspan>
+      <tspan x="840" dy="22">rollback</tspan>
+    </text>
+  </g>
+  <g aria-label="Step 5: Pending reflection. Record explicit lifecycle evidence without executing a project.">
+    <rect class="surface" x="1080" y="115" width="230" height="150" rx="14"/>
+    <text class="meta" x="1100" y="145">Step 5</text>
+    <text class="step" x="1100" y="185">
+      <tspan x="1100" dy="0">Pending reflection</tspan>
+    </text>
+  </g>
+  <g aria-label="Step 6: Verified sync. Confirm registry and generated state are structurally consistent. This runtime result is structural evidence, not a published-version verified badge.">
+    <rect class="surface" x="1340" y="115" width="230" height="150" rx="14"/>
+    <text class="meta" x="1360" y="145">Step 6</text>
+    <text class="step" x="1360" y="185">
+      <tspan x="1360" dy="0">Verified sync</tspan>
+    </text>
+  </g>
+  <text class="meta" x="40" y="320">0.1.0 · implemented · unpublished</text>
+</svg>

@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 1,
+  "id": "project-harness-flow",
+  "package": {
+    "id": "project-harness",
+    "displayName": "Project Harness",
+    "version": "0.1.0",
+    "artifactStatus": {
+      "implementation": "implemented",
+      "publication": "unpublished"
+    }
+  },
+  "source": {
+    "catalog": "catalog/harnesses.json",
+    "spec": "graphs/project-harness.graph.json",
+    "staticAsset": "assets/project-harness.svg"
+  },
+  "purpose": "Preserve durable context and a resumable work cycle inside one explicitly selected local project.",
+  "meaning": "Package-specific conceptual flow. Edges show operating sequence, not package ranking or dependency.",
+  "nodes": [
+    {
+      "id": "skill-trigger",
+      "kind": "flow-step",
+      "position": 1,
+      "label": "Skill trigger",
+      "description": "Select the project-local operating contract."
+    },
+    {
+      "id": "initializer",
+      "kind": "flow-step",
+      "position": 2,
+      "label": "Initializer",
+      "description": "Preview and create the bounded managed structure."
+    },
+    {
+      "id": "local-context",
+      "kind": "flow-step",
+      "position": 3,
+      "label": "Local context",
+      "description": "Open durable project context and current state."
+    },
+    {
+      "id": "work-cycle",
+      "kind": "flow-step",
+      "position": 4,
+      "label": "Work cycle",
+      "description": "Digest, checkpoint, and continue one bounded project cycle."
+    },
+    {
+      "id": "finalizer",
+      "kind": "flow-step",
+      "position": 5,
+      "label": "Finalizer",
+      "description": "Close the work block with explicit recorded content."
+    },
+    {
+      "id": "durable-next",
+      "kind": "flow-step",
+      "position": 6,
+      "label": "Durable next",
+      "description": "Reopen from the persisted next action."
+    }
+  ],
+  "edges": [
+    {
+      "from": "skill-trigger",
+      "to": "initializer",
+      "kind": "next"
+    },
+    {
+      "from": "initializer",
+      "to": "local-context",
+      "kind": "next"
+    },
+    {
+      "from": "local-context",
+      "to": "work-cycle",
+      "kind": "next"
+    },
+    {
+      "from": "work-cycle",
+      "to": "finalizer",
+      "kind": "next"
+    },
+    {
+      "from": "finalizer",
+      "to": "durable-next",
+      "kind": "next"
+    }
+  ]
+}

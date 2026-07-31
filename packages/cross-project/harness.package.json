@@ -1,0 +1,10 @@
+{
+  "$schema": "../../schemas/harness-package.schema.json",
+  "schemaVersion": 1,
+  "id": "cross-project",
+  "displayName": "Cross-Project Harness",
+  "version": "0.1.1",
+  "license": "MIT",
+  "status": "implemented",
+  "readme": "README.md"
+}

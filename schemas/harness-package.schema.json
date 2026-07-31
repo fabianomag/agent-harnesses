@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Agent harness package manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "schemaVersion",
+    "id",
+    "displayName",
+    "version",
+    "license",
+    "status",
+    "readme"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "const": "../../schemas/harness-package.schema.json"
+    },
+    "schemaVersion": {
+      "type": "integer",
+      "const": 1
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+    },
+    "displayName": {
+      "type": "string",
+      "minLength": 1
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(?:-[0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*)?(?:\\+[0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*)?$"
+    },
+    "license": {
+      "type": "string",
+      "const": "MIT"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "contract-only",
+        "implemented"
+      ]
+    },
+    "readme": {
+      "type": "string",
+      "const": "README.md"
+    }
+  }
+}

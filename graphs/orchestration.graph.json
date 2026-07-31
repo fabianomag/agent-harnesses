@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 1,
+  "id": "orchestration-flow",
+  "package": {
+    "id": "orchestration",
+    "displayName": "Orchestration Harness",
+    "version": "0.1.0",
+    "artifactStatus": {
+      "implementation": "implemented",
+      "publication": "unpublished"
+    }
+  },
+  "source": {
+    "catalog": "catalog/harnesses.json",
+    "spec": "graphs/orchestration.graph.json",
+    "staticAsset": "assets/orchestration.svg"
+  },
+  "purpose": "Operate a transactional local control plane with a strict registry, explicit lifecycle records, recovery, and structural sync.",
+  "meaning": "Package-specific conceptual flow. Edges show operating sequence, not package ranking or dependency.",
+  "nodes": [
+    {
+      "id": "strategic-opening",
+      "kind": "flow-step",
+      "position": 1,
+      "label": "Strategic opening",
+      "description": "Open the Master control plane without mutation."
+    },
+    {
+      "id": "registry-validation",
+      "kind": "flow-step",
+      "position": 2,
+      "label": "Registry validation",
+      "description": "Validate the canonical registry and front boundaries."
+    },
+    {
+      "id": "dry-run",
+      "kind": "flow-step",
+      "position": 3,
+      "label": "Dry-run",
+      "description": "Preview the exact transactional mutation."
+    },
+    {
+      "id": "transactional-apply-rollback",
+      "kind": "flow-step",
+      "position": 4,
+      "label": "Transactional apply / rollback",
+      "description": "Apply through a journal or recover verified prior bytes."
+    },
+    {
+      "id": "pending-reflection",
+      "kind": "flow-step",
+      "position": 5,
+      "label": "Pending reflection",
+      "description": "Record explicit lifecycle evidence without executing a project."
+    },
+    {
+      "id": "verified-sync",
+      "kind": "flow-step",
+      "position": 6,
+      "label": "Verified sync",
+      "description": "Confirm registry and generated state are structurally consistent. This runtime result is structural evidence, not a published-version verified badge."
+    }
+  ],
+  "edges": [
+    {
+      "from": "strategic-opening",
+      "to": "registry-validation",
+      "kind": "next"
+    },
+    {
+      "from": "registry-validation",
+      "to": "dry-run",
+      "kind": "next"
+    },
+    {
+      "from": "dry-run",
+      "to": "transactional-apply-rollback",
+      "kind": "next"
+    },
+    {
+      "from": "transactional-apply-rollback",
+      "to": "pending-reflection",
+      "kind": "next"
+    },
+    {
+      "from": "pending-reflection",
+      "to": "verified-sync",
+      "kind": "next"
+    }
+  ]
+}

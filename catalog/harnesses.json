@@ -1,0 +1,888 @@
+{
+  "$schema": "../schemas/harness-catalog.schema.json",
+  "schemaVersion": 2,
+  "license": "MIT",
+  "copyrightHolder": "Fabiano Magalhães",
+  "licenseFile": {
+    "path": "LICENSE",
+    "sha256": "c8ea4fbf482ed73383d56d1a3146ab6be82cef35c6b172f43715766db5e53648"
+  },
+  "evolutionModel": {
+    "axis": "coordination-boundary",
+    "ranking": false,
+    "description": "Package order is stable presentation order. Boundary and operational complexity guide selection; neither is a quality ranking."
+  },
+  "badgeScale": {
+    "levels": [
+      "absent",
+      "basic",
+      "partial",
+      "strong",
+      "verified"
+    ],
+    "packageRanking": false,
+    "description": "Levels describe evidence strength for each capability dimension, not overall package quality.",
+    "verifiedRequirement": "Repeatable evaluations of the exact published version."
+  },
+  "packages": [
+    {
+      "id": "project-harness",
+      "displayName": "Project Harness",
+      "version": "0.1.0",
+      "license": "MIT",
+      "artifactStatus": {
+        "implementation": "implemented",
+        "publication": "unpublished"
+      },
+      "manifest": "packages/project-harness/harness.package.json",
+      "purpose": "Preserve durable context and a resumable work cycle inside one explicitly selected local project.",
+      "complexity": {
+        "level": "low-to-intermediate",
+        "description": "One root, one canonical state file, and one project-local lifecycle."
+      },
+      "evolutionaryPosition": {
+        "boundary": "single-project",
+        "description": "One project is the complete coordination boundary; no cross-project state is introduced.",
+        "ranking": false
+      },
+      "audience": {
+        "primary": "project-maintainers",
+        "description": "People or agents maintaining one local project with explicit context, decisions, and next actions."
+      },
+      "badges": {
+        "Context": {
+          "level": "strong",
+          "evidence": [
+            {
+              "method": "automated",
+              "path": "packages/project-harness/tests/test_project_harness.py",
+              "claim": "Exercises canonical state and deterministic managed context projections."
+            }
+          ]
+        },
+        "Skill": {
+          "level": "partial",
+          "evidence": [
+            {
+              "method": "structural",
+              "path": "packages/project-harness/skills/project-harness/SKILL.md",
+              "claim": "Packages a Codex Skill with validated name and description frontmatter; manual Codex evidence is pending."
+            }
+          ]
+        },
+        "Harness": {
+          "level": "strong",
+          "evidence": [
+            {
+              "method": "automated",
+              "path": "packages/project-harness/project_harness.py",
+              "claim": "Provides the implemented root-bound command surface exercised by package tests."
+            }
+          ]
+        },
+        "Loop": {
+          "level": "strong",
+          "evidence": [
+            {
+              "method": "automated",
+              "path": "packages/project-harness/tests/test_project_harness.py",
+              "claim": "Exercises initialization, opening, checkpoint, closeout, and durable resumption."
+            }
+          ]
+        },
+        "Guardrails": {
+          "level": "strong",
+          "evidence": [
+            {
+              "method": "automated",
+              "path": "packages/project-harness/tests/test_project_harness.py",
+              "claim": "Exercises dry-run, bounded paths, collision handling, rollback, and link rejection."
+            }
+          ]
+        }
+      },
+      "limitations": [
+        "It does not coordinate workspaces, sibling projects, external services, releases, or publication.",
+        "Multi-file operations are not crash-atomic, and hostile concurrent writers are unsupported."
+      ],
+      "graph": {
+        "id": "project-harness-flow",
+        "spec": "graphs/project-harness.graph.json",
+        "staticAsset": "assets/project-harness.svg",
+        "flow": [
+          {
+            "id": "skill-trigger",
+            "label": "Skill trigger",
+            "description": "Select the project-local operating contract."
+          },
+          {
+            "id": "initializer",
+            "label": "Initializer",
+            "description": "Preview and create the bounded managed structure."
+          },
+          {
+            "id": "local-context",
+            "label": "Local context",
+            "description": "Open durable project context and current state."
+          },
+          {
+            "id": "work-cycle",
+            "label": "Work cycle",
+            "description": "Digest, checkpoint, and continue one bounded project cycle."
+          },
+          {
+            "id": "finalizer",
+            "label": "Finalizer",
+            "description": "Close the work block with explicit recorded content."
+          },
+          {
+            "id": "durable-next",
+            "label": "Durable next",
+            "description": "Reopen from the persisted next action."
+          }
+        ]
+      },
+      "immutableLinks": {
+        "documentation": {
+          "status": "unpublished"
+        },
+        "prompt": {
+          "status": "unpublished"
+        },
+        "source": {
+          "status": "unpublished"
+        },
+        "release": {
+          "status": "unpublished"
+        },
+        "interactiveDiagram": {
+          "status": "unpublished"
+        }
+      },
+      "evidence": {
+        "automated": {
+          "method": "automated",
+          "status": "defined",
+          "references": [
+            "packages/project-harness/tests/test_project_harness.py"
+          ],
+          "description": "Repeatable package tests are included; this catalog does not record a candidate-bound result."
+        },
+        "structural": {
+          "method": "structural",
+          "status": "defined",
+          "references": [
+            "packages/project-harness/tests/validate_generated_fixture.py"
+          ],
+          "description": "A repeatable generated-fixture check is included; this catalog does not record a candidate-bound result."
+        },
+        "manualCodex": {
+          "method": "manual-codex",
+          "status": "pending",
+          "references": [
+            "packages/project-harness/README.md"
+          ],
+          "description": "A fresh Project Harness walkthrough must be executed against the next candidate; no manual result is claimed here."
+        }
+      },
+      "files": [
+        {
+          "path": "README.md",
+          "sha256": "1e7d855ce40ccf6005d53e9cc22c58ab7d2972cc617f2aa71f6c8051c4a7f66f"
+        },
+        {
+          "path": "harness.package.json",
+          "sha256": "7dec653db0094064b6b8cf391a75f4ea00a2c6167fb20b8f1eb6ca9fa62a8385"
+        },
+        {
+          "path": "project_harness.py",
+          "sha256": "d0a7ad0396727de8e7ee97f14f47d9eca375f4dbdfad7646070cf03336a455fb"
+        },
+        {
+          "path": "skills/project-harness/SKILL.md",
+          "sha256": "bf5cc1175efd44d9ec8c6a71cd39da6cf2f4963b55af69c8950efc801f1a50a4"
+        },
+        {
+          "path": "tests/test_project_harness.py",
+          "sha256": "5cb1d2c32faa2b6d93c6de659ca193fca998909961fffb7ee0d53c9d949d5e03"
+        },
+        {
+          "path": "tests/validate_generated_fixture.py",
+          "sha256": "b0a0b7969934d6fe92fa4df766b9dbdbd60ccc60286a56afb0543e1c9fee30bb"
+        }
+      ]
+    },
+    {
+      "id": "workspace-coordination",
+      "displayName": "Workspace Coordination Harness",
+      "version": "0.1.0",
+      "license": "MIT",
+      "artifactStatus": {
+        "implementation": "implemented",
+        "publication": "unpublished"
+      },
+      "manifest": "packages/workspace-coordination/harness.package.json",
+      "purpose": "Coordinate explicitly registered autonomous child folders inside one containing workspace while preserving child-local ownership.",
+      "complexity": {
+        "level": "intermediate",
+        "description": "One coordinator plus explicit child ownership and shared governance boundaries."
+      },
+      "evolutionaryPosition": {
+        "boundary": "contained-workspace",
+        "description": "One containing workspace owns the child index and shared governance while each child owns its detailed state.",
+        "ranking": false
+      },
+      "audience": {
+        "primary": "workspace-coordinators",
+        "description": "Operators coordinating autonomous child folders contained by one explicit local root."
+      },
+      "badges": {
+        "Context": {
+          "level": "strong",
+          "evidence": [
+            {
+              "method": "automated",
+              "path": "packages/workspace-coordination/tests/test_workspace_coordination.py",
+              "claim": "Exercises the child index, shared views, and child-local continuity."
+            }
+          ]
+        },
+        "Skill": {
+          "level": "partial",
+          "evidence": [
+            {
+              "method": "structural",
+              "path": "packages/workspace-coordination/SKILL.md",
+              "claim": "Packages a Codex Skill with validated name and description frontmatter; manual Codex evidence is pending."
+            }
+          ]
+        },
+        "Harness": {
+          "level": "strong",
+          "evidence": [
+            {
+              "method": "automated",
+              "path": "packages/workspace-coordination/workspace_coordination.py",
+              "claim": "Provides the implemented explicit-root command surface exercised by package tests."
+            }
+          ]
+        },
+        "Loop": {
+          "level": "strong",
+          "evidence": [
+            {
+              "method": "automated",
+              "path": "packages/workspace-coordination/tests/test_workspace_coordination.py",
+              "claim": "Exercises child selection, local recording, shared reflection, closeout, and reopening."
+            }
+          ]
+        },
+        "Guardrails": {
+          "level": "strong",
+          "evidence": [
+            {
+              "method": "automated",
+              "path": "packages/workspace-coordination/tests/test_workspace_coordination.py",
+              "claim": "Exercises explicit registration, dry-run/apply, root boundaries, collisions, and link rejection."
+            }
+          ]
+        }
+      },
+      "limitations": [
+        "It does not discover children, scan adjacent folders, dispatch agents, or execute child work.",
+        "Version 0.1.0 supports one mutating writer per coordinator root."
+      ],
+      "graph": {
+        "id": "workspace-coordination-flow",
+        "spec": "graphs/workspace-coordination.graph.json",
+        "staticAsset": "assets/workspace-coordination.svg",
+        "flow": [
+          {
+            "id": "workspace-coordinator",
+            "label": "Workspace coordinator",
+            "description": "Open one explicit containing workspace."
+          },
+          {
+            "id": "child-index",
+            "label": "Child index",
+            "description": "Select only an explicitly registered child folder."
+          },
+          {
+            "id": "shared-boundary-governance",
+            "label": "Shared boundary / governance",
+            "description": "Keep shared constraints and concise deltas at the coordinator."
+          },
+          {
+            "id": "child-local-owner",
+            "label": "Child-local owner",
+            "description": "Leave detailed context and execution state with the child."
+          },
+          {
+            "id": "reflection",
+            "label": "Reflection",
+            "description": "Return only an explicit shared boundary delta."
+          }
+        ]
+      },
+      "immutableLinks": {
+        "documentation": {
+          "status": "unpublished"
+        },
+        "prompt": {
+          "status": "unpublished"
+        },
+        "source": {
+          "status": "unpublished"
+        },
+        "release": {
+          "status": "unpublished"
+        },
+        "interactiveDiagram": {
+          "status": "unpublished"
+        }
+      },
+      "evidence": {
+        "automated": {
+          "method": "automated",
+          "status": "defined",
+          "references": [
+            "packages/workspace-coordination/tests/test_workspace_coordination.py"
+          ],
+          "description": "Repeatable package tests are included; this catalog does not record a candidate-bound result."
+        },
+        "structural": {
+          "method": "structural",
+          "status": "defined",
+          "references": [
+            "tests/test_common.py",
+            "tools/validate.py"
+          ],
+          "description": "Installed-copy and repository structure checks are defined; this catalog does not record a candidate-bound result."
+        },
+        "manualCodex": {
+          "method": "manual-codex",
+          "status": "pending",
+          "references": [
+            "packages/workspace-coordination/README.md"
+          ],
+          "description": "A fresh Workspace Coordination walkthrough must be executed against the next candidate; no manual result is claimed here."
+        }
+      },
+      "files": [
+        {
+          "path": "README.md",
+          "sha256": "03d28ed7b0d9942d704d81db3b405a3c434415001e3d6c2c3db614a31bffa1fb"
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "bfd1f78e2b7d11930a5ecd915f282f808d5f8e250a73e49adf0f3ac894567c04"
+        },
+        {
+          "path": "harness.package.json",
+          "sha256": "4a464bdc3a6c8bdadfa38ebc9e8f0e189401f195e7f2f34914724a7e2cd4228e"
+        },
+        {
+          "path": "tests/fixtures/coordinator/child-alpha/AGENTS.md",
+          "sha256": "aef788f685149bb9e239790795f5df75b52f745ed7ae4a0dc7de6a4c2b58abf4"
+        },
+        {
+          "path": "tests/fixtures/coordinator/child-alpha/PROJECT_STATE.md",
+          "sha256": "fc754c45e472624443aa693dd54f2746f77a19bc90f39d74258b443c7e10c8a5"
+        },
+        {
+          "path": "tests/fixtures/coordinator/child-beta/OWNER.md",
+          "sha256": "859f82464883f44235c62fba7cafa2915b34bd5c72dd980359d6129e1e29fa83"
+        },
+        {
+          "path": "tests/test_workspace_coordination.py",
+          "sha256": "b5dd5aabbed8caead4c8cc96dc93c9adfd1ceeca96237430deb2ee3b5f42df22"
+        },
+        {
+          "path": "workspace_coordination.py",
+          "sha256": "45cadedc9393f574a20c426a146756556a55b82d6004fa20d9c887a1c018e5f7"
+        }
+      ]
+    },
+    {
+      "id": "cross-project",
+      "displayName": "Cross-Project Harness",
+      "version": "0.1.1",
+      "license": "MIT",
+      "artifactStatus": {
+        "implementation": "implemented",
+        "publication": "unpublished"
+      },
+      "manifest": "packages/cross-project/harness.package.json",
+      "purpose": "Coordinate explicit named projects through canonical transversal state, structural sync, and bounded reflection.",
+      "complexity": {
+        "level": "high",
+        "description": "Named independent fronts, transversal state, cooperative locking, and rollback-protected multi-file updates."
+      },
+      "evolutionaryPosition": {
+        "boundary": "independent-projects",
+        "description": "Independent project fronts remain local owners while one selected root holds transversal coordination state.",
+        "ranking": false
+      },
+      "audience": {
+        "primary": "cross-project-coordinators",
+        "description": "Operators managing named handoffs and shared state across independent local projects."
+      },
+      "badges": {
+        "Context": {
+          "level": "strong",
+          "evidence": [
+            {
+              "method": "automated",
+              "path": "packages/cross-project/tests/test_cross_project.py",
+              "claim": "Exercises canonical front state and bounded managed projections."
+            }
+          ]
+        },
+        "Skill": {
+          "level": "partial",
+          "evidence": [
+            {
+              "method": "structural",
+              "path": "packages/cross-project/SKILL.md",
+              "claim": "Packages a Codex Skill with validated name and description frontmatter; manual Codex evidence is pending."
+            }
+          ]
+        },
+        "Harness": {
+          "level": "strong",
+          "evidence": [
+            {
+              "method": "automated",
+              "path": "packages/cross-project/scripts/cross_project.py",
+              "claim": "Provides the implemented named-target command surface exercised by package tests."
+            }
+          ]
+        },
+        "Loop": {
+          "level": "strong",
+          "evidence": [
+            {
+              "method": "automated",
+              "path": "packages/cross-project/tests/test_cross_project.py",
+              "claim": "Exercises registration, structural sync, checkpointing, closeout, and transversal reflection."
+            }
+          ]
+        },
+        "Guardrails": {
+          "level": "strong",
+          "evidence": [
+            {
+              "method": "automated",
+              "path": "packages/cross-project/tests/test_cross_project.py",
+              "claim": "Exercises bounded paths, cooperative locking, rollback, collision handling, and link rejection."
+            }
+          ]
+        }
+      },
+      "limitations": [
+        "Rollback and coherence cover catchable failures and cooperative readers, not physical crash-safe multi-file atomicity after process kill or power loss.",
+        "Adversarial replacement of the selected root inode remains a residual risk."
+      ],
+      "graph": {
+        "id": "cross-project-flow",
+        "spec": "graphs/cross-project.graph.json",
+        "staticAsset": "assets/cross-project.svg",
+        "flow": [
+          {
+            "id": "named-target",
+            "label": "Named target",
+            "description": "Select one explicitly named project front."
+          },
+          {
+            "id": "manifest",
+            "label": "Manifest",
+            "description": "Read the canonical root-relative coordination authority."
+          },
+          {
+            "id": "structural-sync",
+            "label": "Structural sync",
+            "description": "Validate structure and generated projections without repair."
+          },
+          {
+            "id": "front-state",
+            "label": "Front state",
+            "description": "Route the smallest live coordination checkpoint."
+          },
+          {
+            "id": "local-owner",
+            "label": "Local owner",
+            "description": "Keep dense implementation state inside the selected project."
+          },
+          {
+            "id": "transversal-reflection",
+            "label": "Transversal reflection",
+            "description": "Record the explicit cross-project handoff and resumption trigger."
+          }
+        ]
+      },
+      "immutableLinks": {
+        "documentation": {
+          "status": "unpublished"
+        },
+        "prompt": {
+          "status": "unpublished"
+        },
+        "source": {
+          "status": "unpublished"
+        },
+        "release": {
+          "status": "unpublished"
+        },
+        "interactiveDiagram": {
+          "status": "unpublished"
+        }
+      },
+      "evidence": {
+        "automated": {
+          "method": "automated",
+          "status": "defined",
+          "references": [
+            "packages/cross-project/tests/test_cross_project.py"
+          ],
+          "description": "Repeatable package tests are included; this catalog does not record a candidate-bound result."
+        },
+        "structural": {
+          "method": "structural",
+          "status": "defined",
+          "references": [
+            "tests/test_common.py",
+            "tools/validate.py"
+          ],
+          "description": "Installed-copy and repository structure checks are defined; this catalog does not record a candidate-bound result."
+        },
+        "manualCodex": {
+          "method": "manual-codex",
+          "status": "pending",
+          "references": [
+            "packages/cross-project/tests/manual_walkthrough.sh"
+          ],
+          "description": "A fresh Cross-Project walkthrough must be executed against the next candidate; the procedure is not evidence of execution."
+        }
+      },
+      "files": [
+        {
+          "path": "README.md",
+          "sha256": "570b3f2c7000d211c126008bb546c7fca174d0d037d0db5ceb4dfe0330444940"
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "57daa3f170702dc6b609e50c6a8954a4f689b6823a8cecdaf2bbb3cb0aceb1aa"
+        },
+        {
+          "path": "agents/openai.yaml",
+          "sha256": "24b5b416afe45e052e93add6068f9a0bf11795bdbc3c72d22d33d905c9b2bc3c"
+        },
+        {
+          "path": "harness.package.json",
+          "sha256": "6eaebcd7ad58ef0a05a9692d1f4302f34906c6465ddbcbcc596eecc9a1b6f690"
+        },
+        {
+          "path": "scripts/cross_project.py",
+          "sha256": "e553342aba24a3ebf9b53933d7963eb5304779fad71111a74af3960fa1bdcda5"
+        },
+        {
+          "path": "tests/manual_walkthrough.sh",
+          "sha256": "6a897015de3d3e7f928bd47f7bc2636d542df6cccebaf1142bbccdbd003ea23a"
+        },
+        {
+          "path": "tests/test_cross_project.py",
+          "sha256": "9c0a87e68f1633e4f642fea732963fddd5b8555b395086cacf9a7f746720f9d3"
+        }
+      ]
+    },
+    {
+      "id": "orchestration",
+      "displayName": "Orchestration Harness",
+      "version": "0.1.0",
+      "license": "MIT",
+      "artifactStatus": {
+        "implementation": "implemented",
+        "publication": "unpublished"
+      },
+      "manifest": "packages/orchestration/harness.package.json",
+      "purpose": "Operate a transactional local control plane with a strict registry, explicit lifecycle records, recovery, and structural sync.",
+      "complexity": {
+        "level": "advanced",
+        "description": "A strict registry, journaled transactions, explicit recovery, and validated lifecycle coordination."
+      },
+      "evolutionaryPosition": {
+        "boundary": "transactional-orchestration",
+        "description": "One Master control plane coordinates registered fronts through validated transactions without executing projects.",
+        "ranking": false
+      },
+      "audience": {
+        "primary": "orchestration-operators",
+        "description": "Operators who need a transactional local registry, explicit front focus, lifecycle records, and journal recovery."
+      },
+      "badges": {
+        "Context": {
+          "level": "strong",
+          "evidence": [
+            {
+              "method": "automated",
+              "path": "packages/orchestration/tests/test_workflow.py",
+              "claim": "Exercises canonical registry state, lifecycle records, and deterministic projections."
+            }
+          ]
+        },
+        "Skill": {
+          "level": "partial",
+          "evidence": [
+            {
+              "method": "structural",
+              "path": "packages/orchestration/SKILL.md",
+              "claim": "Packages a Codex Skill with validated name and description frontmatter; manual Codex evidence is pending."
+            }
+          ]
+        },
+        "Harness": {
+          "level": "strong",
+          "evidence": [
+            {
+              "method": "automated",
+              "path": "packages/orchestration/hq.py",
+              "claim": "Provides the implemented transactional local control-plane command surface."
+            }
+          ]
+        },
+        "Loop": {
+          "level": "strong",
+          "evidence": [
+            {
+              "method": "automated",
+              "path": "packages/orchestration/tests/test_workflow.py",
+              "claim": "Exercises opening, focus, digest, record, closeout, and structural sync."
+            }
+          ]
+        },
+        "Guardrails": {
+          "level": "strong",
+          "evidence": [
+            {
+              "method": "automated",
+              "path": "packages/orchestration/tests/test_transaction.py",
+              "claim": "Exercises journaling, bounded paths, locking, rollback, and explicit recovery."
+            }
+          ]
+        }
+      },
+      "limitations": [
+        "It does not call a model, dispatch agents, execute project commands, publish content, or infer reflections.",
+        "Its transactional guarantees remain bounded by cooperative local filesystem and recovery assumptions."
+      ],
+      "graph": {
+        "id": "orchestration-flow",
+        "spec": "graphs/orchestration.graph.json",
+        "staticAsset": "assets/orchestration.svg",
+        "flow": [
+          {
+            "id": "strategic-opening",
+            "label": "Strategic opening",
+            "description": "Open the Master control plane without mutation."
+          },
+          {
+            "id": "registry-validation",
+            "label": "Registry validation",
+            "description": "Validate the canonical registry and front boundaries."
+          },
+          {
+            "id": "dry-run",
+            "label": "Dry-run",
+            "description": "Preview the exact transactional mutation."
+          },
+          {
+            "id": "transactional-apply-rollback",
+            "label": "Transactional apply / rollback",
+            "description": "Apply through a journal or recover verified prior bytes."
+          },
+          {
+            "id": "pending-reflection",
+            "label": "Pending reflection",
+            "description": "Record explicit lifecycle evidence without executing a project."
+          },
+          {
+            "id": "verified-sync",
+            "label": "Verified sync",
+            "description": "Confirm registry and generated state are structurally consistent. This runtime result is structural evidence, not a published-version verified badge."
+          }
+        ]
+      },
+      "immutableLinks": {
+        "documentation": {
+          "status": "unpublished"
+        },
+        "prompt": {
+          "status": "unpublished"
+        },
+        "source": {
+          "status": "unpublished"
+        },
+        "release": {
+          "status": "unpublished"
+        },
+        "interactiveDiagram": {
+          "status": "unpublished"
+        }
+      },
+      "evidence": {
+        "automated": {
+          "method": "automated",
+          "status": "defined",
+          "references": [
+            "packages/orchestration/tests/test_workflow.py",
+            "packages/orchestration/tests/test_transaction.py"
+          ],
+          "description": "Repeatable package tests are included; this catalog does not record a candidate-bound result."
+        },
+        "structural": {
+          "method": "structural",
+          "status": "defined",
+          "references": [
+            "packages/orchestration/scripts/verify_package.py",
+            "packages/orchestration/scripts/structural_check.py"
+          ],
+          "description": "Repeatable package structure and isolated-cycle checks are included; this catalog does not record a candidate-bound result."
+        },
+        "manualCodex": {
+          "method": "manual-codex",
+          "status": "pending",
+          "references": [
+            "packages/orchestration/README.md"
+          ],
+          "description": "A fresh Orchestration walkthrough must be executed against the next candidate; no manual result is claimed here."
+        }
+      },
+      "files": [
+        {
+          "path": "README.md",
+          "sha256": "e2f601845c2dd4b783cebdaea3f2422931542f759725a557b81afbf430012d7e"
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "377579fc08b480d51fc5e38855728d07e52599396aa5254d6923097af5e129b3"
+        },
+        {
+          "path": "agents/openai.yaml",
+          "sha256": "001c6473ce8e209cf26811510c766003bd513cc54caa3254ca3e1fa8a6ed51a6"
+        },
+        {
+          "path": "harness.package.json",
+          "sha256": "c8bba2ef2bcaaf8f83d5ec4487f67de01f4c34e452a41f29307d6410efd91be0"
+        },
+        {
+          "path": "hq.py",
+          "sha256": "4e1619b94ff2d1b10fafc6a1daa04ff32f92a8ce1c2924bdf0552f11c61491d1"
+        },
+        {
+          "path": "orchestration_harness/__init__.py",
+          "sha256": "84058549e2cb51365c048f9360367217e9d8210d79896355c6ebf22bcd367fc8"
+        },
+        {
+          "path": "orchestration_harness/cli.py",
+          "sha256": "0c1eea6f5153a1963f4d7966a736a633f27692af88ef75ee5bfb8af90224622f"
+        },
+        {
+          "path": "orchestration_harness/errors.py",
+          "sha256": "4410d23e2c400b775fe4f036d130a4e5309dd131baff276ccaa53c6fc80bf901"
+        },
+        {
+          "path": "orchestration_harness/model.py",
+          "sha256": "a53ed88bdf716c063ad28033c3347694770bf3cb234de7cae81874a30ec81257"
+        },
+        {
+          "path": "orchestration_harness/paths.py",
+          "sha256": "63d05cdc50f01f2972396fb5eee4e22d448608eff46f2ddb9e5211b065e31c6d"
+        },
+        {
+          "path": "orchestration_harness/render.py",
+          "sha256": "7613113dd3998249577778460d4968f4abad250dcfd4c1b3eae011457ef7e565"
+        },
+        {
+          "path": "orchestration_harness/service.py",
+          "sha256": "792560b508a3e06cae3f0c8edb992a394ed6376f7f606fb45eaeec476eb8cd4f"
+        },
+        {
+          "path": "orchestration_harness/transaction.py",
+          "sha256": "9506dfd59635d888a8c5e55d36c019cc098e1184caf5c94c57497539cddf7af4"
+        },
+        {
+          "path": "orchestration_harness/verifier.py",
+          "sha256": "6bf2535caea85417d268163ec05d6823540377dbb7e64e9f0c142b3b004261b3"
+        },
+        {
+          "path": "scripts/structural_check.py",
+          "sha256": "bba8095c875be4761e330898d5a3dc480bb0707a30c4b9b5544534d4b2fcf970"
+        },
+        {
+          "path": "scripts/verify_package.py",
+          "sha256": "7a60ce8a2eba47d3b228368311fa5d054c3a7561e31a05e64e6a84ca3b96c4d5"
+        },
+        {
+          "path": "templates/master/AGENTS.md",
+          "sha256": "1734d1e12c93c4239780df8069fea616cb186114f9f99c944f3edae533ec4481"
+        },
+        {
+          "path": "templates/master/ARCHITECTURE.md",
+          "sha256": "f076d94e28e0aa5c1efda7598b1704ff28149548505be30ca91f548ad926577b"
+        },
+        {
+          "path": "templates/master/NEXT.md",
+          "sha256": "55da747fa0694bf87540a0af5206a09984249a767d70f638084c9933514d77ad"
+        },
+        {
+          "path": "templates/project/AGENTS.md",
+          "sha256": "9065dc8f94430554b12e6afed176fd7af3c8afcf65b0c81fdae2ac44e0ebe35d"
+        },
+        {
+          "path": "templates/project/ARCHITECTURE.md",
+          "sha256": "8135c871b5c8cb30aaa773ada11841e8a87a6869dc82a53c2d25a1ce22f39bcb"
+        },
+        {
+          "path": "templates/project/RECORDS.md",
+          "sha256": "7c643c5b8b56789ff7a18e1949858585755f638fe5891233e990effd4e153c62"
+        },
+        {
+          "path": "templates/project/REFLECTIONS.md",
+          "sha256": "1f5b753116ff04e335d7f949c40f08bbcc9f7ad3561dff348b00188fa3f87d3f"
+        },
+        {
+          "path": "templates/project/SESSIONS.md",
+          "sha256": "7a526feb847810a05060daafb3ca7537c3052ecb6da9854536f8e09c2c14f680"
+        },
+        {
+          "path": "tests/__init__.py",
+          "sha256": "3aa45d6e911c7ba8a2ea338c6562330c84d3d918287806f351dda2f2bc45cc91"
+        },
+        {
+          "path": "tests/_bootstrap.py",
+          "sha256": "439536ff43540db08dbf788b16b8d7d5bb26ea12402e93d21a011b93064439fa"
+        },
+        {
+          "path": "tests/helpers.py",
+          "sha256": "f9e7f0120448f505296edea61f2852a277bfdce38b87946db096d868f3592faf"
+        },
+        {
+          "path": "tests/test_cli_and_verifier.py",
+          "sha256": "a55d8bcaea00ec1bd26881744cc13e36bea3f57c6ec22f800322496e506c3c42"
+        },
+        {
+          "path": "tests/test_model.py",
+          "sha256": "6ceaf1c7cadf2ed04dd9833fa84321dfb71d6b347266cc15dec52b5e78255e0b"
+        },
+        {
+          "path": "tests/test_transaction.py",
+          "sha256": "7f59d5a75e2ef3e513ce3b7252240d76ead5ea08602d0203f5c3ef9fe1ada162"
+        },
+        {
+          "path": "tests/test_workflow.py",
+          "sha256": "22cb23da530fedfbfa400d75aec20d6f378911dac2cbe19a62bcab1a88e21fc3"
+        }
+      ]
+    }
+  ]
+}

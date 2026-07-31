@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "id": "workspace-coordination-flow",
+  "package": {
+    "id": "workspace-coordination",
+    "displayName": "Workspace Coordination Harness",
+    "version": "0.1.0",
+    "artifactStatus": {
+      "implementation": "implemented",
+      "publication": "unpublished"
+    }
+  },
+  "source": {
+    "catalog": "catalog/harnesses.json",
+    "spec": "graphs/workspace-coordination.graph.json",
+    "staticAsset": "assets/workspace-coordination.svg"
+  },
+  "purpose": "Coordinate explicitly registered autonomous child folders inside one containing workspace while preserving child-local ownership.",
+  "meaning": "Package-specific conceptual flow. Edges show operating sequence, not package ranking or dependency.",
+  "nodes": [
+    {
+      "id": "workspace-coordinator",
+      "kind": "flow-step",
+      "position": 1,
+      "label": "Workspace coordinator",
+      "description": "Open one explicit containing workspace."
+    },
+    {
+      "id": "child-index",
+      "kind": "flow-step",
+      "position": 2,
+      "label": "Child index",
+      "description": "Select only an explicitly registered child folder."
+    },
+    {
+      "id": "shared-boundary-governance",
+      "kind": "flow-step",
+      "position": 3,
+      "label": "Shared boundary / governance",
+      "description": "Keep shared constraints and concise deltas at the coordinator."
+    },
+    {
+      "id": "child-local-owner",
+      "kind": "flow-step",
+      "position": 4,
+      "label": "Child-local owner",
+      "description": "Leave detailed context and execution state with the child."
+    },
+    {
+      "id": "reflection",
+      "kind": "flow-step",
+      "position": 5,
+      "label": "Reflection",
+      "description": "Return only an explicit shared boundary delta."
+    }
+  ],
+  "edges": [
+    {
+      "from": "workspace-coordinator",
+      "to": "child-index",
+      "kind": "next"
+    },
+    {
+      "from": "child-index",
+      "to": "shared-boundary-governance",
+      "kind": "next"
+    },
+    {
+      "from": "shared-boundary-governance",
+      "to": "child-local-owner",
+      "kind": "next"
+    },
+    {
+      "from": "child-local-owner",
+      "to": "reflection",
+      "kind": "next"
+    }
+  ]
+}

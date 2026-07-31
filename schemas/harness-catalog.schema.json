@@ -1,0 +1,730 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Agent Harnesses public package catalog",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "schemaVersion",
+    "license",
+    "copyrightHolder",
+    "licenseFile",
+    "evolutionModel",
+    "badgeScale",
+    "packages"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "const": "../schemas/harness-catalog.schema.json"
+    },
+    "schemaVersion": {
+      "type": "integer",
+      "const": 2
+    },
+    "license": {
+      "type": "string",
+      "const": "MIT"
+    },
+    "copyrightHolder": {
+      "type": "string",
+      "const": "Fabiano Magalhães"
+    },
+    "licenseFile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "const": "LICENSE"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "evolutionModel": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "axis",
+        "ranking",
+        "description"
+      ],
+      "properties": {
+        "axis": {
+          "type": "string",
+          "const": "coordination-boundary"
+        },
+        "ranking": {
+          "type": "boolean",
+          "const": false
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "badgeScale": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "levels",
+        "packageRanking",
+        "description",
+        "verifiedRequirement"
+      ],
+      "properties": {
+        "levels": {
+          "type": "array",
+          "minItems": 5,
+          "maxItems": 5,
+          "prefixItems": [
+            {
+              "const": "absent"
+            },
+            {
+              "const": "basic"
+            },
+            {
+              "const": "partial"
+            },
+            {
+              "const": "strong"
+            },
+            {
+              "const": "verified"
+            }
+          ],
+          "items": false
+        },
+        "packageRanking": {
+          "type": "boolean",
+          "const": false
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "verifiedRequirement": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "packages": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "prefixItems": [
+        {
+          "$ref": "#/$defs/projectHarness"
+        },
+        {
+          "$ref": "#/$defs/workspaceCoordination"
+        },
+        {
+          "$ref": "#/$defs/crossProject"
+        },
+        {
+          "$ref": "#/$defs/orchestration"
+        }
+      ],
+      "items": false
+    }
+  },
+  "$defs": {
+    "badgeEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "path",
+        "claim"
+      ],
+      "properties": {
+        "method": {
+          "type": "string",
+          "enum": [
+            "automated",
+            "structural"
+          ]
+        },
+        "path": {
+          "type": "string",
+          "pattern": "^(?!\\.\\.?$)(?!\\.\\.?/)(?!.*\\/\\.\\.?(?:\\/|$))[A-Za-z0-9._-]+(?:/[A-Za-z0-9._-]+)*$"
+        },
+        "claim": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "badge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "level",
+        "evidence"
+      ],
+      "properties": {
+        "level": {
+          "type": "string",
+          "enum": [
+            "absent",
+            "basic",
+            "partial",
+            "strong",
+            "verified"
+          ]
+        },
+        "evidence": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/badgeEvidence"
+          }
+        }
+      }
+    },
+    "evidenceMethod": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "status",
+        "references",
+        "description"
+      ],
+      "properties": {
+        "method": {
+          "type": "string",
+          "enum": [
+            "automated",
+            "structural",
+            "manual-codex"
+          ]
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "defined",
+            "pending"
+          ]
+        },
+        "references": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "pattern": "^(?!\\.\\.?$)(?!\\.\\.?/)(?!.*\\/\\.\\.?(?:\\/|$))[A-Za-z0-9._-]+(?:/[A-Za-z0-9._-]+)*$"
+          }
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "unpublishedLink": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "const": "unpublished"
+        }
+      }
+    },
+    "flowStep": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "label",
+        "description"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "file": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "pattern": "^(?!\\.\\.?$)(?!\\.\\.?/)(?!.*\\/\\.\\.?(?:\\/|$))[A-Za-z0-9._-]+(?:/[A-Za-z0-9._-]+)*$"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "package": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "displayName",
+        "version",
+        "license",
+        "artifactStatus",
+        "manifest",
+        "purpose",
+        "complexity",
+        "evolutionaryPosition",
+        "audience",
+        "badges",
+        "limitations",
+        "graph",
+        "immutableLinks",
+        "evidence",
+        "files"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+        },
+        "displayName": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(?:-[0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*)?(?:\\+[0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*)?$"
+        },
+        "license": {
+          "type": "string",
+          "const": "MIT"
+        },
+        "artifactStatus": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "implementation",
+            "publication"
+          ],
+          "properties": {
+            "implementation": {
+              "type": "string",
+              "enum": [
+                "contract-only",
+                "implemented"
+              ]
+            },
+            "publication": {
+              "type": "string",
+              "const": "unpublished"
+            }
+          }
+        },
+        "manifest": {
+          "type": "string",
+          "pattern": "^packages/[a-z][a-z0-9-]*/harness\\.package\\.json$"
+        },
+        "purpose": {
+          "type": "string",
+          "minLength": 1
+        },
+        "complexity": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "level",
+            "description"
+          ],
+          "properties": {
+            "level": {
+              "type": "string",
+              "enum": [
+                "low-to-intermediate",
+                "intermediate",
+                "high",
+                "advanced"
+              ]
+            },
+            "description": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "evolutionaryPosition": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "boundary",
+            "description",
+            "ranking"
+          ],
+          "properties": {
+            "boundary": {
+              "type": "string",
+              "enum": [
+                "single-project",
+                "contained-workspace",
+                "independent-projects",
+                "transactional-orchestration"
+              ]
+            },
+            "description": {
+              "type": "string",
+              "minLength": 1
+            },
+            "ranking": {
+              "type": "boolean",
+              "const": false
+            }
+          }
+        },
+        "audience": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "primary",
+            "description"
+          ],
+          "properties": {
+            "primary": {
+              "type": "string",
+              "enum": [
+                "project-maintainers",
+                "workspace-coordinators",
+                "cross-project-coordinators",
+                "orchestration-operators"
+              ]
+            },
+            "description": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "badges": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "Context",
+            "Skill",
+            "Harness",
+            "Loop",
+            "Guardrails"
+          ],
+          "properties": {
+            "Context": {
+              "$ref": "#/$defs/badge"
+            },
+            "Skill": {
+              "$ref": "#/$defs/badge"
+            },
+            "Harness": {
+              "$ref": "#/$defs/badge"
+            },
+            "Loop": {
+              "$ref": "#/$defs/badge"
+            },
+            "Guardrails": {
+              "$ref": "#/$defs/badge"
+            }
+          }
+        },
+        "limitations": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "graph": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "spec",
+            "staticAsset",
+            "flow"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*-flow$"
+            },
+            "spec": {
+              "type": "string",
+              "pattern": "^graphs/[a-z][a-z0-9-]*\\.graph\\.json$"
+            },
+            "staticAsset": {
+              "type": "string",
+              "pattern": "^assets/[a-z][a-z0-9-]*\\.svg$"
+            },
+            "flow": {
+              "type": "array",
+              "minItems": 5,
+              "maxItems": 6,
+              "items": {
+                "$ref": "#/$defs/flowStep"
+              }
+            }
+          }
+        },
+        "immutableLinks": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "documentation",
+            "prompt",
+            "source",
+            "release",
+            "interactiveDiagram"
+          ],
+          "properties": {
+            "documentation": {
+              "$ref": "#/$defs/unpublishedLink"
+            },
+            "prompt": {
+              "$ref": "#/$defs/unpublishedLink"
+            },
+            "source": {
+              "$ref": "#/$defs/unpublishedLink"
+            },
+            "release": {
+              "$ref": "#/$defs/unpublishedLink"
+            },
+            "interactiveDiagram": {
+              "$ref": "#/$defs/unpublishedLink"
+            }
+          }
+        },
+        "evidence": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "automated",
+            "structural",
+            "manualCodex"
+          ],
+          "properties": {
+            "automated": {
+              "allOf": [
+                {
+                  "$ref": "#/$defs/evidenceMethod"
+                },
+                {
+                  "properties": {
+                    "method": {
+                      "const": "automated"
+                    },
+                    "status": {
+                      "const": "defined"
+                    }
+                  }
+                }
+              ]
+            },
+            "structural": {
+              "allOf": [
+                {
+                  "$ref": "#/$defs/evidenceMethod"
+                },
+                {
+                  "properties": {
+                    "method": {
+                      "const": "structural"
+                    },
+                    "status": {
+                      "const": "defined"
+                    }
+                  }
+                }
+              ]
+            },
+            "manualCodex": {
+              "allOf": [
+                {
+                  "$ref": "#/$defs/evidenceMethod"
+                },
+                {
+                  "properties": {
+                    "method": {
+                      "const": "manual-codex"
+                    },
+                    "status": {
+                      "const": "pending"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "files": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/file"
+          }
+        }
+      }
+    },
+    "projectHarness": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/package"
+        },
+        {
+          "properties": {
+            "id": {
+              "const": "project-harness"
+            },
+            "displayName": {
+              "const": "Project Harness"
+            },
+            "manifest": {
+              "const": "packages/project-harness/harness.package.json"
+            },
+            "graph": {
+              "properties": {
+                "id": {
+                  "const": "project-harness-flow"
+                },
+                "spec": {
+                  "const": "graphs/project-harness.graph.json"
+                },
+                "staticAsset": {
+                  "const": "assets/project-harness.svg"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "workspaceCoordination": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/package"
+        },
+        {
+          "properties": {
+            "id": {
+              "const": "workspace-coordination"
+            },
+            "displayName": {
+              "const": "Workspace Coordination Harness"
+            },
+            "manifest": {
+              "const": "packages/workspace-coordination/harness.package.json"
+            },
+            "graph": {
+              "properties": {
+                "id": {
+                  "const": "workspace-coordination-flow"
+                },
+                "spec": {
+                  "const": "graphs/workspace-coordination.graph.json"
+                },
+                "staticAsset": {
+                  "const": "assets/workspace-coordination.svg"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "crossProject": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/package"
+        },
+        {
+          "properties": {
+            "id": {
+              "const": "cross-project"
+            },
+            "displayName": {
+              "const": "Cross-Project Harness"
+            },
+            "manifest": {
+              "const": "packages/cross-project/harness.package.json"
+            },
+            "graph": {
+              "properties": {
+                "id": {
+                  "const": "cross-project-flow"
+                },
+                "spec": {
+                  "const": "graphs/cross-project.graph.json"
+                },
+                "staticAsset": {
+                  "const": "assets/cross-project.svg"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "orchestration": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/package"
+        },
+        {
+          "properties": {
+            "id": {
+              "const": "orchestration"
+            },
+            "displayName": {
+              "const": "Orchestration Harness"
+            },
+            "manifest": {
+              "const": "packages/orchestration/harness.package.json"
+            },
+            "graph": {
+              "properties": {
+                "id": {
+                  "const": "orchestration-flow"
+                },
+                "spec": {
+                  "const": "graphs/orchestration.graph.json"
+                },
+                "staticAsset": {
+                  "const": "assets/orchestration.svg"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

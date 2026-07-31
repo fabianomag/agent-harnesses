@@ -1,0 +1,4 @@
+interface:
+  display_name: "Orchestration Harness"
+  short_description: "Run safe local Master and front workflows"
+  default_prompt: "Use $orchestration to inspect or operate a local Master and its registered fronts safely."
