@@ -11,6 +11,7 @@
     "licenseFile",
     "evolutionModel",
     "badgeScale",
+    "agentCompatibility",
     "packages"
   ],
   "properties": {
@@ -115,6 +116,80 @@
         "verifiedRequirement": {
           "type": "string",
           "minLength": 1
+        }
+      }
+    },
+    "agentCompatibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "description",
+        "codex",
+        "otherAgents"
+      ],
+      "properties": {
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "codex": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "verification",
+            "verifiedEligible",
+            "scope"
+          ],
+          "properties": {
+            "status": {
+              "type": "string",
+              "const": "compatible"
+            },
+            "verification": {
+              "type": "string",
+              "enum": [
+                "pending",
+                "verified"
+              ]
+            },
+            "verifiedEligible": {
+              "type": "boolean",
+              "const": true
+            },
+            "scope": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "otherAgents": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "verification",
+            "verifiedEligible",
+            "scope"
+          ],
+          "properties": {
+            "status": {
+              "type": "string",
+              "const": "compatible"
+            },
+            "verification": {
+              "type": "string",
+              "const": "unverified"
+            },
+            "verifiedEligible": {
+              "type": "boolean",
+              "const": false
+            },
+            "scope": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
         }
       }
     },

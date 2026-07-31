@@ -125,6 +125,19 @@ class CatalogIntegrationTests(unittest.TestCase):
         )
         self.assertFalse(checked["badgeScale"]["packageRanking"])
         self.assertFalse(checked["evolutionModel"]["ranking"])
+        compatibility = checked["agentCompatibility"]
+        self.assertEqual("compatible", compatibility["codex"]["status"])
+        self.assertEqual("pending", compatibility["codex"]["verification"])
+        self.assertTrue(compatibility["codex"]["verifiedEligible"])
+        self.assertEqual(
+            "compatible",
+            compatibility["otherAgents"]["status"],
+        )
+        self.assertEqual(
+            "unverified",
+            compatibility["otherAgents"]["verification"],
+        )
+        self.assertFalse(compatibility["otherAgents"]["verifiedEligible"])
 
         for entry in checked["packages"]:
             self.assertTrue(entry["purpose"])
@@ -516,6 +529,7 @@ class CatalogIntegrationTests(unittest.TestCase):
         self.assertIn("Codex", root_readme)
         self.assertIn("integrations are unverified", root_readme)
         self.assertIn("## Optional installation report", root_readme)
+        self.assertIn("Problems installing? Report it.", root_readme)
         self.assertLess(
             root_readme.index("Draft a short installation report"),
             root_readme.index("Installation Report Issue Form"),

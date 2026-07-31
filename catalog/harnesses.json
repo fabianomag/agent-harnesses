@@ -24,6 +24,21 @@
     "description": "Levels describe evidence strength for each capability dimension, not overall package quality.",
     "verifiedRequirement": "Repeatable evaluations of the exact published version."
   },
+  "agentCompatibility": {
+    "description": "Agent compatibility is separate from package capability badges and from published-version verification.",
+    "codex": {
+      "status": "compatible",
+      "verification": "pending",
+      "verifiedEligible": true,
+      "scope": "Packaged Codex Skills plus explicit CLI and Markdown contracts; exact published-version walkthrough evidence is pending."
+    },
+    "otherAgents": {
+      "status": "compatible",
+      "verification": "unverified",
+      "verifiedEligible": false,
+      "scope": "Explicit CLI and Markdown contracts only; no agent-specific integration evaluation or Skill behavior is claimed."
+    }
+  },
   "packages": [
     {
       "id": "project-harness",

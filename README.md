@@ -215,6 +215,9 @@ external patterns, matching content, source excerpts, or external input path.
 
 ## Optional installation report
 
+**Problems installing? Report it.** Start with a private, reviewable draft;
+nothing is created or submitted automatically.
+
 First, copy this prompt into your local agent session. It asks for a draft only:
 
 ```text

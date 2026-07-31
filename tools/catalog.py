@@ -1047,6 +1047,34 @@ def _unpublished_immutable_links() -> dict[str, dict[str, str]]:
     }
 
 
+def _agent_compatibility() -> dict[str, Any]:
+    return {
+        "description": (
+            "Agent compatibility is separate from package capability badges "
+            "and from published-version verification."
+        ),
+        "codex": {
+            "status": "compatible",
+            "verification": "pending",
+            "verifiedEligible": True,
+            "scope": (
+                "Packaged Codex Skills plus explicit CLI and Markdown "
+                "contracts; exact published-version walkthrough evidence is "
+                "pending."
+            ),
+        },
+        "otherAgents": {
+            "status": "compatible",
+            "verification": "unverified",
+            "verifiedEligible": False,
+            "scope": (
+                "Explicit CLI and Markdown contracts only; no agent-specific "
+                "integration evaluation or Skill behavior is claimed."
+            ),
+        },
+    }
+
+
 def _validate_manifest_identity(
     manifest: Any,
     *,
@@ -1173,6 +1201,7 @@ def expected_catalog(repository_root: Path) -> dict[str, Any]:
                 "Repeatable evaluations of the exact published version."
             ),
         },
+        "agentCompatibility": _agent_compatibility(),
         "packages": packages,
     }
 
