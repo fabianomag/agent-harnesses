@@ -606,7 +606,7 @@
         },
         {
           "path": "tests/test_cross_project.py",
-          "sha256": "9c0a87e68f1633e4f642fea732963fddd5b8555b395086cacf9a7f746720f9d3"
+          "sha256": "342b14c20aae7df960bec9f32a181c6798bead7f20af1ba950c35346eb0b250e"
         }
       ]
     },

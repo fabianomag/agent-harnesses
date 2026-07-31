@@ -196,7 +196,10 @@ class CrossProjectTests(unittest.TestCase):
         self.assertEqual(result["changed"], [])
         self.assertEqual(first, self.digest())
         self.assertTrue(agents.read_text(encoding="utf-8").startswith(owner_text))
-        self.assertEqual(agents.stat().st_mode & 0o777, 0o640)
+        if os.name == "posix":
+            self.assertEqual(agents.stat().st_mode & 0o777, 0o640)
+        else:
+            self.assertTrue(stat.S_ISREG(agents.stat().st_mode))
 
     def test_id_and_path_collisions_are_rejected(self) -> None:
         self.run_cli(*self.init_arguments())
@@ -443,7 +446,10 @@ class CrossProjectTests(unittest.TestCase):
         for name in (*MODULE.MANAGED_FILES, MODULE.CONFIG_NAME):
             if name == "AGENTS.md":
                 self.assertEqual(agents.read_text(encoding="utf-8"), "Owner notes\n")
-                self.assertEqual(agents.stat().st_mode & 0o777, 0o640)
+                if os.name == "posix":
+                    self.assertEqual(agents.stat().st_mode & 0o777, 0o640)
+                else:
+                    self.assertTrue(stat.S_ISREG(agents.stat().st_mode))
             else:
                 self.assertFalse((self.root / name).exists())
         self.assertFalse((self.root / MODULE.LOCK_NAME).exists())
