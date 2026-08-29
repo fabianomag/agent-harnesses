@@ -72,6 +72,23 @@ def expected_readmes(
     return expected
 
 
+def expected_operator_artifacts(value: dict) -> dict[Path, bytes]:
+    """Render neutral machine and human operator contracts for every package."""
+    expected: dict[Path, bytes] = {}
+    for definition in value["packages"]:
+        package_root = Path("packages") / definition["id"]
+        expected[package_root / "operations.json"] = product.canonical_json_bytes(
+            product.operations_document(value, definition)
+        )
+        expected[package_root / "OPERATOR_GUIDE.md"] = (
+            product.operator_guide(value, definition, "en").rstrip() + "\n"
+        ).encode("utf-8")
+        expected[package_root / "OPERATOR_GUIDE.pt-BR.md"] = (
+            product.operator_guide(value, definition, "ptBr").rstrip() + "\n"
+        ).encode("utf-8")
+    return expected
+
+
 def expected_installer(repository_root: Path = REPOSITORY_ROOT) -> bytes:
     value = product.load_product(repository_root)
     try:
@@ -93,6 +110,7 @@ def check(repository_root: Path = REPOSITORY_ROOT) -> list[str]:
         ),
     }
     expected.update(expected_readmes(repository_root, value))
+    expected.update(expected_operator_artifacts(value))
     drift: list[str] = []
     for relative, content in expected.items():
         try:
@@ -113,6 +131,7 @@ def write(repository_root: Path = REPOSITORY_ROOT) -> list[str]:
         ),
     }
     expected.update(expected_readmes(repository_root, value))
+    expected.update(expected_operator_artifacts(value))
     written: list[str] = []
     for relative, content in expected.items():
         destination = repository_root / relative

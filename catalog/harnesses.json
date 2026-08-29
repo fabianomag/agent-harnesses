@@ -30,20 +30,20 @@
       "status": "compatible",
       "verification": "pending",
       "verifiedEligible": false,
-      "scope": "Packaged Codex Skills plus explicit CLI and Markdown contracts; a fresh walkthrough of the exact v0.2.0 release assets is still pending."
+      "scope": "The agent-agnostic CLI, operations contract, and Markdown guides are primary. Optional Codex adapters remain outside the core assets; a fresh walkthrough of the exact v0.2.1 release assets is still pending."
     },
     "otherAgents": {
       "status": "compatible",
       "verification": "unverified",
       "verifiedEligible": false,
-      "scope": "Explicit CLI and Markdown contracts only; no agent-specific integration evaluation or Skill behavior is claimed."
+      "scope": "The core uses explicit CLI, JSON, and Markdown contracts. Claude Code Desktop receives a bounded compatibility smoke; no generic agent-specific Skill behavior is claimed."
     }
   },
   "packages": [
     {
       "id": "project-harness",
       "displayName": "Project Harness",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "license": "MIT",
       "artifactStatus": {
         "implementation": "implemented",
@@ -80,8 +80,8 @@
           "evidence": [
             {
               "method": "structural",
-              "path": "packages/project-harness/skills/project-harness/SKILL.md",
-              "claim": "Packages a Codex Skill with validated name and description frontmatter; manual Codex evidence must be bound to the exact release before any verified claim."
+              "path": "adapters/openai/project-harness/SKILL.md",
+              "claim": "Provides an optional Codex Skill adapter outside the agent-agnostic core package; no adapter is installed by the default release flow."
             }
           ]
         },
@@ -161,22 +161,22 @@
       "immutableLinks": {
         "documentation": {
           "status": "published",
-          "url": "https://github.com/fabianomag/agent-harnesses/blob/v0.2.0/packages/project-harness/README.md"
+          "url": "https://github.com/fabianomag/agent-harnesses/blob/v0.2.1/packages/project-harness/README.md"
         },
         "prompt": {
           "status": "published",
-          "url": "https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.0/project-harness-0.2.0.zip"
+          "url": "https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.1/project-harness-0.2.1.zip"
         },
         "source": {
           "status": "published",
-          "url": "https://github.com/fabianomag/agent-harnesses/tree/v0.2.0/packages/project-harness"
+          "url": "https://github.com/fabianomag/agent-harnesses/tree/v0.2.1/packages/project-harness"
         },
         "release": {
           "status": "published",
-          "url": "https://github.com/fabianomag/agent-harnesses/releases/tag/v0.2.0"
+          "url": "https://github.com/fabianomag/agent-harnesses/releases/tag/v0.2.1"
         },
         "interactiveDiagram": {
-          "status": "published",
+          "status": "planned",
           "url": "https://fabianomag.com/projects/agent-harnesses"
         }
       },
@@ -208,32 +208,40 @@
       },
       "files": [
         {
+          "path": "OPERATOR_GUIDE.md",
+          "sha256": "dfb0e21f53170c156ddf3a5198db24af280e0d2ce8d8c4cdc6efbe5bae4d7bf8"
+        },
+        {
+          "path": "OPERATOR_GUIDE.pt-BR.md",
+          "sha256": "23cf44c982839a570e3d9c82d8d7db857089f17320c134af3ca33f6eea7e0c4b"
+        },
+        {
           "path": "README.md",
-          "sha256": "8dd059706d1e50a684cc825b13b8e901e64ec47d05903b59535b5a88c5118fe7"
+          "sha256": "32d28674345938e67c0e54d97c5a204c86652fa35aac13f4ebbff91717926396"
         },
         {
           "path": "README.pt-BR.md",
-          "sha256": "0b6b727806ee08c5e04d7b5a7b464297ba852b4d9b8cd30eece8bb4b9a84ee77"
+          "sha256": "7675936b20a0a6b8c2ec992d0291bfb378dbf73a71a10dd141e2b862aa19cec1"
         },
         {
           "path": "docs/REFERENCE.md",
-          "sha256": "dd8684b50ae83ff56ef47383aaca1b610a8a5bae8d8313f324c5d55231021d8c"
+          "sha256": "2429be22b8bc01073ae77dfb839a1e9acd0e9cdd221e34b70ac2c1e0356b13bb"
         },
         {
           "path": "harness.package.json",
-          "sha256": "f588bbdc7a1dd953fe1fcb761954c16b8ae379d74d7ec09add6a62012a037477"
+          "sha256": "a42cdab1b616fcd2915b0d7918bfdd344ed3706bfba3796a30499470d55b3b12"
+        },
+        {
+          "path": "operations.json",
+          "sha256": "7dcb04217dd6859a68c1bc9ab6ee2f73df0ffd59efb9a2074a7ad88daef71883"
         },
         {
           "path": "project_harness.py",
-          "sha256": "7096cffbadec9338e1a8f20497bb7e9d49cc1f50a0d9cf549daa07828f132e53"
-        },
-        {
-          "path": "skills/project-harness/SKILL.md",
-          "sha256": "bf5cc1175efd44d9ec8c6a71cd39da6cf2f4963b55af69c8950efc801f1a50a4"
+          "sha256": "121239dbb65f9bcfe88ea8fc12b2ff9bdfe61139bea10122f42628b583ad6b33"
         },
         {
           "path": "tests/test_project_harness.py",
-          "sha256": "d8dcfe4f3ab55f4fb4e976cd8f90ab438564c0a512de212d1ecb0b42c062a060"
+          "sha256": "5d100d8c4f644710b95e1b7e9c3c2e4b754d02c21cedaee611a57241c81e3649"
         },
         {
           "path": "tests/validate_generated_fixture.py",
@@ -244,7 +252,7 @@
     {
       "id": "workspace-coordination",
       "displayName": "Workspace Harness",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "license": "MIT",
       "artifactStatus": {
         "implementation": "implemented",
@@ -281,8 +289,8 @@
           "evidence": [
             {
               "method": "structural",
-              "path": "packages/workspace-coordination/SKILL.md",
-              "claim": "Packages a Codex Skill with validated name and description frontmatter; manual Codex evidence must be bound to the exact release before any verified claim."
+              "path": "adapters/openai/workspace-coordination/SKILL.md",
+              "claim": "Provides an optional Codex Skill adapter outside the agent-agnostic core package; no adapter is installed by the default release flow."
             }
           ]
         },
@@ -320,7 +328,7 @@
       "limitations": [
         "Independent repositories or a single project with no child coordination.",
         "It does not discover children, scan adjacent folders, dispatch agents, or execute child work.",
-        "Version 0.2.0 supports one mutating writer per coordinator root."
+        "Version 0.2.1 supports one mutating writer per coordinator root."
       ],
       "graph": {
         "id": "workspace-coordination-flow",
@@ -357,22 +365,22 @@
       "immutableLinks": {
         "documentation": {
           "status": "published",
-          "url": "https://github.com/fabianomag/agent-harnesses/blob/v0.2.0/packages/workspace-coordination/README.md"
+          "url": "https://github.com/fabianomag/agent-harnesses/blob/v0.2.1/packages/workspace-coordination/README.md"
         },
         "prompt": {
           "status": "published",
-          "url": "https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.0/workspace-coordination-0.2.0.zip"
+          "url": "https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.1/workspace-coordination-0.2.1.zip"
         },
         "source": {
           "status": "published",
-          "url": "https://github.com/fabianomag/agent-harnesses/tree/v0.2.0/packages/workspace-coordination"
+          "url": "https://github.com/fabianomag/agent-harnesses/tree/v0.2.1/packages/workspace-coordination"
         },
         "release": {
           "status": "published",
-          "url": "https://github.com/fabianomag/agent-harnesses/releases/tag/v0.2.0"
+          "url": "https://github.com/fabianomag/agent-harnesses/releases/tag/v0.2.1"
         },
         "interactiveDiagram": {
-          "status": "published",
+          "status": "planned",
           "url": "https://fabianomag.com/projects/agent-harnesses"
         }
       },
@@ -405,24 +413,32 @@
       },
       "files": [
         {
+          "path": "OPERATOR_GUIDE.md",
+          "sha256": "0b0327be6b4675642c924633fda14927e28f3c891a9c7e6a512d79cb67374f6b"
+        },
+        {
+          "path": "OPERATOR_GUIDE.pt-BR.md",
+          "sha256": "01e702ea6db72661f5d18fddf58010640fb8d8599af77891299453bbb5cfc5f3"
+        },
+        {
           "path": "README.md",
-          "sha256": "9fd5016b7e6cde6f14cc7348c05996538b99fd2bd64e623de53af98251776830"
+          "sha256": "5fc6fff50e425126524b4d60ef321a73950086c27c53e39062215593e43ef082"
         },
         {
           "path": "README.pt-BR.md",
-          "sha256": "7607a03b7a1267103e30982e1d51d6556aa2f81b4c79c2abd6c44fabd39001be"
-        },
-        {
-          "path": "SKILL.md",
-          "sha256": "f8f438dcc26912d8a0faff7952c7306bb9ac1a0ddae1ea525a9f37393abf6df3"
+          "sha256": "4bea61bbd6b6a24aff869dfa1ce8cf61ae05fb291c2c3dbab100d6733da2dd82"
         },
         {
           "path": "docs/REFERENCE.md",
-          "sha256": "bc1f1dff44bddaee6b7f5861c3ebac50c63a90a8c5f17b664d40c02c1069a577"
+          "sha256": "e6f6220708b53fd0ec2ede92848fc6c97be8bbbb471ff4bbac943a117a60d37a"
         },
         {
           "path": "harness.package.json",
-          "sha256": "9b5578a4569042b28b470eb6fec8f689ea1f1ab9c44581c92e4a41373ca4f0e7"
+          "sha256": "4ce53b456075f6aa9ba417f177edfd382b047713d8d014f9c68125f0921f7632"
+        },
+        {
+          "path": "operations.json",
+          "sha256": "486c0f9896030a89e11b9489a90e5c335da52c9ae970cfce2b1505d7849fa99e"
         },
         {
           "path": "tests/fixtures/coordinator/child-alpha/AGENTS.md",
@@ -449,7 +465,7 @@
     {
       "id": "cross-project",
       "displayName": "Multi-Project Harness",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "license": "MIT",
       "artifactStatus": {
         "implementation": "implemented",
@@ -486,8 +502,8 @@
           "evidence": [
             {
               "method": "structural",
-              "path": "packages/cross-project/SKILL.md",
-              "claim": "Packages a Codex Skill with validated name and description frontmatter; manual Codex evidence must be bound to the exact release before any verified claim."
+              "path": "adapters/openai/cross-project/SKILL.md",
+              "claim": "Provides an optional Codex Skill adapter outside the agent-agnostic core package; no adapter is installed by the default release flow."
             }
           ]
         },
@@ -567,22 +583,22 @@
       "immutableLinks": {
         "documentation": {
           "status": "published",
-          "url": "https://github.com/fabianomag/agent-harnesses/blob/v0.2.0/packages/cross-project/README.md"
+          "url": "https://github.com/fabianomag/agent-harnesses/blob/v0.2.1/packages/cross-project/README.md"
         },
         "prompt": {
           "status": "published",
-          "url": "https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.0/cross-project-0.2.0.zip"
+          "url": "https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.1/cross-project-0.2.1.zip"
         },
         "source": {
           "status": "published",
-          "url": "https://github.com/fabianomag/agent-harnesses/tree/v0.2.0/packages/cross-project"
+          "url": "https://github.com/fabianomag/agent-harnesses/tree/v0.2.1/packages/cross-project"
         },
         "release": {
           "status": "published",
-          "url": "https://github.com/fabianomag/agent-harnesses/releases/tag/v0.2.0"
+          "url": "https://github.com/fabianomag/agent-harnesses/releases/tag/v0.2.1"
         },
         "interactiveDiagram": {
-          "status": "published",
+          "status": "planned",
           "url": "https://fabianomag.com/projects/agent-harnesses"
         }
       },
@@ -615,28 +631,32 @@
       },
       "files": [
         {
+          "path": "OPERATOR_GUIDE.md",
+          "sha256": "eaf3ea44907e75a5d804fcd40d672cca1f0362bc02175ce9096a7bc00c0823d3"
+        },
+        {
+          "path": "OPERATOR_GUIDE.pt-BR.md",
+          "sha256": "0f85b9dec168b9ebf7192641356ea520b868e9e18276f3e3ed6ff2d2b37e48ed"
+        },
+        {
           "path": "README.md",
-          "sha256": "df24f49ab6baa04e46fad33c06ccb8ad2b9d27b6aa5d2ebf5b989c4c9638ffd4"
+          "sha256": "d8122b21e3ce8c3ebf7a5f98c4935aeb298638f39997a9857ae16bb6d1444809"
         },
         {
           "path": "README.pt-BR.md",
-          "sha256": "642b1dec34f039846177ac8266924537d94aa756c623367f37f74aee129bab8b"
-        },
-        {
-          "path": "SKILL.md",
-          "sha256": "2b1e8f6e19d6c3aeba7a46c5660c294f23c13da9e47caf260f6014f16c316fbf"
-        },
-        {
-          "path": "agents/openai.yaml",
-          "sha256": "30dd81cde03ccb4bf10ceaef4c5146fb9a9df54a5f475b18ab1a781a5b7e98b0"
+          "sha256": "4f24a7c5a85a75e78012762e98de961b4409e02811534d96fb4153faaf73d531"
         },
         {
           "path": "docs/REFERENCE.md",
-          "sha256": "a23ce6634bf19e41372d4302c50d1b4d0418c0147621360d9ebae16e6aa7f499"
+          "sha256": "f8124830eb29088505cc62ae1969c5595d2a5f4ccb33375974ce80af58f616f2"
         },
         {
           "path": "harness.package.json",
-          "sha256": "5eaccce8156f0d0f559cc089355482e48d19f66b0541c834e6d593615fccf8ef"
+          "sha256": "f2924a5a8cce2a60befa22da22ed85a1ae186ac20dbd60f31eb96401f382946f"
+        },
+        {
+          "path": "operations.json",
+          "sha256": "8b955895f13b593357309c85733c926d0c41b8a9bb2670e248f49f219db60bfc"
         },
         {
           "path": "scripts/cross_project.py",
@@ -655,7 +675,7 @@
     {
       "id": "orchestration",
       "displayName": "Control Plane Harness",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "license": "MIT",
       "artifactStatus": {
         "implementation": "implemented",
@@ -692,8 +712,8 @@
           "evidence": [
             {
               "method": "structural",
-              "path": "packages/orchestration/SKILL.md",
-              "claim": "Packages a Codex Skill with validated name and description frontmatter; manual Codex evidence must be bound to the exact release before any verified claim."
+              "path": "adapters/openai/orchestration/SKILL.md",
+              "claim": "Provides an optional Codex Skill adapter outside the agent-agnostic core package; no adapter is installed by the default release flow."
             }
           ]
         },
@@ -773,22 +793,22 @@
       "immutableLinks": {
         "documentation": {
           "status": "published",
-          "url": "https://github.com/fabianomag/agent-harnesses/blob/v0.2.0/packages/orchestration/README.md"
+          "url": "https://github.com/fabianomag/agent-harnesses/blob/v0.2.1/packages/orchestration/README.md"
         },
         "prompt": {
           "status": "published",
-          "url": "https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.0/orchestration-0.2.0.zip"
+          "url": "https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.1/orchestration-0.2.1.zip"
         },
         "source": {
           "status": "published",
-          "url": "https://github.com/fabianomag/agent-harnesses/tree/v0.2.0/packages/orchestration"
+          "url": "https://github.com/fabianomag/agent-harnesses/tree/v0.2.1/packages/orchestration"
         },
         "release": {
           "status": "published",
-          "url": "https://github.com/fabianomag/agent-harnesses/releases/tag/v0.2.0"
+          "url": "https://github.com/fabianomag/agent-harnesses/releases/tag/v0.2.1"
         },
         "interactiveDiagram": {
-          "status": "published",
+          "status": "planned",
           "url": "https://fabianomag.com/projects/agent-harnesses"
         }
       },
@@ -822,36 +842,40 @@
       },
       "files": [
         {
+          "path": "OPERATOR_GUIDE.md",
+          "sha256": "8ec31d1c2993f7f3e0f0eb1ffac2b8680c40bf0d7e27208c3f53c21df6fa6614"
+        },
+        {
+          "path": "OPERATOR_GUIDE.pt-BR.md",
+          "sha256": "03203bb92ef5f872589915694af0d8822d2ec3bc76f07ea00806e4c8cc75c792"
+        },
+        {
           "path": "README.md",
-          "sha256": "1b8a1dac8f11ed8da345cd150623d2d6fb5022461a92e5278185b7b6797054ea"
+          "sha256": "697f96543b93c8d1e92d7b0987dfcf671e8ee045be6b29b98f25cb7725dbba40"
         },
         {
           "path": "README.pt-BR.md",
-          "sha256": "9f993c3ed6108dc24e55fc0a23a2d691365cb5ea4d13dc1b78366c2a250efdbe"
-        },
-        {
-          "path": "SKILL.md",
-          "sha256": "377579fc08b480d51fc5e38855728d07e52599396aa5254d6923097af5e129b3"
-        },
-        {
-          "path": "agents/openai.yaml",
-          "sha256": "abae30564b1f3049cbeb8b36efe1be36ddfadb576dd7a66909c17173c67bea0b"
+          "sha256": "477962069647e7bbc2ed46c4f75b37e843ee051ef26e78a71813df4a236086c2"
         },
         {
           "path": "docs/REFERENCE.md",
-          "sha256": "815e2c44d0e295e5372f9ab267339b6ea77b6de4b53669ccba29a89dd8aa3446"
+          "sha256": "df7452c92d2e233cda4a5899bf85ff8bc9721dc91942976a0052960203a00dfd"
         },
         {
           "path": "harness.package.json",
-          "sha256": "471236de90124a022e2c900da6b911e8e6d3d87cef1437ee418b00b91989d6eb"
+          "sha256": "167200449f519be9fc3b842fd0956566b1417681f414ef332d95ff374f75a8c2"
         },
         {
           "path": "hq.py",
           "sha256": "25c3356786e0dabf3a8971a34b84c6ea33e73d7d066ae3390f9ac8025117a0ae"
         },
         {
+          "path": "operations.json",
+          "sha256": "72a80c6f94320b0a01fcc842d50f3ce2b2a381fa68f75e838e12acc91aaba552"
+        },
+        {
           "path": "orchestration_harness/__init__.py",
-          "sha256": "69727564f3743a1c01aec03c6b1f1b6eb88061c97c28276afeaf473df1b13b12"
+          "sha256": "82eab95991fb82a82fc8262d741ee897279f2e7cbe6966f2438b99aab1667d19"
         },
         {
           "path": "orchestration_harness/cli.py",
@@ -875,7 +899,7 @@
         },
         {
           "path": "orchestration_harness/service.py",
-          "sha256": "792560b508a3e06cae3f0c8edb992a394ed6376f7f606fb45eaeec476eb8cd4f"
+          "sha256": "f6e2ea3c2358502cbd33f97c71037e719efc638c59122976dd6933ac7a94489f"
         },
         {
           "path": "orchestration_harness/transaction.py",
@@ -883,7 +907,7 @@
         },
         {
           "path": "orchestration_harness/verifier.py",
-          "sha256": "382c715eb73627969678b28fde03648aff31f5e360fcd908fcfc5c1254e03daf"
+          "sha256": "415c8f8f4454f73a67481f709a9605a78dc67a18dd558898817dfff600aef626"
         },
         {
           "path": "scripts/structural_check.py",
@@ -939,7 +963,7 @@
         },
         {
           "path": "tests/test_cli_and_verifier.py",
-          "sha256": "a55d8bcaea00ec1bd26881744cc13e36bea3f57c6ec22f800322496e506c3c42"
+          "sha256": "7ade3c250a42fa3ca35b0d3a3a9099d5975ed53411e4b7e67ea34fe15b93e5cd"
         },
         {
           "path": "tests/test_model.py",
@@ -951,7 +975,7 @@
         },
         {
           "path": "tests/test_workflow.py",
-          "sha256": "22cb23da530fedfbfa400d75aec20d6f378911dac2cbe19a62bcab1a88e21fc3"
+          "sha256": "1ad5d18fceb48f6b9bff6e2a37cc5c7c3f6baa8001e124a754f12aa7a7ff7025"
         }
       ]
     }

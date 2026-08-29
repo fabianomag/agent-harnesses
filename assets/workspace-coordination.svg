@@ -57,7 +57,7 @@
       <tspan x="1100" dy="0">Reflection</tspan>
     </text>
   </g>
-  <text class="meta" x="40" y="320">0.2.0 · implemented · published</text>
+  <text class="meta" x="40" y="320">0.2.1 · implemented · published</text>
   <a href="https://fabianomag.com/projects/agent-harnesses" aria-label="Open the interactive Workspace Harness diagram">
     <text class="link" x="40" y="345">Interactive diagram</text>
   </a>

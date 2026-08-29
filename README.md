@@ -7,7 +7,7 @@ Four local harnesses for four different coordination boundaries. Choose the smal
 
 Interactive guide: https://fabianomag.com/projects/agent-harnesses
 
-Requirements: Python 3.10 or newer, an explicit existing target directory, and one exact `v0.2.0` release asset. The runtimes use only the Python standard library. The installer does not change `PATH`, edit `.gitignore`, or install a global Skill.
+Requirements: Python 3.10 or newer, an explicit existing target directory, and one exact `v0.2.1` ZIP with its matching checksum sidecar. Each ZIP installs the complete Python-standard-library runtime, command inventory, and agent-agnostic operator guide for one harness. It does not change `PATH`, edit `.gitignore`, or require a global Skill.
 
 ## What do you need to coordinate?
 
@@ -27,54 +27,114 @@ Copy only the block for the harness you chose. Each block names one package, one
 ### Project Harness
 
 ```text
-Install Project Harness (`project-harness`) v0.2.0 from https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.0/project-harness-0.2.0.zip. Before any write, confirm the explicit target and resolve exactly one Python 3.10+ executable available to the user or system as `<python>` (for example `python3`, `python`, or `py -3`); reuse only that executable and never use a private Codex runtime. Download the ZIP and its adjacent `.sha256` sidecar into an isolated temporary directory, verify the checksum before extraction or execution, then extract it. From the extracted bundle root run:
+Install Project Harness (`project-harness`) v0.2.1 from https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.1/project-harness-0.2.1.zip.
+
+Before proposing execution, confirm every selected-harness readiness fact:
+- The explicit target is the root of one real project.
+- That project's write boundary is understood and does not include sibling projects.
+- The requested scope is project-local operational memory, not coordination across multiple projects.
+If any fact is unknown or false, stop before downloads or target writes, explain what must be organized first, and offer the support contacts below.
+
+If the current mode cannot execute, request a switch to an execution-capable mode only after presenting the plan and receiving confirmation.
+
+Use the agent's native Plan mode and structured questions when available; otherwise present the same plan and questions conversationally. Work in two explicit stages: plan first, then execute only after confirmation. Before any write, including a download or temporary extraction, inspect only the explicit target and available public tooling read-only. Present four separate checklists: (1) fit and target, (2) safety and write plan, (3) initialization and readiness, and (4) tutorial and handoff. State the selected harness, target, one user- or system-available Python 3.10+ executable as `<python>` (for example `python3`, `python`, or `py -3`), expected writes, required initialization inputs, verification, rollback, and tutorial steps; ask the user to confirm that plan. Never use a private Codex runtime. Do not organize, rename, summarize, migrate, or infer the user's project data. Ask for any missing value instead of inventing it. After confirmation, download the ZIP and its adjacent `.sha256` sidecar into an isolated temporary directory, verify the checksum before extraction or execution, and extract it. From the extracted bundle root run:
 `<python> -B installer.py doctor project-harness --target "<target>" --json`
-Stop without writes on a mismatch and only recommend a better fit; never silently substitute another harness. Then run:
+If doctor or any pre-apply readiness check fails, stop with zero target writes, clean only isolated temporary files, and recommend a better fit when applicable; never silently substitute another harness. Then run:
 `<python> -B installer.py install project-harness --target "<target>" --dry-run --json`
+Review the result against the confirmed plan and ask again if the write set or assumptions materially changed. Otherwise run:
 `<python> -B installer.py install project-harness --target "<target>" --apply --json`
-Follow `package/README.md` inside the extracted bundle to initialize the target, then run from the bundle root:
+Follow `package/README.md` to initialize the target, previewing every runtime mutation and using only confirmed user values. If any step fails after the first apply or final readiness is false, stop normal execution and follow the exact package's documented rollback or recovery procedure, preview it before apply, preserve unrelated files, verify restoration toward the exact pre-install state, and report any unavoidable residual change instead of claiming success. Then run from the bundle root:
 `<python> -B installer.py verify project-harness --target "<target>" --json`
-Report success only when this final result contains `ready=true`. Clean up temporary files and report the receipt plus `uninstall`/rollback instructions. Do not edit unrelated documentation, `PATH`, or `.gitignore`, and do not install a global Skill.
+Report installation success only when this final result contains `ready=true`. After readiness, read the installed runtime's `operations.json` and `OPERATOR_GUIDE.md`, then give the user a concise tutorial in the conversation covering every command, the first-use, daily, close-and-resume, and verify-or-recover workflows, safe examples with confirmed values or placeholders, and update/uninstall guidance. Do not create tutorial files. Clean temporary files and report the receipt, readiness evidence, rollback status, and runtime location. Offer support through LinkedIn at https://www.linkedin.com/in/fabianomag/ or email at fm@fabianomag.com. Do not edit unrelated documentation, `PATH`, or `.gitignore`, and do not install a global Skill.
+
+Deliver the tutorial in the user's language and in the conversation without creating project documentation. Use only values explicitly supplied by the user; otherwise retain placeholders. Do not install or instruct the installation of any global agent adapter.
 ```
 
 ### Workspace Harness
 
 ```text
-Install Workspace Harness (`workspace-coordination`) v0.2.0 from https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.0/workspace-coordination-0.2.0.zip. Before any write, confirm the explicit target and resolve exactly one Python 3.10+ executable available to the user or system as `<python>` (for example `python3`, `python`, or `py -3`); reuse only that executable and never use a private Codex runtime. Download the ZIP and its adjacent `.sha256` sidecar into an isolated temporary directory, verify the checksum before extraction or execution, then extract it. From the extracted bundle root run:
+Install Workspace Harness (`workspace-coordination`) v0.2.1 from https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.1/workspace-coordination-0.2.1.zip.
+
+Before proposing execution, confirm every selected-harness readiness fact:
+- The explicit target is the container workspace, not one of its child projects.
+- The existing contained child projects to register are already known.
+- Each selected child has an explicit local owner file and its detailed state will remain locally owned.
+If any fact is unknown or false, stop before downloads or target writes, explain what must be organized first, and offer the support contacts below.
+
+If the current mode cannot execute, request a switch to an execution-capable mode only after presenting the plan and receiving confirmation.
+
+Use the agent's native Plan mode and structured questions when available; otherwise present the same plan and questions conversationally. Work in two explicit stages: plan first, then execute only after confirmation. Before any write, including a download or temporary extraction, inspect only the explicit target and available public tooling read-only. Present four separate checklists: (1) fit and target, (2) safety and write plan, (3) initialization and readiness, and (4) tutorial and handoff. State the selected harness, target, one user- or system-available Python 3.10+ executable as `<python>` (for example `python3`, `python`, or `py -3`), expected writes, required initialization inputs, verification, rollback, and tutorial steps; ask the user to confirm that plan. Never use a private Codex runtime. Do not organize, rename, summarize, migrate, or infer the user's project data. Ask for any missing value instead of inventing it. After confirmation, download the ZIP and its adjacent `.sha256` sidecar into an isolated temporary directory, verify the checksum before extraction or execution, and extract it. From the extracted bundle root run:
 `<python> -B installer.py doctor workspace-coordination --target "<target>" --json`
-Stop without writes on a mismatch and only recommend a better fit; never silently substitute another harness. Then run:
+If doctor or any pre-apply readiness check fails, stop with zero target writes, clean only isolated temporary files, and recommend a better fit when applicable; never silently substitute another harness. Then run:
 `<python> -B installer.py install workspace-coordination --target "<target>" --dry-run --json`
+Review the result against the confirmed plan and ask again if the write set or assumptions materially changed. Otherwise run:
 `<python> -B installer.py install workspace-coordination --target "<target>" --apply --json`
-Follow `package/README.md` inside the extracted bundle to initialize the target, then run from the bundle root:
+Follow `package/README.md` to initialize the target, previewing every runtime mutation and using only confirmed user values. If any step fails after the first apply or final readiness is false, stop normal execution and follow the exact package's documented rollback or recovery procedure, preview it before apply, preserve unrelated files, verify restoration toward the exact pre-install state, and report any unavoidable residual change instead of claiming success. Then run from the bundle root:
 `<python> -B installer.py verify workspace-coordination --target "<target>" --json`
-Report success only when this final result contains `ready=true`. Clean up temporary files and report the receipt plus `uninstall`/rollback instructions. Do not edit unrelated documentation, `PATH`, or `.gitignore`, and do not install a global Skill.
+Report installation success only when this final result contains `ready=true`. After readiness, read the installed runtime's `operations.json` and `OPERATOR_GUIDE.md`, then give the user a concise tutorial in the conversation covering every command, the first-use, daily, close-and-resume, and verify-or-recover workflows, safe examples with confirmed values or placeholders, and update/uninstall guidance. Do not create tutorial files. Clean temporary files and report the receipt, readiness evidence, rollback status, and runtime location. Offer support through LinkedIn at https://www.linkedin.com/in/fabianomag/ or email at fm@fabianomag.com. Do not edit unrelated documentation, `PATH`, or `.gitignore`, and do not install a global Skill.
+
+Deliver the tutorial in the user's language and in the conversation without creating project documentation. Use only values explicitly supplied by the user; otherwise retain placeholders. Do not install or instruct the installation of any global agent adapter.
 ```
 
 ### Multi-Project Harness
 
 ```text
-Install Multi-Project Harness (`cross-project`) v0.2.0 from https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.0/cross-project-0.2.0.zip. Before any write, confirm the explicit target and resolve exactly one Python 3.10+ executable available to the user or system as `<python>` (for example `python3`, `python`, or `py -3`); reuse only that executable and never use a private Codex runtime. Download the ZIP and its adjacent `.sha256` sidecar into an isolated temporary directory, verify the checksum before extraction or execution, then extract it. From the extracted bundle root run:
+Install Multi-Project Harness (`cross-project`) v0.2.1 from https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.1/cross-project-0.2.1.zip.
+
+Before proposing execution, confirm every selected-harness readiness fact:
+- The coordination root and the independent existing project roots are explicit.
+- The projects have known boundaries and a real need for handoffs or structural sync across roots.
+- The user can supply each selected project's role and next action without repository discovery or invented state.
+If any fact is unknown or false, stop before downloads or target writes, explain what must be organized first, and offer the support contacts below.
+
+If the current mode cannot execute, request a switch to an execution-capable mode only after presenting the plan and receiving confirmation.
+
+Use the agent's native Plan mode and structured questions when available; otherwise present the same plan and questions conversationally. Work in two explicit stages: plan first, then execute only after confirmation. Before any write, including a download or temporary extraction, inspect only the explicit target and available public tooling read-only. Present four separate checklists: (1) fit and target, (2) safety and write plan, (3) initialization and readiness, and (4) tutorial and handoff. State the selected harness, target, one user- or system-available Python 3.10+ executable as `<python>` (for example `python3`, `python`, or `py -3`), expected writes, required initialization inputs, verification, rollback, and tutorial steps; ask the user to confirm that plan. Never use a private Codex runtime. Do not organize, rename, summarize, migrate, or infer the user's project data. Ask for any missing value instead of inventing it. After confirmation, download the ZIP and its adjacent `.sha256` sidecar into an isolated temporary directory, verify the checksum before extraction or execution, and extract it. From the extracted bundle root run:
 `<python> -B installer.py doctor cross-project --target "<target>" --json`
-Stop without writes on a mismatch and only recommend a better fit; never silently substitute another harness. Then run:
+If doctor or any pre-apply readiness check fails, stop with zero target writes, clean only isolated temporary files, and recommend a better fit when applicable; never silently substitute another harness. Then run:
 `<python> -B installer.py install cross-project --target "<target>" --dry-run --json`
+Review the result against the confirmed plan and ask again if the write set or assumptions materially changed. Otherwise run:
 `<python> -B installer.py install cross-project --target "<target>" --apply --json`
-Follow `package/README.md` inside the extracted bundle to initialize the target, then run from the bundle root:
+Follow `package/README.md` to initialize the target, previewing every runtime mutation and using only confirmed user values. If any step fails after the first apply or final readiness is false, stop normal execution and follow the exact package's documented rollback or recovery procedure, preview it before apply, preserve unrelated files, verify restoration toward the exact pre-install state, and report any unavoidable residual change instead of claiming success. Then run from the bundle root:
 `<python> -B installer.py verify cross-project --target "<target>" --json`
-Report success only when this final result contains `ready=true`. Clean up temporary files and report the receipt plus `uninstall`/rollback instructions. Do not edit unrelated documentation, `PATH`, or `.gitignore`, and do not install a global Skill.
+Report installation success only when this final result contains `ready=true`. After readiness, read the installed runtime's `operations.json` and `OPERATOR_GUIDE.md`, then give the user a concise tutorial in the conversation covering every command, the first-use, daily, close-and-resume, and verify-or-recover workflows, safe examples with confirmed values or placeholders, and update/uninstall guidance. Do not create tutorial files. Clean temporary files and report the receipt, readiness evidence, rollback status, and runtime location. Offer support through LinkedIn at https://www.linkedin.com/in/fabianomag/ or email at fm@fabianomag.com. Do not edit unrelated documentation, `PATH`, or `.gitignore`, and do not install a global Skill.
+
+Deliver the tutorial in the user's language and in the conversation without creating project documentation. Use only values explicitly supplied by the user; otherwise retain placeholders. Do not install or instruct the installation of any global agent adapter.
 ```
 
 ### Control Plane Harness
 
 ```text
-Install Control Plane Harness (`orchestration`) v0.2.0 from https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.0/orchestration-0.2.0.zip. Before any write, confirm the explicit target and resolve exactly one Python 3.10+ executable available to the user or system as `<python>` (for example `python3`, `python`, or `py -3`); reuse only that executable and never use a private Codex runtime. Download the ZIP and its adjacent `.sha256` sidecar into an isolated temporary directory, verify the checksum before extraction or execution, then extract it. From the extracted bundle root run:
+Install Control Plane Harness (`orchestration`) v0.2.1 from https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.1/orchestration-0.2.1.zip.
+
+Before proposing execution, confirm every selected-harness readiness fact:
+- The explicit target is a deliberate new Master or control-plane root, not an existing coordination structure to adopt.
+- The initial fronts, their intended relative paths, and their boundaries are already known.
+- The work genuinely requires a transactional registry, validated mutations, rollback, and recovery rather than only project handoffs.
+If any fact is unknown or false, stop before downloads or target writes, explain what must be organized first, and offer the support contacts below.
+
+If the current mode cannot execute, request a switch to an execution-capable mode only after presenting the plan and receiving confirmation.
+
+Use the agent's native Plan mode and structured questions when available; otherwise present the same plan and questions conversationally. Work in two explicit stages: plan first, then execute only after confirmation. Before any write, including a download or temporary extraction, inspect only the explicit target and available public tooling read-only. Present four separate checklists: (1) fit and target, (2) safety and write plan, (3) initialization and readiness, and (4) tutorial and handoff. State the selected harness, target, one user- or system-available Python 3.10+ executable as `<python>` (for example `python3`, `python`, or `py -3`), expected writes, required initialization inputs, verification, rollback, and tutorial steps; ask the user to confirm that plan. Never use a private Codex runtime. Do not organize, rename, summarize, migrate, or infer the user's project data. Ask for any missing value instead of inventing it. After confirmation, download the ZIP and its adjacent `.sha256` sidecar into an isolated temporary directory, verify the checksum before extraction or execution, and extract it. From the extracted bundle root run:
 `<python> -B installer.py doctor orchestration --target "<target>" --json`
-Stop without writes on a mismatch and only recommend a better fit; never silently substitute another harness. Then run:
+If doctor or any pre-apply readiness check fails, stop with zero target writes, clean only isolated temporary files, and recommend a better fit when applicable; never silently substitute another harness. Then run:
 `<python> -B installer.py install orchestration --target "<target>" --dry-run --json`
+Review the result against the confirmed plan and ask again if the write set or assumptions materially changed. Otherwise run:
 `<python> -B installer.py install orchestration --target "<target>" --apply --json`
-Follow `package/README.md` inside the extracted bundle to initialize the target, then run from the bundle root:
+Follow `package/README.md` to initialize the target, previewing every runtime mutation and using only confirmed user values. If any step fails after the first apply or final readiness is false, stop normal execution and follow the exact package's documented rollback or recovery procedure, preview it before apply, preserve unrelated files, verify restoration toward the exact pre-install state, and report any unavoidable residual change instead of claiming success. Then run from the bundle root:
 `<python> -B installer.py verify orchestration --target "<target>" --json`
-Report success only when this final result contains `ready=true`. Clean up temporary files and report the receipt plus `uninstall`/rollback instructions. Do not edit unrelated documentation, `PATH`, or `.gitignore`, and do not install a global Skill.
+Report installation success only when this final result contains `ready=true`. After readiness, read the installed runtime's `operations.json` and `OPERATOR_GUIDE.md`, then give the user a concise tutorial in the conversation covering every command, the first-use, daily, close-and-resume, and verify-or-recover workflows, safe examples with confirmed values or placeholders, and update/uninstall guidance. Do not create tutorial files. Clean temporary files and report the receipt, readiness evidence, rollback status, and runtime location. Offer support through LinkedIn at https://www.linkedin.com/in/fabianomag/ or email at fm@fabianomag.com. Do not edit unrelated documentation, `PATH`, or `.gitignore`, and do not install a global Skill.
+
+Deliver the tutorial in the user's language and in the conversation without creating project documentation. Use only values explicitly supplied by the user; otherwise retain placeholders. Do not install or instruct the installation of any global agent adapter.
 ```
+
+## Agent compatibility
+
+Codex is the primary guided-install experience. Claude Code Desktop is the agent-agnostic smoke target; neither path requires a global Skill.
+
+## Support
+
+LinkedIn: https://www.linkedin.com/in/fabianomag/ · Email: fm@fabianomag.com
 <!-- END GENERATED:PRODUCT -->
 
 ## Manual install
@@ -100,14 +160,17 @@ Then follow `package/README.md` in the extracted bundle and finish with:
 ```
 
 The selected runtime lives at
-`<target>/.agent-harnesses/runtime/<id>/0.2.0`.
+`<target>/.agent-harnesses/runtime/<id>/0.2.1`.
 
 The state is explicit: `downloaded → installed → initialized → verified →
 ready`. Installing package bytes is not operational success. Only a successful
 `verify` result with `"ready": true` means the initialized target is ready.
+`tutorial delivered` is a separate conversational outcome: after readiness,
+the coding agent reads the installed operator contract and teaches the user;
+the installer does not pretend to measure whether that explanation happened.
 
-To remove only unchanged, receipt-owned runtime bytes while leaving initialized
-project files untouched:
+To remove only the exact managed onboarding block and unchanged, receipt-owned
+runtime bytes while leaving initialized project files untouched:
 
 ```text
 <python> -B installer.py uninstall <selector> --target "<target>" --dry-run --json
@@ -120,10 +183,12 @@ The five evidence dimensions (`Context`, `Skill`, `Harness`, `Loop`, and
 `Guardrails`) remain technical evidence, not comparison badges or a package
 ranking. See the generated [catalog](catalog/harnesses.json),
 [graphs](graphs/), and the [advanced reference](docs/REFERENCE.md).
+Optional platform-native integrations live under [`adapters/`](adapters/) and
+are never part of the four core ZIPs or the default installation.
 
-Release `v0.2.0` contains four deterministic package-only ZIPs, one checksum
+Release `v0.2.1` contains four deterministic package-only ZIPs, one checksum
 sidecar per asset, the standalone installer, the release manifest, the site
-snapshot, and the changelog. Historical `0.1.x` tags remain immutable and are
-superseded rather than rewritten.
+snapshot, and the changelog. Historical `0.1.x` tags and immutable `v0.2.0`
+remain available and are superseded rather than rewritten.
 
 Copyright Fabiano Magalhães. [MIT License](LICENSE).

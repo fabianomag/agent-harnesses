@@ -54,6 +54,27 @@ PROJECT_REQUIRED_FILES = (
     "NEXT.md",
     *PROJECT_LOG_FILES,
 )
+PACKAGE_VERSION = "0.2.1"
+INSTALLER_ONBOARDING_START = (
+    "<!-- agent-harnesses:onboarding:orchestration:start -->"
+)
+INSTALLER_ONBOARDING_END = (
+    "<!-- agent-harnesses:onboarding:orchestration:end -->"
+)
+
+
+def _installer_onboarding_block() -> str:
+    runtime = f".agent-harnesses/runtime/orchestration/{PACKAGE_VERSION}"
+    return (
+        f"{INSTALLER_ONBOARDING_START}\n"
+        "## Agent Harness operating contract\n\n"
+        "Before operating this harness, read these target-relative files:\n\n"
+        f"- Operations contract: `{runtime}/operations.json`\n"
+        f"- Operator guide (English): `{runtime}/OPERATOR_GUIDE.md`\n"
+        f"- Guia do operador (PT-BR): `{runtime}/OPERATOR_GUIDE.pt-BR.md`\n\n"
+        "Use only the operations declared for this installed harness.\n"
+        f"{INSTALLER_ONBOARDING_END}\n"
+    )
 
 
 @dataclass(frozen=True)
@@ -415,9 +436,25 @@ class ControlPlane:
             MANIFEST_RELATIVE,
             *(self._front_relative(front, name) for name in PROJECT_REQUIRED_FILES),
         )
+        installer_agents: str | None = None
         for relative in targets:
             path = safe_path(self.root, relative)
             if path.exists() or is_link_like(path):
+                if relative == "AGENTS.md" and not is_link_like(path) and path.is_file():
+                    try:
+                        candidate = path.read_text(encoding="utf-8")
+                    except (OSError, UnicodeError) as error:
+                        raise CollisionError(
+                            "installer onboarding block is not readable UTF-8"
+                        ) from error
+                    onboarding = _installer_onboarding_block()
+                    if (
+                        candidate.count(onboarding) == 1
+                        and candidate.count(INSTALLER_ONBOARDING_START) == 1
+                        and candidate.count(INSTALLER_ONBOARDING_END) == 1
+                    ):
+                        installer_agents = candidate
+                        continue
                 raise CollisionError("initialization would overwrite existing state")
 
         manifest = Manifest.create(front, transaction_id=transaction_id)
@@ -426,7 +463,12 @@ class ControlPlane:
             PANEL_RELATIVE: render_panel(manifest),
         }
         for name in MASTER_TEMPLATE_FILES:
-            changes[name] = self._template("master", name)
+            template = self._template("master", name)
+            if name == "AGENTS.md" and installer_agents is not None:
+                separator = "" if installer_agents.endswith("\n\n") else "\n"
+                changes[name] = installer_agents + separator + template
+            else:
+                changes[name] = template
         for name in PROJECT_STATIC_FILES:
             changes[self._front_relative(front, name)] = self._template(
                 "project",

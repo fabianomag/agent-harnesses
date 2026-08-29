@@ -8,6 +8,12 @@ description: Coordinate several real child projects from one local root with nam
 Keep project-local detail in each child. Store only role, coordination state,
 next action, blocker, reflection summary, and reflection trigger in the root.
 
+Operate the already installed agent-agnostic runtime at
+`<target>/.agent-harnesses/runtime/cross-project/0.2.1/`. Treat that runtime's
+`operations.json` as the machine-readable command authority and its operator
+guide as the user-facing contract. This optional adapter does not replace or
+install the runtime.
+
 ## Operate
 
 1. Run `scripts/cross_project.py bom-dia --root <root>` before changing state.
@@ -28,4 +34,5 @@ Git metadata as the harness root or a child. Do not scan home, parents, sibling
 workspaces, Git remotes, or external services. A read that encounters an active
 mutation lock must stop and retry; it must not repair.
 
-Use the exact command surface and state fields documented in `README.md`.
+Use the exact command surface and state fields documented by the installed
+runtime's `operations.json` and operator guide.

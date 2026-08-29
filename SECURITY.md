@@ -2,9 +2,9 @@
 
 ## Supported versions
 
-The supported public line is the unified Agent Harnesses `v0.2.0` release.
-Historical `0.1.x` tags remain immutable but are superseded. Package version
-and state schema are independent; Project Harness `0.2.0` reads and verifies
+The supported public line is the unified Agent Harnesses `v0.2.1` release.
+Historical `0.1.x` tags and `v0.2.0` remain immutable but are superseded.
+Package version and state schema are independent; Project Harness `0.2.1` reads and verifies
 its `0.1.0` state without silently rewriting it.
 
 ## Local safety boundary
@@ -17,19 +17,25 @@ harness markers, malformed inventories, and changed installed bytes.
 `doctor` is read-only. `install --dry-run` verifies the selected bundle
 inventory and target compatibility without writing. `install --apply` copies
 only the selected package into a target-local runtime boundary and records an
-exact receipt. It does not change `PATH`, install a global Skill, edit
-`.gitignore`, initialize the target, or edit unrelated documentation.
+exact receipt. It also manages one bounded onboarding block in target-root
+`AGENTS.md`, preserving all content outside that block. It does not change
+`PATH`, install a global Skill, edit `.gitignore`, initialize the target, or
+edit unrelated documentation.
 
 Publication uses a unique target-local stage and a platform-native no-clobber
 directory rename. A failed or interrupted installer-owned download, extraction,
 or pre-publication stage is cleaned up. An already published exact runtime is
 verified and treated idempotently; divergent or extra bytes are refused rather
 than overwritten. `uninstall` removes only unchanged receipt-owned runtime
-bytes and never removes the initialized harness state.
+bytes and its unchanged onboarding block. It never removes initialized harness
+state or unrelated `AGENTS.md` content.
 
 Operational readiness is separate from package installation. The installer
 returns `ready: true` only after the selected runtime verifies an initialized
-target. Installed but uninitialized targets fail with `E_NOT_READY`.
+target. The onboarding pointer must also remain intact. Installed but
+uninitialized targets fail with `E_NOT_READY`. Conversational tutorial delivery
+is a separate coding-agent obligation and is never fabricated as installer
+state.
 
 These guarantees assume a cooperative local filesystem. They do not promise
 durability across power loss, hostile filesystem replacement, network

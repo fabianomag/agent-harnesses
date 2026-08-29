@@ -9,6 +9,12 @@ Use this skill when a user wants a durable local context and work cycle for one
 project. Do not use it to coordinate a workspace, sibling projects, external
 systems, releases, or publication.
 
+Operate the already installed agent-agnostic runtime at
+`<target>/.agent-harnesses/runtime/project-harness/0.2.1/`. Treat that
+runtime's `operations.json` as the machine-readable command authority and its
+operator guide as the user-facing contract. This optional adapter does not
+replace or install the runtime.
+
 ## First use
 
 The selected root must already exist and must be the intended project boundary.
@@ -18,9 +24,8 @@ The selected root must already exist and must be the intended project boundary.
 3. Run `verify`.
 4. Run `open` to read the durable starting point.
 
-Use the executable documented in the package README. The repository-level
-package manager can install an exact package copy, but it does not create a
-global command.
+Use `project_harness.py` from the installed runtime. The harness does not
+create a global command.
 
 ## Work cycle
 

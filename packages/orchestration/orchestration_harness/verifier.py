@@ -11,8 +11,10 @@ from .paths import is_link_like
 
 REQUIRED_FILES = (
     "README.md",
-    "SKILL.md",
-    "agents/openai.yaml",
+    "README.pt-BR.md",
+    "OPERATOR_GUIDE.md",
+    "OPERATOR_GUIDE.pt-BR.md",
+    "operations.json",
     "harness.package.json",
     "hq.py",
     "orchestration_harness/__init__.py",
@@ -76,46 +78,11 @@ def verify_package(package_root: Path | None = None) -> list[str]:
                 "id": "orchestration",
                 "license": "MIT",
                 "status": "implemented",
-                "version": "0.2.0",
+                "version": "0.2.1",
             }
             if not isinstance(manifest, dict) or any(
                 manifest.get(key) != value for key, value in expected.items()
             ):
                 issues.append("MANIFEST:contract")
 
-    skill_path = root / "SKILL.md"
-    if skill_path.is_file() and not is_link_like(skill_path):
-        try:
-            skill_text = skill_path.read_text(encoding="utf-8")
-            opening, separator, _body = skill_text.partition("\n---\n")
-            if not separator or not opening.startswith("---\n"):
-                raise ValueError
-            metadata: dict[str, str] = {}
-            for line in opening.removeprefix("---\n").splitlines():
-                key, marker, value = line.partition(":")
-                if not marker or not value.strip():
-                    raise ValueError
-                metadata[key.strip()] = value.strip()
-            if frozenset(metadata) != frozenset(("name", "description")):
-                raise ValueError
-            if metadata["name"] != "orchestration":
-                raise ValueError
-        except (OSError, UnicodeError, ValueError):
-            issues.append("SKILL:frontmatter")
-
-    agents_path = root / "agents" / "openai.yaml"
-    if agents_path.is_file() and not is_link_like(agents_path):
-        try:
-            agents_text = agents_path.read_text(encoding="utf-8")
-        except (OSError, UnicodeError):
-            issues.append("SKILL:agents")
-        else:
-            required_values = (
-                'display_name: "Control Plane Harness"',
-                'short_description: "Run safe local Master and front workflows"',
-                "default_prompt:",
-                "$orchestration",
-            )
-            if not all(value in agents_text for value in required_values):
-                issues.append("SKILL:agents")
     return sorted(set(issues))

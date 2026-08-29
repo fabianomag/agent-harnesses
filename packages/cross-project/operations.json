@@ -1,0 +1,276 @@
+{
+  "compatibility": {
+    "primary": {
+      "agent": "Codex",
+      "description": {
+        "en": "Primary guided-install and operator experience; release acceptance requires the complete copied-prompt flow.",
+        "ptBr": "Experiência principal de instalação guiada e operação; a aceitação da release exige o fluxo completo a partir do prompt copiado."
+      },
+      "level": "primary"
+    },
+    "smoke": {
+      "agent": "Claude Code Desktop",
+      "description": {
+        "en": "Agent-agnostic compatibility target; release acceptance requires a copied-prompt smoke flow without a formal Skill dependency. This bounded smoke does not claim complete agent equivalence.",
+        "ptBr": "Alvo de compatibilidade agent-agnostic; a aceitação da release exige um smoke flow a partir do prompt copiado, sem depender de uma Skill formal. Esse smoke limitado não afirma equivalência completa entre agentes."
+      },
+      "level": "smoke"
+    }
+  },
+  "installationReadiness": {
+    "en": [
+      "The coordination root and the independent existing project roots are explicit.",
+      "The projects have known boundaries and a real need for handoffs or structural sync across roots.",
+      "The user can supply each selected project's role and next action without repository discovery or invented state."
+    ],
+    "ptBr": [
+      "A coordination root e as raízes independentes dos projetos existentes estão explícitas.",
+      "Os projetos têm boundaries conhecidos e uma necessidade real de handoffs ou structural sync entre raízes.",
+      "O usuário pode fornecer o papel e a próxima ação de cada projeto selecionado sem descoberta de repositórios nem estado inventado."
+    ]
+  },
+  "memory": {
+    "canonical": [
+      "harness.config.json"
+    ],
+    "description": {
+      "en": "The coordination root owns the canonical cross-project manifest and concise projections; each independent project keeps its detailed local memory.",
+      "ptBr": "A coordination root mantém o manifest canônico entre projetos e projeções concisas; cada projeto independente preserva sua memória local detalhada."
+    },
+    "projections": [
+      "AGENTS.md",
+      "FRONTS.md",
+      "NEXT.md"
+    ]
+  },
+  "operations": [
+    {
+      "command": "bom-dia",
+      "effects": {
+        "en": "Reads bounded coordination state and reports the current next action without writing.",
+        "ptBr": "Lê o estado delimitado de coordenação e informa a próxima ação atual sem writes."
+      },
+      "example": "<python> -B scripts/cross_project.py bom-dia --root \"<coordination-root>\" --front \"<front-id>\"",
+      "inputs": [
+        "<coordination-root>",
+        "<front-id?>"
+      ],
+      "kind": "read",
+      "purpose": {
+        "en": "Open the cross-project coordination state or one named project's resumption point.",
+        "ptBr": "Abrir o estado de coordenação entre projetos ou o ponto de retomada de um projeto nomeado."
+      }
+    },
+    {
+      "command": "hq-init",
+      "effects": {
+        "en": "Creates or updates only the canonical coordination manifest and its root projections; it does not take ownership of project-local details.",
+        "ptBr": "Cria ou atualiza somente o manifest canônico de coordenação e suas projeções na raiz; não assume ownership dos detalhes locais do projeto."
+      },
+      "example": "<python> -B scripts/cross_project.py hq-init --root \"<coordination-root>\" --master-name \"<master-name>\" --front \"<front-id>\" --name \"<front-name>\" --path \"<project-path>\" --role \"<role>\" --next \"<next-action>\" --dry-run",
+      "inputs": [
+        "<coordination-root>",
+        "<master-name>",
+        "<front-id>",
+        "<front-name>",
+        "<project-path>",
+        "<role>",
+        "<next-action>",
+        "--dry-run|apply"
+      ],
+      "kind": "write",
+      "purpose": {
+        "en": "Preview or register one existing independent project under an explicit coordination root.",
+        "ptBr": "Fazer preview ou registrar um projeto independente existente sob uma raiz explícita de coordenação."
+      }
+    },
+    {
+      "command": "hq-sync",
+      "effects": {
+        "en": "Reports consistency and issues without repair.",
+        "ptBr": "Informa consistência e issues sem repair."
+      },
+      "example": "<python> -B scripts/cross_project.py hq-sync --root \"<coordination-root>\"",
+      "inputs": [
+        "<coordination-root>"
+      ],
+      "kind": "read",
+      "purpose": {
+        "en": "Validate the canonical manifest and all managed coordination projections.",
+        "ptBr": "Validar o manifest canônico e todas as projeções gerenciadas de coordenação."
+      }
+    },
+    {
+      "command": "digere",
+      "effects": {
+        "en": "Returns ownership routing and writes nothing; it does not synthesize a digest.",
+        "ptBr": "Retorna o roteamento de ownership e não escreve; não sintetiza um digest."
+      },
+      "example": "<python> -B scripts/cross_project.py digere --root \"<coordination-root>\" --front \"<front-id>\" --scope \"<local|coordination|ephemeral>\"",
+      "inputs": [
+        "<coordination-root>",
+        "<front-id>",
+        "<local|coordination|ephemeral>"
+      ],
+      "kind": "read",
+      "purpose": {
+        "en": "Classify one explicit input as project-local, coordination-wide, or ephemeral.",
+        "ptBr": "Classificar uma entrada explícita como local ao projeto, transversal à coordenação ou ephemeral."
+      }
+    },
+    {
+      "command": "registra",
+      "effects": {
+        "en": "Updates only explicit coordination state and leaves the initial reflection pending when applicable.",
+        "ptBr": "Atualiza somente o estado explícito de coordenação e mantém a reflexão inicial pendente quando aplicável."
+      },
+      "example": "<python> -B scripts/cross_project.py registra --root \"<coordination-root>\" --front \"<front-id>\" --state \"<state>\" --next \"<next-action>\" --blocker \"<blocker>\"",
+      "inputs": [
+        "<coordination-root>",
+        "<front-id>",
+        "<state>",
+        "<next-action>",
+        "<blocker?>"
+      ],
+      "kind": "write",
+      "purpose": {
+        "en": "Persist one minimal confirmed coordination checkpoint for a registered project.",
+        "ptBr": "Persistir um checkpoint mínimo e confirmado de coordenação para um projeto registrado."
+      }
+    },
+    {
+      "command": "encerra",
+      "effects": {
+        "en": "Closes the coordination block, clears the pending reflection, and records the confirmed resumption contract.",
+        "ptBr": "Encerra o bloco de coordenação, remove a reflexão pendente e registra o contrato confirmado de retomada."
+      },
+      "example": "<python> -B scripts/cross_project.py encerra --root \"<coordination-root>\" --front \"<front-id>\" --role \"<role>\" --state \"<state>\" --next \"<next-action>\" --summary \"<summary>\" --reflect-when \"<reflect-when>\" --blocker \"<blocker>\"",
+      "inputs": [
+        "<coordination-root>",
+        "<front-id>",
+        "<role>",
+        "<state>",
+        "<next-action>",
+        "<summary>",
+        "<reflect-when>",
+        "<blocker?>"
+      ],
+      "kind": "write",
+      "purpose": {
+        "en": "Persist a complete explicit reflection or later cross-project handoff.",
+        "ptBr": "Persistir uma reflexão explícita completa ou um handoff posterior entre projetos."
+      }
+    }
+  ],
+  "package": {
+    "displayName": "Multi-Project Harness",
+    "entrypoint": "scripts/cross_project.py",
+    "id": "cross-project",
+    "version": "0.2.1"
+  },
+  "readiness": {
+    "en": "The coordination manifest has at least one explicit existing project registration, every managed projection matches it, and hq-sync reports consistent state.",
+    "ptBr": "O manifest de coordenação contém ao menos um registro explícito de projeto existente, cada projeção gerenciada corresponde a ele e hq-sync informa estado consistente."
+  },
+  "schemaVersion": 1,
+  "support": {
+    "email": "fm@fabianomag.com",
+    "linkedin": "https://www.linkedin.com/in/fabianomag/"
+  },
+  "tutorial": {
+    "constraints": {
+      "en": "Deliver the tutorial in the user's language and in the conversation without creating project documentation. Use only values explicitly supplied by the user; otherwise retain placeholders. Do not install or instruct the installation of any global agent adapter.",
+      "ptBr": "Entregue o tutorial no idioma do usuário e na conversa sem criar documentação no projeto. Use somente valores fornecidos explicitamente pelo usuário; caso contrário, mantenha placeholders. Não instale nem oriente a instalação de qualquer adapter global de agente."
+    },
+    "delivery": "conversation",
+    "mustCover": {
+      "en": [
+        "The mental model: what the installed harness remembers and what remains outside its boundary.",
+        "The exact target-local locations of canonical operational memory and readable projections.",
+        "Every installed command, its read, write, or repair kind, and when to use it.",
+        "The first-use, daily, close-and-resume, and verify-or-recover workflows.",
+        "A first safe example that uses only confirmed user values and retains placeholders for anything unknown.",
+        "How to close, resume, verify, and recover without inventing state.",
+        "The installation receipt, how to preview mutations, and how to roll back, update, or uninstall."
+      ],
+      "ptBr": [
+        "O modelo mental: o que o harness instalado preserva e o que permanece fora do seu limite.",
+        "As localizações exatas e locais ao target da memória operacional canônica e das projeções legíveis.",
+        "Cada comando instalado, sua categoria read, write ou repair e quando usá-lo.",
+        "Os workflows de primeiro uso, uso diário, closeout e retomada e verificação ou recovery.",
+        "Um primeiro exemplo seguro que use somente valores confirmados pelo usuário e preserve placeholders para tudo que for desconhecido.",
+        "Como encerrar, retomar, verificar e executar recovery sem inventar estado.",
+        "O receipt de instalação, como prever mutações e como executar rollback, update ou uninstall."
+      ]
+    },
+    "packageLifecycle": {
+      "en": [
+        "Receipt: target-relative `.agent-harnesses/runtime/<id>/<version>/.agent-harness-receipt.json`.",
+        "From a checksum-verified `<version>` bundle, preview package removal with `<python> -B installer.py uninstall <id> --target \"<target>\" --dry-run --json`; after review, apply it with `<python> -B installer.py uninstall <id> --target \"<target>\" --apply --json`.",
+        "Uninstall removes only the receipt-owned runtime and installer-managed onboarding block. It never removes initialized operational state.",
+        "If a step fails after package apply, first run this package's verify-or-recover workflow. If the target still is not ready, preview and then apply uninstall to roll back the package. Preserve and report any residual initialized state; never delete it automatically.",
+        "To update, download the new version's ZIP and matching checksum sidecar, verify the checksum, read its migration notes, then run the new bundle's doctor, install --dry-run, and install --apply. Do not edit a versioned runtime in place; keep the old version until the new one reaches ready=true."
+      ],
+      "ptBr": [
+        "Receipt: path relativo ao target `.agent-harnesses/runtime/<id>/<version>/.agent-harness-receipt.json`.",
+        "A partir de um bundle `<version>` com checksum verificado, antecipe a remoção do package com `<python> -B installer.py uninstall <id> --target \"<target>\" --dry-run --json`; após a revisão, aplique-a com `<python> -B installer.py uninstall <id> --target \"<target>\" --apply --json`.",
+        "Uninstall remove somente o runtime pertencente ao receipt e o bloco de onboarding gerenciado pelo installer. Ele nunca remove o estado operacional inicializado.",
+        "Se uma etapa falhar após o apply do package, primeiro execute o workflow de verify ou recovery deste package. Se o target ainda não estiver ready, antecipe e depois aplique o uninstall para executar rollback do package. Preserve e informe qualquer estado inicializado residual; nunca o apague automaticamente.",
+        "Para update, baixe o ZIP e o checksum sidecar correspondentes à nova versão, verifique o checksum, leia as migration notes e então execute doctor, install --dry-run e install --apply com o novo bundle. Não edite um runtime versionado in-place; mantenha a versão anterior até a nova chegar a ready=true."
+      ]
+    },
+    "requiredAfterReady": true,
+    "sources": {
+      "operations": "operations.json",
+      "operatorGuide": {
+        "en": "OPERATOR_GUIDE.md",
+        "ptBr": "OPERATOR_GUIDE.pt-BR.md"
+      }
+    }
+  },
+  "workflows": {
+    "closeResume": {
+      "purpose": {
+        "en": "Close with a complete reflection and reopen the same named project from its recorded next action.",
+        "ptBr": "Encerrar com uma reflexão completa e reabrir o mesmo projeto nomeado a partir da próxima ação registrada."
+      },
+      "steps": [
+        "encerra",
+        "hq-sync",
+        "bom-dia"
+      ]
+    },
+    "daily": {
+      "purpose": {
+        "en": "Open one named project, route explicit input, and save only the minimal confirmed coordination delta.",
+        "ptBr": "Abrir um projeto nomeado, rotear a entrada explícita e salvar somente o delta mínimo e confirmado de coordenação."
+      },
+      "steps": [
+        "bom-dia",
+        "digere",
+        "registra",
+        "hq-sync"
+      ]
+    },
+    "firstUse": {
+      "purpose": {
+        "en": "Open read-only, preview and register one confirmed existing project, then require clean structural sync.",
+        "ptBr": "Abrir em modo read-only, fazer preview e registrar um projeto existente e confirmado e então exigir sincronização estrutural limpa."
+      },
+      "steps": [
+        "bom-dia",
+        "hq-init",
+        "hq-sync"
+      ]
+    },
+    "verifyRecover": {
+      "purpose": {
+        "en": "Use hq-sync as read-only diagnosis; on inconsistency, stop for explicit manual recovery because this harness has no repair command.",
+        "ptBr": "Usar hq-sync como diagnóstico read-only; em caso de inconsistência, parar para recovery manual explícito porque este harness não possui comando de repair."
+      },
+      "steps": [
+        "hq-sync"
+      ]
+    }
+  }
+}

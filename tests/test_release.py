@@ -11,7 +11,7 @@ import sys
 import tempfile
 import unittest
 import zipfile
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 from tools import build_release, product
 
@@ -50,6 +50,7 @@ class ReleaseAssetTests(unittest.TestCase):
                 repository_root=REPOSITORY_ROOT,
             )
             self.assertEqual(sorted(_files(first)), verified)
+            self.assertEqual(16, len(verified))
             self.assertNotIn("SHA256SUMS", verified)
 
     def test_manifest_binds_commit_tag_sizes_and_digests(self) -> None:
@@ -59,6 +60,7 @@ class ReleaseAssetTests(unittest.TestCase):
             manifest = json.loads(files[build_release.RELEASE_MANIFEST_NAME])
             value = product.load_product(REPOSITORY_ROOT)
 
+            self.assertEqual(1, manifest["schemaVersion"])
             self.assertEqual(SYNTHETIC_COMMIT, manifest["release"]["sourceCommit"])
             self.assertEqual(value["release"]["tag"], manifest["release"]["tag"])
             self.assertEqual(
@@ -132,6 +134,45 @@ class ReleaseAssetTests(unittest.TestCase):
                         for name in names
                         if name.startswith(f"{root}/package/")
                     }
+                    self.assertTrue(
+                        build_release.CORE_OPERATION_FILES.issubset(payload_names)
+                    )
+                    self.assertFalse(
+                        any(
+                            build_release._is_agent_adapter_path(
+                                PurePosixPath(name)
+                            )
+                            for name in payload_names
+                        )
+                    )
+                    operations = json.loads(
+                        archive.read(f"{root}/package/operations.json")
+                    )
+                    self.assertEqual(1, operations["schemaVersion"])
+                    self.assertEqual(
+                        definition["id"], operations["package"]["id"]
+                    )
+                    self.assertEqual(
+                        value["release"]["version"],
+                        operations["package"]["version"],
+                    )
+                    self.assertTrue(operations["tutorial"]["requiredAfterReady"])
+                    for guide in (
+                        "OPERATOR_GUIDE.md",
+                        "OPERATOR_GUIDE.pt-BR.md",
+                    ):
+                        rendered = archive.read(f"{root}/package/{guide}").decode(
+                            "utf-8"
+                        )
+                        self.assertIn("operations.json", rendered)
+                        self.assertIn(definition["id"], rendered)
+                    bundle_manifest = json.loads(
+                        archive.read(f"{root}/bundle-manifest.json")
+                    )
+                    inventory_names = {
+                        item["path"] for item in bundle_manifest["files"]
+                    }
+                    self.assertEqual(payload_names, inventory_names)
                     for other_id in all_ids - {definition["id"]}:
                         self.assertFalse(
                             any(
@@ -149,11 +190,84 @@ class ReleaseAssetTests(unittest.TestCase):
                     encoding="utf-8"
                 )
             )
+            value = product.load_product(REPOSITORY_ROOT)
             expected = (
                 "https://github.com/fabianomag/agent-harnesses/releases/"
-                "download/v0.2.0/release-manifest.json"
+                f"download/{value['release']['tag']}/release-manifest.json"
             )
+            self.assertEqual(2, snapshot["schemaVersion"])
+            self.assertEqual("0.2.1", snapshot["release"]["version"])
+            self.assertEqual("v0.2.1", snapshot["release"]["tag"])
             self.assertEqual(expected, snapshot["releaseManifest"]["url"])
+            self.assertTrue(snapshot["tutorial"]["requiredAfterReady"])
+            self.assertEqual("conversation", snapshot["tutorial"]["delivery"])
+            self.assertNotIn("adapters", snapshot)
+            for package in snapshot["packages"]:
+                self.assertNotIn("adapters", package)
+                self.assertEqual(
+                    product.EXPECTED_OPERATIONS[package["id"]],
+                    tuple(
+                        operation["command"]
+                        for operation in package["operator"]["operations"]
+                    ),
+                )
+            rendered_snapshot = json.dumps(snapshot, ensure_ascii=False)
+            self.assertNotIn("adapters/openai", rendered_snapshot)
+            self.assertNotIn("SKILL.md", rendered_snapshot)
+            self.assertNotIn("openai.yaml", rendered_snapshot)
+
+    def test_openai_adapters_are_optional_repository_only_files(self) -> None:
+        adapters = REPOSITORY_ROOT / "adapters" / "openai"
+        for package_id in product.PACKAGE_IDS:
+            with self.subTest(package_id=package_id):
+                adapter = adapters / package_id
+                skill = (adapter / "SKILL.md").read_text(encoding="utf-8")
+                self.assertIn("operations.json", skill)
+                self.assertIn(
+                    f".agent-harnesses/runtime/{package_id}/0.2.1/",
+                    skill,
+                )
+                self.assertIn("optional adapter", skill.lower())
+
+        expected_yaml = {
+            "cross-project/agents/openai.yaml",
+            "orchestration/agents/openai.yaml",
+        }
+        observed_yaml = {
+            path.relative_to(adapters).as_posix()
+            for path in adapters.rglob("openai.yaml")
+        }
+        self.assertEqual(expected_yaml, observed_yaml)
+
+        legacy_paths = (
+            "packages/project-harness/skills/project-harness/SKILL.md",
+            "packages/workspace-coordination/SKILL.md",
+            "packages/cross-project/SKILL.md",
+            "packages/cross-project/agents/openai.yaml",
+            "packages/orchestration/SKILL.md",
+            "packages/orchestration/agents/openai.yaml",
+        )
+        self.assertFalse(
+            any((REPOSITORY_ROOT / relative).exists() for relative in legacy_paths)
+        )
+
+    def test_core_adapter_path_guard_covers_legacy_layouts(self) -> None:
+        for relative in (
+            "SKILL.md",
+            "skill.md",
+            "skills/project-harness/SKILL.md",
+            "agents/openai.yaml",
+            "AGENTS/OpenAI.yaml",
+            "adapters/openai/example/SKILL.md",
+        ):
+            with self.subTest(relative=relative):
+                self.assertTrue(
+                    build_release._is_agent_adapter_path(PurePosixPath(relative))
+                )
+        for relative in build_release.CORE_OPERATION_FILES:
+            self.assertFalse(
+                build_release._is_agent_adapter_path(PurePosixPath(relative))
+            )
 
     def test_exact_package_archives_reach_ready_after_documented_first_use(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -247,6 +361,8 @@ class ReleaseAssetTests(unittest.TestCase):
                         / package_id
                         / value["release"]["version"]
                     )
+                    for relative in build_release.CORE_OPERATION_FILES:
+                        self.assertTrue((runtime / relative).is_file())
                     if package_id == "project-harness":
                         executable = str(runtime / "project_harness.py")
                         run(executable, "init", "--root", str(target), "--dry-run", cwd=runtime)

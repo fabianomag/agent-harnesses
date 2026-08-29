@@ -169,12 +169,9 @@ class VerifierTests(unittest.TestCase):
             )
             self.assertIn("MANIFEST:contract", verify_package(copy))
 
-    def test_skill_frontmatter_corruption_is_detected(self) -> None:
+    def test_missing_operator_contract_is_detected(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             copy = Path(directory) / "orchestration"
             shutil.copytree(self.package_root, copy)
-            (copy / "SKILL.md").write_text(
-                "# Missing frontmatter\n",
-                encoding="utf-8",
-            )
-            self.assertIn("SKILL:frontmatter", verify_package(copy))
+            (copy / "operations.json").unlink()
+            self.assertIn("MISSING:operations.json", verify_package(copy))

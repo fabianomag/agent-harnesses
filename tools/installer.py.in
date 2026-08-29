@@ -7,11 +7,13 @@ import errno
 import hashlib
 import json
 import os
+import re
 import shutil
 import stat
 import subprocess
 import sys
 import tempfile
+import time
 import urllib.request
 import uuid
 import zipfile
@@ -28,6 +30,20 @@ MARKERS = {
 }
 RUNTIME_RELATIVE = Path(".agent-harnesses/runtime")
 RECEIPT_NAME = ".agent-harness-receipt.json"
+AGENTS_RELATIVE = Path("AGENTS.md")
+ONBOARDING_MARKER_TOKEN = b"<!-- agent-harnesses:onboarding:"
+ONBOARDING_MARKER = re.compile(
+    rb"<!-- agent-harnesses:onboarding:"
+    rb"([a-z][a-z0-9]*(?:-[a-z0-9]+)*):(start|end) -->"
+)
+ONBOARDING_PACKAGE_FILES = (
+    "operations.json",
+    "OPERATOR_GUIDE.md",
+    "OPERATOR_GUIDE.pt-BR.md",
+)
+ONBOARDING_SEPARATOR = b"\n\n"
+ONBOARDING_LOCK_NAME = ".onboarding.lock"
+ONBOARDING_LOCK_ATTEMPTS = 500
 MANAGED_PATH_SHAPES = {
     "project-harness": {
         ".project-harness": "directory",
@@ -85,6 +101,52 @@ def _result(code, phase, message, remediation="", ready=False):
     }
 
 
+def _onboarding_paths(package_id):
+    base = (RUNTIME_RELATIVE / package_id / VERSION).as_posix()
+    return {
+        "operationsContract": "%s/operations.json" % base,
+        "operatorGuides": {
+            "en": "%s/OPERATOR_GUIDE.md" % base,
+            "ptBr": "%s/OPERATOR_GUIDE.pt-BR.md" % base,
+        },
+    }
+
+
+def _with_onboarding(result, package_id):
+    enriched = dict(result)
+    enriched.update(_onboarding_paths(package_id))
+    return enriched
+
+
+def _onboarding_markers(package_id):
+    return (
+        ("<!-- agent-harnesses:onboarding:%s:start -->" % package_id).encode("ascii"),
+        ("<!-- agent-harnesses:onboarding:%s:end -->" % package_id).encode("ascii"),
+    )
+
+
+def _onboarding_block(package_id):
+    begin, end = _onboarding_markers(package_id)
+    paths = _onboarding_paths(package_id)
+    return (
+        begin
+        + b"\n## Agent Harness operating contract\n\n"
+        + b"Before operating this harness, read these target-relative files:\n\n"
+        + ("- Operations contract: `%s`\n" % paths["operationsContract"]).encode("utf-8")
+        + (
+            "- Operator guide (English): `%s`\n"
+            % paths["operatorGuides"]["en"]
+        ).encode("utf-8")
+        + (
+            "- Guia do operador (PT-BR): `%s`\n\n"
+            % paths["operatorGuides"]["ptBr"]
+        ).encode("utf-8")
+        + b"Use only the operations declared for this installed harness.\n"
+        + end
+        + b"\n"
+    )
+
+
 def _is_link_like(path):
     try:
         metadata = path.lstat()
@@ -104,6 +166,116 @@ def _is_link_like(path):
 
 def _lexists(path):
     return os.path.lexists(os.fspath(path))
+
+
+def _onboarding_failure(code, phase, message, remediation):
+    raise InstallerFailure(code, phase, message, remediation)
+
+
+def _inspect_onboarding(target, package_id, phase="downloaded", required=False):
+    path = target / AGENTS_RELATIVE
+    if not _lexists(path):
+        if required:
+            _onboarding_failure(
+                "E_CHECKSUM_MISMATCH",
+                phase,
+                "The target-local onboarding block is missing.",
+                "Restore the exact managed AGENTS.md block before retrying.",
+            )
+        return {
+            "path": path,
+            "exists": False,
+            "data": None,
+            "mode": 0o644,
+            "packageId": None,
+            "start": None,
+            "end": None,
+            "exclusive": False,
+        }
+    if _is_link_like(path) or not path.is_file():
+        _onboarding_failure(
+            "E_INITIALIZATION_CONFLICT",
+            phase,
+            "AGENTS.md is not a real regular file.",
+            "Resolve the AGENTS.md collision without following or overwriting it.",
+        )
+    try:
+        data = path.read_bytes()
+        mode = stat.S_IMODE(path.stat().st_mode)
+    except OSError as error:
+        raise InstallerFailure(
+            "E_INITIALIZATION_CONFLICT",
+            phase,
+            "AGENTS.md cannot be read safely.",
+            "Keep it unchanged and resolve its permissions before retrying.",
+        ) from error
+    matches = list(ONBOARDING_MARKER.finditer(data))
+    reserved_count = data.count(ONBOARDING_MARKER_TOKEN)
+    if reserved_count == 0:
+        if required:
+            _onboarding_failure(
+                "E_CHECKSUM_MISMATCH",
+                phase,
+                "The target-local onboarding block is missing.",
+                "Restore the exact managed AGENTS.md block before retrying.",
+            )
+        return {
+            "path": path,
+            "exists": True,
+            "data": data,
+            "mode": mode,
+            "packageId": None,
+            "start": None,
+            "end": None,
+            "exclusive": False,
+        }
+    if reserved_count != len(matches) or len(matches) != 2:
+        _onboarding_failure(
+            "E_INITIALIZATION_CONFLICT",
+            phase,
+            "The target-local onboarding markers are malformed or duplicated.",
+            "Keep AGENTS.md unchanged and restore exactly one valid managed marker pair.",
+        )
+    first_id = matches[0].group(1).decode("ascii")
+    second_id = matches[1].group(1).decode("ascii")
+    first_kind = matches[0].group(2)
+    second_kind = matches[1].group(2)
+    if first_id != second_id or first_kind != b"start" or second_kind != b"end":
+        _onboarding_failure(
+            "E_INITIALIZATION_CONFLICT",
+            phase,
+            "The target-local onboarding markers are malformed or out of order.",
+            "Keep AGENTS.md unchanged and restore exactly one ordered marker pair.",
+        )
+    if first_id != package_id:
+        _onboarding_failure(
+            "E_HARNESS_MISMATCH",
+            phase,
+            "AGENTS.md contains onboarding for a different harness.",
+            "Keep the target unchanged and use %s." % _recommend(first_id)
+            if first_id in {item["id"] for item in PRODUCT["packages"]}
+            else "Remove the unknown managed block only after resolving its ownership.",
+        )
+    expected = _onboarding_block(package_id)
+    start = matches[0].start()
+    end = start + len(expected)
+    if data[start:end] != expected or matches[1].end() != end - 1:
+        _onboarding_failure(
+            "E_CHECKSUM_MISMATCH",
+            phase,
+            "The target-local onboarding block differs from its exact contract.",
+            "Restore the generated block without changing surrounding AGENTS.md bytes.",
+        )
+    return {
+        "path": path,
+        "exists": True,
+        "data": data,
+        "mode": mode,
+        "packageId": package_id,
+        "start": start,
+        "end": end,
+        "exclusive": data == expected,
+    }
 
 
 def _safe_existing_directory(value):
@@ -255,6 +427,12 @@ def _doctor(package, target):
             "The target is already initialized for a different harness.",
             "Keep the target unchanged and use %s." % _recommend(observed),
         )
+    destination = _runtime_destination(target, package["id"])
+    onboarding = _inspect_onboarding(
+        target,
+        package["id"],
+        phase="installed" if _lexists(destination) else "downloaded",
+    )
     _validate_managed_shapes(package, target)
     runtime_root = target / ".agent-harnesses"
     if _lexists(runtime_root) and (_is_link_like(runtime_root) or not runtime_root.is_dir()):
@@ -264,13 +442,20 @@ def _doctor(package, target):
             "The target-local runtime boundary is not a real directory.",
             "Resolve the .agent-harnesses collision without overwriting it.",
         )
-    destination = _runtime_destination(target, package["id"])
+    if onboarding["packageId"] == package["id"] and not _lexists(destination):
+        raise InstallerFailure(
+            "E_INITIALIZATION_CONFLICT",
+            "downloaded",
+            "AGENTS.md contains an unreceipted onboarding block.",
+            "Keep it unchanged and resolve its ownership before installing this runtime.",
+        )
     if _lexists(destination):
-        _verify_runtime_files(destination, package["id"])
+        receipt = _verify_runtime_files(destination, package["id"])
+        _verify_onboarding(target, package["id"], receipt)
     if package["id"] == "orchestration" and not marker_ids:
         master_like = any(
             _lexists(target / name)
-            for name in ("AGENTS.md", "ARCHITECTURE.md", "NEXT.md", "FRONTS.md", "harness.config.json")
+            for name in ("ARCHITECTURE.md", "NEXT.md", "FRONTS.md", "harness.config.json")
         )
         project_directories = [
             child
@@ -404,6 +589,14 @@ def _source_from_repository(root, expected_id):
 
 def _validate_inventory(package_root, inventory):
     expected = _parse_inventory(inventory, "downloaded")
+    missing_onboarding = sorted(set(ONBOARDING_PACKAGE_FILES) - set(expected))
+    if missing_onboarding:
+        raise InstallerFailure(
+            "E_CHECKSUM_MISMATCH",
+            "downloaded",
+            "The package inventory is missing its operator onboarding contract.",
+            "Discard the source and fetch the complete immutable release bundle.",
+        )
     observed = {}
     for path in sorted(package_root.rglob("*")):
         if _is_link_like(path):
@@ -497,11 +690,45 @@ def _runtime_destination(target, package_id):
     return target / RUNTIME_RELATIVE / package_id / VERSION
 
 
-def _receipt(package_id, inventory):
+def _onboarding_digest(package_id, agents_created, attachment_offset):
+    block = _onboarding_block(package_id)
+    if agents_created:
+        return hashlib.sha256(block).hexdigest()
+    anchored = (
+        b"agent-harnesses:onboarding-attachment:v1\n"
+        + str(attachment_offset).encode("ascii")
+        + b"\n"
+        + ONBOARDING_SEPARATOR
+        + block
+    )
+    return hashlib.sha256(anchored).hexdigest()
+
+
+def _onboarding_receipt(package_id, agents_created, attachment_offset):
+    value = _onboarding_paths(package_id)
+    value.update(
+        {
+            "agentsCreated": bool(agents_created),
+            "blockSha256": _onboarding_digest(
+                package_id,
+                bool(agents_created),
+                attachment_offset,
+            ),
+        }
+    )
+    return value
+
+
+def _receipt(package_id, inventory, agents_created, attachment_offset):
     return {
-        "schemaVersion": 1,
+        "schemaVersion": 2,
         "package": {"id": package_id, "version": VERSION},
         "files": [{"path": path, "sha256": inventory[path]} for path in sorted(inventory)],
+        "onboarding": _onboarding_receipt(
+            package_id,
+            agents_created,
+            attachment_offset,
+        ),
     }
 
 
@@ -523,23 +750,110 @@ def _verify_runtime_files(destination, package_id):
     )
     if (
         not isinstance(receipt, dict)
-        or set(receipt) != {"schemaVersion", "package", "files"}
+        or set(receipt) != {"schemaVersion", "package", "files", "onboarding"}
         or type(receipt.get("schemaVersion")) is not int
-        or receipt.get("schemaVersion") != 1
+        or receipt.get("schemaVersion") != 2
         or not isinstance(receipt.get("package"), dict)
         or receipt["package"] != {"id": package_id, "version": VERSION}
+        or not isinstance(receipt.get("onboarding"), dict)
+    ):
+        raise InstallerFailure("E_CHECKSUM_MISMATCH", "installed", "The installation receipt is invalid.", "Do not overwrite it; use uninstall only after restoring receipt-owned bytes.")
+    onboarding = receipt["onboarding"]
+    expected_onboarding_paths = _onboarding_paths(package_id)
+    if (
+        set(onboarding)
+        != {
+            "agentsCreated",
+            "blockSha256",
+            "operationsContract",
+            "operatorGuides",
+        }
+        or type(onboarding.get("agentsCreated")) is not bool
+        or not isinstance(onboarding.get("blockSha256"), str)
+        or not re.fullmatch(r"[0-9a-f]{64}", onboarding["blockSha256"])
+        or onboarding.get("operationsContract")
+        != expected_onboarding_paths["operationsContract"]
+        or onboarding.get("operatorGuides")
+        != expected_onboarding_paths["operatorGuides"]
     ):
         raise InstallerFailure("E_CHECKSUM_MISMATCH", "installed", "The installation receipt is invalid.", "Do not overwrite it; use uninstall only after restoring receipt-owned bytes.")
     expected = _parse_inventory(receipt["files"], "installed")
+    if set(ONBOARDING_PACKAGE_FILES) - set(expected):
+        raise InstallerFailure(
+            "E_CHECKSUM_MISMATCH",
+            "installed",
+            "The installed runtime receipt omits its operator onboarding contract.",
+            "Restore the exact receipt-owned runtime bytes before retrying.",
+        )
+    expected_directories = set()
+    for relative_text in expected:
+        parent = PurePosixPath(relative_text).parent
+        while parent != PurePosixPath("."):
+            expected_directories.add(parent.as_posix())
+            parent = parent.parent
     observed = {}
     for path in sorted(destination.rglob("*")):
         if _is_link_like(path):
             raise InstallerFailure("E_CHECKSUM_MISMATCH", "installed", "The installed runtime contains a linked entry.", "Inspect it without following links.")
+        relative_text = path.relative_to(destination).as_posix()
         if path.is_file() and path != receipt_path:
             observed[path.relative_to(destination).as_posix()] = _sha256(path)
+        elif path.is_dir():
+            if relative_text not in expected_directories:
+                raise InstallerFailure(
+                    "E_CHECKSUM_MISMATCH",
+                    "installed",
+                    "The installed runtime contains an unreceipted directory.",
+                    "Do not uninstall or overwrite it; inspect the target-local runtime.",
+                )
+        elif path != receipt_path:
+            raise InstallerFailure(
+                "E_CHECKSUM_MISMATCH",
+                "installed",
+                "The installed runtime contains an unreceipted special entry.",
+                "Do not uninstall or overwrite it; inspect the target-local runtime.",
+            )
     if observed != expected or receipt_path.read_bytes() != _canonical_bytes(receipt):
         raise InstallerFailure("E_CHECKSUM_MISMATCH", "installed", "Installed runtime bytes differ from the receipt.", "Do not overwrite or uninstall changed bytes; inspect the target-local runtime.")
     return receipt
+
+
+def _verify_onboarding(target, package_id, receipt):
+    state = _inspect_onboarding(
+        target,
+        package_id,
+        phase="installed",
+        required=True,
+    )
+    agents_created = receipt["onboarding"]["agentsCreated"]
+    attachment_start = state["start"]
+    if not agents_created:
+        separator_start = state["start"] - len(ONBOARDING_SEPARATOR)
+        if (
+            separator_start < 0
+            or state["data"][separator_start : state["start"]]
+            != ONBOARDING_SEPARATOR
+        ):
+            raise InstallerFailure(
+                "E_CHECKSUM_MISMATCH",
+                "installed",
+                "The onboarding separator differs from its exact contract.",
+                "Restore the generated separator and managed AGENTS.md block before retrying.",
+            )
+        attachment_start = separator_start
+    expected_digest = _onboarding_digest(
+        package_id,
+        agents_created,
+        attachment_start,
+    )
+    if receipt["onboarding"]["blockSha256"] != expected_digest:
+        raise InstallerFailure(
+            "E_CHECKSUM_MISMATCH",
+            "installed",
+            "The onboarding receipt does not match the managed block attachment.",
+            "Restore the exact receipt-owned runtime and AGENTS.md attachment before retrying.",
+        )
+    return state
 
 
 def _publish_no_replace(source, destination):
@@ -573,23 +887,239 @@ def _publish_no_replace(source, destination):
     raise InstallerFailure("E_INITIALIZATION_CONFLICT", "downloaded", "Atomic no-overwrite publication is unavailable.", "Use a supported macOS, Linux, or Windows runtime.")
 
 
+def _fsync_directory(path):
+    try:
+        descriptor = os.open(path, os.O_RDONLY)
+    except OSError:
+        return
+    try:
+        os.fsync(descriptor)
+    except OSError:
+        pass
+    finally:
+        os.close(descriptor)
+
+
+def _acquire_onboarding_lock(target):
+    boundary = target / RUNTIME_RELATIVE.parts[0]
+    boundary_created = False
+    try:
+        boundary.mkdir()
+        boundary_created = True
+    except FileExistsError:
+        if _is_link_like(boundary) or not boundary.is_dir():
+            raise InstallerFailure(
+                "E_INITIALIZATION_CONFLICT",
+                "downloaded",
+                "The target-local runtime boundary is not a real directory.",
+                "Resolve the .agent-harnesses collision without overwriting it.",
+            )
+    lock = boundary / ONBOARDING_LOCK_NAME
+    for _attempt in range(ONBOARDING_LOCK_ATTEMPTS):
+        try:
+            lock.mkdir()
+        except FileExistsError:
+            if _is_link_like(lock) or not lock.is_dir():
+                if boundary_created:
+                    try:
+                        boundary.rmdir()
+                    except OSError:
+                        pass
+                raise InstallerFailure(
+                    "E_INITIALIZATION_CONFLICT",
+                    "downloaded",
+                    "The onboarding transaction lock has an unsafe type.",
+                    "Keep it unchanged and resolve ownership before retrying.",
+                )
+            time.sleep(0.01)
+            continue
+        return lock, boundary, boundary_created
+    if boundary_created:
+        try:
+            boundary.rmdir()
+        except OSError:
+            pass
+    raise InstallerFailure(
+        "E_INITIALIZATION_CONFLICT",
+        "downloaded",
+        "Another onboarding transaction still owns this target.",
+        "Wait for the active installer to finish; do not remove an unknown lock.",
+    )
+
+
+def _release_onboarding_lock(lock, boundary, boundary_created):
+    try:
+        if _lexists(lock) and not _is_link_like(lock) and lock.is_dir():
+            lock.rmdir()
+    finally:
+        if boundary_created:
+            try:
+                boundary.rmdir()
+            except OSError:
+                pass
+
+
+def _replace_agents_bytes(path, before, after, mode):
+    if before is None:
+        try:
+            descriptor = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, mode)
+        except FileExistsError as error:
+            raise InstallerFailure(
+                "E_INITIALIZATION_CONFLICT",
+                "downloaded",
+                "AGENTS.md changed during onboarding publication.",
+                "Keep the concurrent change and retry after resolving ownership.",
+            ) from error
+        created_metadata = os.fstat(descriptor)
+        try:
+            with os.fdopen(descriptor, "wb") as handle:
+                handle.write(after)
+                handle.flush()
+                os.fsync(handle.fileno())
+        except BaseException:
+            try:
+                current_metadata = path.lstat()
+                if (
+                    stat.S_ISREG(current_metadata.st_mode)
+                    and current_metadata.st_dev == created_metadata.st_dev
+                    and current_metadata.st_ino == created_metadata.st_ino
+                ):
+                    path.unlink()
+            except OSError:
+                pass
+            raise
+        _fsync_directory(path.parent)
+        return
+    if not _lexists(path) or _is_link_like(path) or not path.is_file():
+        raise InstallerFailure(
+            "E_INITIALIZATION_CONFLICT",
+            "downloaded",
+            "AGENTS.md changed type during onboarding publication.",
+            "Keep the concurrent change and retry after resolving ownership.",
+        )
+    try:
+        current = path.read_bytes()
+    except OSError as error:
+        raise InstallerFailure(
+            "E_INITIALIZATION_CONFLICT",
+            "downloaded",
+            "AGENTS.md changed during onboarding publication.",
+            "Keep it unchanged and retry after resolving ownership.",
+        ) from error
+    if current != before:
+        raise InstallerFailure(
+            "E_INITIALIZATION_CONFLICT",
+            "downloaded",
+            "AGENTS.md changed during onboarding publication.",
+            "Keep the concurrent change and retry after resolving ownership.",
+        )
+    descriptor, temporary_name = tempfile.mkstemp(
+        prefix=".agent-harnesses-agents-",
+        dir=path.parent,
+    )
+    temporary = Path(temporary_name)
+    try:
+        with os.fdopen(descriptor, "wb") as handle:
+            handle.write(after)
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.chmod(temporary, mode)
+        if _is_link_like(path) or not path.is_file() or path.read_bytes() != before:
+            raise InstallerFailure(
+                "E_INITIALIZATION_CONFLICT",
+                "downloaded",
+                "AGENTS.md changed during onboarding publication.",
+                "Keep the concurrent change and retry after resolving ownership.",
+            )
+        os.replace(temporary, path)
+        _fsync_directory(path.parent)
+    finally:
+        try:
+            temporary.unlink()
+        except OSError:
+            pass
+
+
+def _onboarding_plan(target, package_id):
+    state = _inspect_onboarding(target, package_id)
+    if state["packageId"] == package_id:
+        raise InstallerFailure(
+            "E_INITIALIZATION_CONFLICT",
+            "downloaded",
+            "AGENTS.md contains an unreceipted onboarding block.",
+            "Keep it unchanged and resolve its ownership before installing this runtime.",
+        )
+    before = state["data"] if state["exists"] else None
+    attachment = _onboarding_block(package_id)
+    if state["exists"]:
+        attachment = ONBOARDING_SEPARATOR + attachment
+    return {
+        "path": state["path"],
+        "before": before,
+        "after": (before or b"") + attachment,
+        "mode": state["mode"],
+        "changed": True,
+        "agentsCreated": not state["exists"],
+        "attachmentStart": len(before or b""),
+    }
+
+
+def _restore_agents_plan(plan):
+    if not plan["changed"]:
+        return
+    path = plan["path"]
+    if plan["before"] is None:
+        if not _lexists(path):
+            return
+        if _is_link_like(path) or not path.is_file() or path.read_bytes() != plan["after"]:
+            raise InstallerFailure(
+                "E_INITIALIZATION_CONFLICT",
+                "downloaded",
+                "AGENTS.md changed while the failed install was rolling back.",
+                "Inspect the target without overwriting the concurrent change.",
+            )
+        path.unlink()
+        _fsync_directory(path.parent)
+        return
+    _replace_agents_bytes(
+        path,
+        plan["after"],
+        plan["before"],
+        plan["mode"],
+    )
+
+
 def _copy_install(source_root, inventory, destination, package_id):
     expected = _validate_inventory(source_root, inventory)
+    target = destination.parents[3]
+    package = next(item for item in PRODUCT["packages"] if item["id"] == package_id)
+    _doctor(package, target)
     if _lexists(destination):
-        _verify_runtime_files(destination, package_id)
+        receipt = _verify_runtime_files(destination, package_id)
+        _verify_onboarding(target, package_id, receipt)
         return "unchanged"
+    lock, boundary, boundary_created = _acquire_onboarding_lock(target)
     runtime_root = destination.parents[2]
     created = []
-    current = destination.parent
-    missing = []
-    while not _lexists(current):
-        missing.append(current)
-        current = current.parent
-    if _is_link_like(current) or not current.is_dir():
-        raise InstallerFailure("E_INITIALIZATION_CONFLICT", "downloaded", "The runtime boundary contains an unsafe component.", "Resolve the collision without overwriting it.")
     stage = runtime_root / (".install-%s-%s" % (package_id, uuid.uuid4().hex))
     stage_created = False
+    onboarding_applied = False
+    committed = False
+    plan = None
     try:
+        _doctor(package, target)
+        if _lexists(destination):
+            receipt = _verify_runtime_files(destination, package_id)
+            _verify_onboarding(target, package_id, receipt)
+            return "unchanged"
+        plan = _onboarding_plan(target, package_id)
+        current = destination.parent
+        missing = []
+        while not _lexists(current):
+            missing.append(current)
+            current = current.parent
+        if _is_link_like(current) or not current.is_dir():
+            raise InstallerFailure("E_INITIALIZATION_CONFLICT", "downloaded", "The runtime boundary contains an unsafe component.", "Resolve the collision without overwriting it.")
         for path in reversed(missing):
             try:
                 path.mkdir()
@@ -607,19 +1137,41 @@ def _copy_install(source_root, inventory, destination, package_id):
         stage_created = True
         for relative_text in sorted(expected):
             relative = Path(*PurePosixPath(relative_text).parts)
-            target = stage / relative
-            target.parent.mkdir(parents=True, exist_ok=True)
-            with (source_root / relative).open("rb") as source, target.open("xb") as output:
+            file_target = stage / relative
+            file_target.parent.mkdir(parents=True, exist_ok=True)
+            with (source_root / relative).open("rb") as source, file_target.open("xb") as output:
                 shutil.copyfileobj(source, output)
-        (stage / RECEIPT_NAME).write_bytes(_canonical_bytes(_receipt(package_id, expected)))
+        (stage / RECEIPT_NAME).write_bytes(
+            _canonical_bytes(
+                _receipt(
+                    package_id,
+                    expected,
+                    plan["agentsCreated"],
+                    plan["attachmentStart"],
+                )
+            )
+        )
         _verify_runtime_files(stage, package_id)
+        if plan["changed"]:
+            _replace_agents_bytes(
+                plan["path"],
+                plan["before"],
+                plan["after"],
+                plan["mode"],
+            )
+            onboarding_applied = True
         try:
             _publish_no_replace(stage, destination)
+            committed = True
         except FileExistsError:
-            _verify_runtime_files(destination, package_id)
+            receipt = _verify_runtime_files(destination, package_id)
+            _verify_onboarding(target, package_id, receipt)
             shutil.rmtree(stage)
+            committed = True
             return "unchanged"
     except BaseException:
+        if onboarding_applied and not committed:
+            _restore_agents_plan(plan)
         if stage_created and stage.exists() and not _is_link_like(stage):
             shutil.rmtree(stage, ignore_errors=True)
         for path in reversed(created):
@@ -628,6 +1180,8 @@ def _copy_install(source_root, inventory, destination, package_id):
             except OSError:
                 pass
         raise
+    finally:
+        _release_onboarding_lock(lock, boundary, boundary_created)
     return "installed"
 
 
@@ -644,7 +1198,8 @@ def _runtime_command(package_id, destination, target):
 
 def _verify_ready(package, target):
     destination = _runtime_destination(target, package["id"])
-    _verify_runtime_files(destination, package["id"])
+    receipt = _verify_runtime_files(destination, package["id"])
+    _verify_onboarding(target, package["id"], receipt)
     marker_ids = _marker_ids(target)
     if not marker_ids:
         raise InstallerFailure(
@@ -668,25 +1223,195 @@ def _verify_ready(package, target):
     return _result("OK", "ready", "The runtime is installed and the initialized target passed operational verification.", ready=True)
 
 
+def _onboarding_removal_plan(target, package_id, receipt):
+    state = _verify_onboarding(target, package_id, receipt)
+    before = state["data"]
+    start = state["start"]
+    if not receipt["onboarding"]["agentsCreated"]:
+        start -= len(ONBOARDING_SEPARATOR)
+    after = before[:start] + before[state["end"] :]
+    return {
+        "path": state["path"],
+        "before": before,
+        "after": after,
+        "mode": state["mode"],
+        "delete": bool(receipt["onboarding"]["agentsCreated"] and state["exclusive"]),
+    }
+
+
+def _apply_onboarding_removal(plan):
+    path = plan["path"]
+    if plan["delete"]:
+        if _is_link_like(path) or not path.is_file() or path.read_bytes() != plan["before"]:
+            raise InstallerFailure(
+                "E_INITIALIZATION_CONFLICT",
+                "installed",
+                "AGENTS.md changed during uninstall.",
+                "Keep the concurrent change and retry after resolving ownership.",
+            )
+        path.unlink()
+        _fsync_directory(path.parent)
+        return
+    _replace_agents_bytes(
+        path,
+        plan["before"],
+        plan["after"],
+        plan["mode"],
+    )
+
+
+def _restore_onboarding_removal(plan):
+    path = plan["path"]
+    if not _lexists(path):
+        if not plan["delete"]:
+            raise InstallerFailure(
+                "E_INITIALIZATION_CONFLICT",
+                "installed",
+                "AGENTS.md disappeared while uninstall was rolling back.",
+                "Inspect the target without overwriting concurrent changes.",
+            )
+        _replace_agents_bytes(
+            path,
+            None,
+            plan["before"],
+            plan["mode"],
+        )
+        return
+    if _is_link_like(path) or not path.is_file():
+        raise InstallerFailure(
+            "E_INITIALIZATION_CONFLICT",
+            "installed",
+            "AGENTS.md changed type while uninstall was rolling back.",
+            "Inspect the target without overwriting concurrent changes.",
+        )
+    current = path.read_bytes()
+    if current == plan["before"]:
+        return
+    if current != plan["after"]:
+        raise InstallerFailure(
+            "E_INITIALIZATION_CONFLICT",
+            "installed",
+            "AGENTS.md changed while uninstall was rolling back.",
+            "Inspect the target without overwriting concurrent changes.",
+        )
+    _replace_agents_bytes(
+        path,
+        plan["after"],
+        plan["before"],
+        plan["mode"],
+    )
+
+
+def _remove_owned_tree(root):
+    if not _lexists(root):
+        return
+    if _is_link_like(root) or not root.is_dir():
+        raise InstallerFailure(
+            "E_INITIALIZATION_CONFLICT",
+            "installed",
+            "An installer-owned cleanup path changed type.",
+            "Keep it unchanged and inspect the target-local runtime boundary.",
+        )
+    entries = sorted(
+        root.rglob("*"),
+        key=lambda path: (len(path.relative_to(root).parts), path.as_posix()),
+        reverse=True,
+    )
+    for path in entries:
+        if not _lexists(path):
+            continue
+        if _is_link_like(path):
+            raise InstallerFailure(
+                "E_INITIALIZATION_CONFLICT",
+                "installed",
+                "An installer-owned cleanup entry changed type.",
+                "Keep it unchanged and inspect the target-local runtime boundary.",
+            )
+        metadata = path.lstat()
+        if stat.S_ISDIR(metadata.st_mode):
+            path.rmdir()
+        elif stat.S_ISREG(metadata.st_mode):
+            path.unlink()
+        else:
+            raise InstallerFailure(
+                "E_INITIALIZATION_CONFLICT",
+                "installed",
+                "An installer-owned cleanup entry has an unsafe type.",
+                "Keep it unchanged and inspect the target-local runtime boundary.",
+            )
+    root.rmdir()
+
+
+def _copy_runtime_tree(source, destination, package_id):
+    shutil.copytree(source, destination, copy_function=shutil.copy2)
+    _verify_runtime_files(destination, package_id)
+
+
+def _restore_runtime_backup(backup, destination, package_id):
+    if _lexists(destination):
+        raise InstallerFailure(
+            "E_INITIALIZATION_CONFLICT",
+            "installed",
+            "The runtime destination changed while uninstall was rolling back.",
+            "Keep both paths unchanged and inspect ownership.",
+        )
+    stage = destination.parent / (".restore-%s-%s" % (VERSION, uuid.uuid4().hex))
+    try:
+        _copy_runtime_tree(backup, stage, package_id)
+        _publish_no_replace(stage, destination)
+    finally:
+        if _lexists(stage):
+            _remove_owned_tree(stage)
+
+
 def _uninstall(package, target, apply):
     destination = _runtime_destination(target, package["id"])
-    _verify_runtime_files(destination, package["id"])
+    receipt = _verify_runtime_files(destination, package["id"])
+    _verify_onboarding(target, package["id"], receipt)
     if not apply:
-        return _result("OK", "installed", "Uninstall dry-run passed; only receipt-owned unchanged runtime bytes would be removed.", ready=False)
+        return _result("OK", "installed", "Uninstall dry-run passed; only the exact onboarding block and receipt-owned unchanged runtime bytes would be removed.", ready=False)
+    lock, boundary, boundary_created = _acquire_onboarding_lock(target)
     quarantine = destination.parent / (".remove-%s-%s" % (VERSION, uuid.uuid4().hex))
-    _publish_no_replace(destination, quarantine)
+    backup_parent = None
+    backup = None
+    quarantined = False
+    removal = None
+    removal_applied = False
     try:
-        shutil.rmtree(quarantine)
+        receipt = _verify_runtime_files(destination, package["id"])
+        removal = _onboarding_removal_plan(target, package["id"], receipt)
+        backup_parent = Path(
+            tempfile.mkdtemp(prefix="agent-harnesses-uninstall-rollback-")
+        )
+        backup = backup_parent / "runtime"
+        _copy_runtime_tree(destination, backup, package["id"])
+        _publish_no_replace(destination, quarantine)
+        quarantined = True
+        _apply_onboarding_removal(removal)
+        removal_applied = True
+        _remove_owned_tree(quarantine)
+        quarantined = False
     except BaseException:
-        if not _lexists(destination) and _lexists(quarantine):
-            os.rename(quarantine, destination)
+        if removal_applied and removal is not None:
+            _restore_onboarding_removal(removal)
+        if quarantined and not _lexists(destination) and backup is not None:
+            _restore_runtime_backup(backup, destination, package["id"])
+        if quarantined and _lexists(quarantine):
+            _remove_owned_tree(quarantine)
+            quarantined = False
         raise
+    finally:
+        try:
+            if backup_parent is not None and _lexists(backup_parent):
+                _remove_owned_tree(backup_parent)
+        finally:
+            _release_onboarding_lock(lock, boundary, boundary_created)
     for parent in (destination.parent, destination.parents[1], destination.parents[2]):
         try:
             parent.rmdir()
         except OSError:
             break
-    return _result("OK", "downloaded", "The receipt-owned runtime was removed; initialized target files were left untouched.", ready=False)
+    return _result("OK", "downloaded", "The exact onboarding block and receipt-owned runtime were removed; initialized target files were left untouched.", ready=False)
 
 
 def _parser():
@@ -732,6 +1457,7 @@ def main(argv=None):
         print(_render(result, wants_json))
         return 2
     arguments = _parser().parse_args(arguments_list)
+    package = None
     try:
         package = _package_for_selector(arguments.selector)
         target = _safe_existing_directory(arguments.target)
@@ -755,10 +1481,11 @@ def main(argv=None):
             else:
                 _validate_inventory(source[0], source[1])
             if _lexists(destination):
-                _verify_runtime_files(destination, package["id"])
-                message = "Install dry-run passed; source inventory is verified and the exact runtime is already installed."
+                receipt = _verify_runtime_files(destination, package["id"])
+                _verify_onboarding(target, package["id"], receipt)
+                message = "Install dry-run passed; source inventory, target-local onboarding, and the exact installed runtime are verified."
             else:
-                message = "Install dry-run passed; source inventory is verified and the selected runtime can be installed without initializing the target."
+                message = "Install dry-run passed; source inventory is verified and the selected runtime plus target-local onboarding block can be installed without initializing the target."
             result = _result("OK", "downloaded", message, ready=False)
         else:
             source = _local_source(package["id"])
@@ -773,6 +1500,8 @@ def main(argv=None):
         result = error.result
     except (OSError, ValueError, zipfile.BadZipFile):
         result = _result("E_INITIALIZATION_CONFLICT", "downloaded", "The operation failed safely without overwriting target content.", "Inspect the target-local runtime boundary and retry from a clean immutable bundle.")
+    if package is not None:
+        result = _with_onboarding(result, package["id"])
     print(_render(result, arguments.json))
     return 0 if result["code"] == "OK" else 2
 

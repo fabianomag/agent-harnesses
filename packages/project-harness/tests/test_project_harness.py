@@ -123,7 +123,7 @@ class InitializationTests(TemporaryProjectTestCase):
         before = _tree_snapshot(self.root)
 
         self.assertEqual([], harness.verify_root(self.root))
-        self.assertEqual("0.2.0", harness.status_snapshot(self.root)["harnessVersion"])
+        self.assertEqual("0.2.1", harness.status_snapshot(self.root)["harnessVersion"])
         _root, plan = harness.plan_init(self.root)
 
         self.assertTrue(plan.is_noop)

@@ -1,7 +1,7 @@
 # Multi-Project Harness — advanced reference
 
 - Package ID: `cross-project`
-- Version: `0.2.0`
+- Version: `0.2.1`
 - Artifact status: implemented, published
 - Runtime: Python 3.10 or newer, standard library only
 
@@ -57,12 +57,12 @@ remains with each local project owner.
 From the source repository root:
 
 ```text
-<python> -B tools/package_manager.py install --package cross-project --version 0.2.0 --root "<install-root>" --dry-run
-<python> -B tools/package_manager.py install --package cross-project --version 0.2.0 --root "<install-root>" --apply
-<python> -B tools/package_manager.py verify --package cross-project --version 0.2.0 --root "<install-root>"
+<python> -B tools/package_manager.py install --package cross-project --version 0.2.1 --root "<install-root>" --dry-run
+<python> -B tools/package_manager.py install --package cross-project --version 0.2.1 --root "<install-root>" --apply
+<python> -B tools/package_manager.py verify --package cross-project --version 0.2.1 --root "<install-root>"
 ```
 
-The installed copy is `<install-root>/cross-project-0.2.0/`. The common
+The installed copy is `<install-root>/cross-project-0.2.1/`. The common
 package manager does not create a global command or invoke the runtime.
 
 ## Preflight
@@ -76,7 +76,7 @@ Enter the installed package root. Start with read-only orientation:
 Preview the exact registration before applying it:
 
 ```text
-<python> -B scripts/cross_project.py hq-init --root "<coordination-root>" --dry-run --front alpha --name "Alpha" --path projects/alpha --role "Produces one shared component" --next "Validate the first slice"
+<python> -B scripts/cross_project.py hq-init --root "<coordination-root>" --dry-run --front "<front-id>" --name "<front-name>" --path "<project-path>" --role "<confirmed-role>" --next "<confirmed-next-action>"
 ```
 
 The preview writes nothing. Read-only, preview, and applying commands reject a
@@ -97,7 +97,7 @@ root:
 Verify installed package bytes from the source repository root:
 
 ```text
-<python> -B tools/package_manager.py verify --package cross-project --version 0.2.0 --root "<install-root>"
+<python> -B tools/package_manager.py verify --package cross-project --version 0.2.1 --root "<install-root>"
 ```
 
 Run package-local automated checks from the installed package root:
@@ -108,20 +108,21 @@ Run package-local automated checks from the installed package root:
 
 ## First use
 
-Create `<coordination-root>/projects/alpha` as a regular directory before
-running this installed-copy sequence. Pass the physical, link-free
+Confirm `<coordination-root>/<project-path>` as a regular existing directory
+before running this installed-copy sequence; do not create a sample project.
+Pass the physical, link-free
 `<coordination-root>` path; a lexically different path through a symlink is
 rejected even when it names the same directory:
 
 ```text
 <python> -B scripts/cross_project.py bom-dia --root "<coordination-root>"
-<python> -B scripts/cross_project.py hq-init --root "<coordination-root>" --dry-run --front alpha --name "Alpha" --path projects/alpha --role "Produces one shared component" --next "Validate the first slice"
-<python> -B scripts/cross_project.py hq-init --root "<coordination-root>" --front alpha --name "Alpha" --path projects/alpha --role "Produces one shared component" --next "Validate the first slice"
+<python> -B scripts/cross_project.py hq-init --root "<coordination-root>" --dry-run --front "<front-id>" --name "<front-name>" --path "<project-path>" --role "<confirmed-role>" --next "<confirmed-next-action>"
+<python> -B scripts/cross_project.py hq-init --root "<coordination-root>" --front "<front-id>" --name "<front-name>" --path "<project-path>" --role "<confirmed-role>" --next "<confirmed-next-action>"
 <python> -B scripts/cross_project.py hq-sync --root "<coordination-root>"
-<python> -B scripts/cross_project.py digere --root "<coordination-root>" --front alpha --scope coordination
-<python> -B scripts/cross_project.py registra --root "<coordination-root>" --front alpha --state active --next "Validate the first slice"
-<python> -B scripts/cross_project.py encerra --root "<coordination-root>" --front alpha --role "Produces one shared component" --state ready --next "Hand off the component" --summary "First slice validated" --reflect-when "The shared interface changes"
-<python> -B scripts/cross_project.py bom-dia --root "<coordination-root>" --front alpha
+<python> -B scripts/cross_project.py digere --root "<coordination-root>" --front "<front-id>" --scope coordination
+<python> -B scripts/cross_project.py registra --root "<coordination-root>" --front "<front-id>" --state "<confirmed-state>" --next "<confirmed-next-action>"
+<python> -B scripts/cross_project.py encerra --root "<coordination-root>" --front "<front-id>" --role "<confirmed-role>" --state "<confirmed-state>" --next "<confirmed-next-action>" --summary "<confirmed-summary>" --reflect-when "<confirmed-reflection-trigger>"
+<python> -B scripts/cross_project.py bom-dia --root "<coordination-root>" --front "<front-id>"
 ```
 
 When working from the source repository root, use
@@ -168,9 +169,8 @@ The package intentionally has no automatic crash-recovery command.
   snapshots, physical-path acceptance, and the reflection lifecycle.
 - **Structural — defined:** common installed-copy and repository validation
   procedures are present; this README does not self-attest a result.
-- **Manual Codex — verified:** a fresh Cross-Project walkthrough passed for
-  this exact release bundle and candidate. The immutable evidence is
-  [published with the release](https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.0/manual-codex-evidence.json).
+- **Manual Codex — pending:** a fresh Multi-Project Harness walkthrough must
+  run against the exact release candidate before publication.
 
 The local runner does not execute manual evidence. Publishable results must
 come from a release manifest or evidence asset bound to the exact published
@@ -178,14 +178,13 @@ package version and commit.
 
 ## Version and immutable links
 
-Version `0.2.0` is published from the immutable `v0.2.0`
-release tag. It is a hardening patch over the earlier local `0.2.0` package
-state; no `0.2.0` release is claimed.
+Version `0.2.1` is bound to the immutable `v0.2.1` release tag and supersedes
+the immutable `v0.2.0` collection release without rewriting it.
 
-- Immutable documentation URL: https://github.com/fabianomag/agent-harnesses/blob/v0.2.0/packages/cross-project/README.md
-- Immutable install prompt: `Install this harness for me: https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.0/cross-project-0.2.0.zip`
-- Immutable source URL: https://github.com/fabianomag/agent-harnesses/tree/v0.2.0/packages/cross-project
-- Release URL: https://github.com/fabianomag/agent-harnesses/releases/tag/v0.2.0
+- Immutable documentation URL: https://github.com/fabianomag/agent-harnesses/blob/v0.2.1/packages/cross-project/README.md
+- Immutable install prompt: `Install this harness for me: https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.1/cross-project-0.2.1.zip`
+- Immutable source URL: https://github.com/fabianomag/agent-harnesses/tree/v0.2.1/packages/cross-project
+- Release URL: https://github.com/fabianomag/agent-harnesses/releases/tag/v0.2.1
 - Installation report: https://github.com/fabianomag/agent-harnesses/issues/new?template=installation-report.yml
 
 Do not substitute a mutable branch URL for the version-bound fields.
@@ -193,7 +192,7 @@ Do not substitute a mutable branch URL for the version-bound fields.
 ## Diagrams
 
 - Graph ID: `cross-project-flow`
-- Immutable spec: https://github.com/fabianomag/agent-harnesses/blob/v0.2.0/graphs/cross-project.graph.json
+- Immutable spec: https://github.com/fabianomag/agent-harnesses/blob/v0.2.1/graphs/cross-project.graph.json
 - Source-tree static asset: `assets/cross-project.svg`
 - Interactive diagram: https://fabianomag.com/projects/agent-harnesses
 

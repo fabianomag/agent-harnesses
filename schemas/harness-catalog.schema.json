@@ -399,19 +399,23 @@
         }
       ]
     },
-    "publishedInteractiveLink": {
-      "allOf": [
-        {
-          "$ref": "#/$defs/publishedLink"
+    "plannedInteractiveLink": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "url"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "const": "planned"
         },
-        {
-          "properties": {
-            "url": {
-              "const": "https://fabianomag.com/projects/agent-harnesses"
-            }
-          }
+        "url": {
+          "type": "string",
+          "const": "https://fabianomag.com/projects/agent-harnesses"
         }
-      ]
+      }
     },
     "flowStep": {
       "type": "object",
@@ -686,7 +690,7 @@
               "$ref": "#/$defs/publishedReleaseLink"
             },
             "interactiveDiagram": {
-              "$ref": "#/$defs/publishedInteractiveLink"
+              "$ref": "#/$defs/plannedInteractiveLink"
             }
           }
         },
@@ -775,35 +779,35 @@
               "const": "Project Harness"
             },
             "version": {
-              "const": "0.2.0"
+              "const": "0.2.1"
             },
             "immutableLinks": {
               "properties": {
                 "documentation": {
                   "properties": {
                     "url": {
-                      "const": "https://github.com/fabianomag/agent-harnesses/blob/v0.2.0/packages/project-harness/README.md"
+                      "const": "https://github.com/fabianomag/agent-harnesses/blob/v0.2.1/packages/project-harness/README.md"
                     }
                   }
                 },
                 "prompt": {
                   "properties": {
                     "url": {
-                      "const": "https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.0/project-harness-0.2.0.zip"
+                      "const": "https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.1/project-harness-0.2.1.zip"
                     }
                   }
                 },
                 "source": {
                   "properties": {
                     "url": {
-                      "const": "https://github.com/fabianomag/agent-harnesses/tree/v0.2.0/packages/project-harness"
+                      "const": "https://github.com/fabianomag/agent-harnesses/tree/v0.2.1/packages/project-harness"
                     }
                   }
                 },
                 "release": {
                   "properties": {
                     "url": {
-                      "const": "https://github.com/fabianomag/agent-harnesses/releases/tag/v0.2.0"
+                      "const": "https://github.com/fabianomag/agent-harnesses/releases/tag/v0.2.1"
                     }
                   }
                 },
@@ -823,7 +827,7 @@
                     "publication": {
                       "properties": {
                         "url": {
-                          "const": "https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.0/manual-codex-evidence.json"
+                          "const": "https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.1/manual-codex-evidence.json"
                         }
                       }
                     }
@@ -865,35 +869,35 @@
               "const": "Workspace Harness"
             },
             "version": {
-              "const": "0.2.0"
+              "const": "0.2.1"
             },
             "immutableLinks": {
               "properties": {
                 "documentation": {
                   "properties": {
                     "url": {
-                      "const": "https://github.com/fabianomag/agent-harnesses/blob/v0.2.0/packages/workspace-coordination/README.md"
+                      "const": "https://github.com/fabianomag/agent-harnesses/blob/v0.2.1/packages/workspace-coordination/README.md"
                     }
                   }
                 },
                 "prompt": {
                   "properties": {
                     "url": {
-                      "const": "https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.0/workspace-coordination-0.2.0.zip"
+                      "const": "https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.1/workspace-coordination-0.2.1.zip"
                     }
                   }
                 },
                 "source": {
                   "properties": {
                     "url": {
-                      "const": "https://github.com/fabianomag/agent-harnesses/tree/v0.2.0/packages/workspace-coordination"
+                      "const": "https://github.com/fabianomag/agent-harnesses/tree/v0.2.1/packages/workspace-coordination"
                     }
                   }
                 },
                 "release": {
                   "properties": {
                     "url": {
-                      "const": "https://github.com/fabianomag/agent-harnesses/releases/tag/v0.2.0"
+                      "const": "https://github.com/fabianomag/agent-harnesses/releases/tag/v0.2.1"
                     }
                   }
                 },
@@ -913,7 +917,7 @@
                     "publication": {
                       "properties": {
                         "url": {
-                          "const": "https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.0/manual-codex-evidence.json"
+                          "const": "https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.1/manual-codex-evidence.json"
                         }
                       }
                     }
@@ -955,35 +959,35 @@
               "const": "Multi-Project Harness"
             },
             "version": {
-              "const": "0.2.0"
+              "const": "0.2.1"
             },
             "immutableLinks": {
               "properties": {
                 "documentation": {
                   "properties": {
                     "url": {
-                      "const": "https://github.com/fabianomag/agent-harnesses/blob/v0.2.0/packages/cross-project/README.md"
+                      "const": "https://github.com/fabianomag/agent-harnesses/blob/v0.2.1/packages/cross-project/README.md"
                     }
                   }
                 },
                 "prompt": {
                   "properties": {
                     "url": {
-                      "const": "https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.0/cross-project-0.2.0.zip"
+                      "const": "https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.1/cross-project-0.2.1.zip"
                     }
                   }
                 },
                 "source": {
                   "properties": {
                     "url": {
-                      "const": "https://github.com/fabianomag/agent-harnesses/tree/v0.2.0/packages/cross-project"
+                      "const": "https://github.com/fabianomag/agent-harnesses/tree/v0.2.1/packages/cross-project"
                     }
                   }
                 },
                 "release": {
                   "properties": {
                     "url": {
-                      "const": "https://github.com/fabianomag/agent-harnesses/releases/tag/v0.2.0"
+                      "const": "https://github.com/fabianomag/agent-harnesses/releases/tag/v0.2.1"
                     }
                   }
                 },
@@ -1003,7 +1007,7 @@
                     "publication": {
                       "properties": {
                         "url": {
-                          "const": "https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.0/manual-codex-evidence.json"
+                          "const": "https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.1/manual-codex-evidence.json"
                         }
                       }
                     }
@@ -1045,35 +1049,35 @@
               "const": "Control Plane Harness"
             },
             "version": {
-              "const": "0.2.0"
+              "const": "0.2.1"
             },
             "immutableLinks": {
               "properties": {
                 "documentation": {
                   "properties": {
                     "url": {
-                      "const": "https://github.com/fabianomag/agent-harnesses/blob/v0.2.0/packages/orchestration/README.md"
+                      "const": "https://github.com/fabianomag/agent-harnesses/blob/v0.2.1/packages/orchestration/README.md"
                     }
                   }
                 },
                 "prompt": {
                   "properties": {
                     "url": {
-                      "const": "https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.0/orchestration-0.2.0.zip"
+                      "const": "https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.1/orchestration-0.2.1.zip"
                     }
                   }
                 },
                 "source": {
                   "properties": {
                     "url": {
-                      "const": "https://github.com/fabianomag/agent-harnesses/tree/v0.2.0/packages/orchestration"
+                      "const": "https://github.com/fabianomag/agent-harnesses/tree/v0.2.1/packages/orchestration"
                     }
                   }
                 },
                 "release": {
                   "properties": {
                     "url": {
-                      "const": "https://github.com/fabianomag/agent-harnesses/releases/tag/v0.2.0"
+                      "const": "https://github.com/fabianomag/agent-harnesses/releases/tag/v0.2.1"
                     }
                   }
                 },
@@ -1093,7 +1097,7 @@
                     "publication": {
                       "properties": {
                         "url": {
-                          "const": "https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.0/manual-codex-evidence.json"
+                          "const": "https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.1/manual-codex-evidence.json"
                         }
                       }
                     }
