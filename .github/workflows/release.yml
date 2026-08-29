@@ -1,0 +1,139 @@
+name: Release candidate
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Exact product release tag
+        required: true
+        default: v0.2.0
+        type: string
+      commit:
+        description: Full lowercase source commit SHA
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: agent-harnesses-release
+  cancel-in-progress: false
+
+env:
+  PYTHONNOUSERSITE: "1"
+  PYTHONDONTWRITEBYTECODE: "1"
+  PYTHONUTF8: "1"
+  RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
+  RELEASE_COMMIT: ${{ inputs.commit || github.sha }}
+
+jobs:
+  build:
+    name: Build and test exact bytes
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - name: Check out the exact source
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ inputs.commit || github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Set up Python 3.10
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: "3.10"
+      - name: Validate tag and checked-out commit
+        shell: bash
+        run: |
+          python -B -c 'import json, re, sys; value=json.load(open("product/harnesses.json", encoding="utf-8")); tag, commit=sys.argv[1:]; assert tag == value["release"]["tag"], "tag does not match product"; assert re.fullmatch(r"[0-9a-f]{40}", commit), "commit must be one full lowercase SHA"' "$RELEASE_TAG" "$RELEASE_COMMIT"
+          test "$(git rev-parse HEAD)" = "$RELEASE_COMMIT"
+      - name: Validate product and repository contracts
+        run: |
+          python -B tools/build_product.py --check
+          python -B tools/build_common.py --check
+          python -B tools/validate.py
+      - name: Run complete automated and structural checks
+        run: python -B tools/run_checks.py
+      - name: Build the release once
+        run: python -B tools/build_release.py build --output release-dist --commit "$RELEASE_COMMIT"
+      - name: Verify the exact built bytes
+        run: python -B tools/build_release.py verify --input release-dist --commit "$RELEASE_COMMIT"
+      - name: Preserve the exact verified release directory
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: agent-harnesses-release
+          path: release-dist
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 7
+
+  release:
+    name: Create and re-verify draft release
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+    steps:
+      - name: Check out the exact source
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ inputs.commit || github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Set up Python 3.10
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: "3.10"
+      - name: Download the exact build-job artifact
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: agent-harnesses-release
+          path: release-dist
+      - name: Verify downloaded build bytes before any release write
+        run: python -B tools/build_release.py verify --input release-dist --commit "$RELEASE_COMMIT"
+      - name: Refuse an existing release or divergent tag
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "Refusing to replace an existing release: $RELEASE_TAG" >&2
+            exit 1
+          fi
+          if git show-ref --verify --quiet "refs/tags/$RELEASE_TAG"; then
+            test "$(git rev-parse "$RELEASE_TAG^{commit}")" = "$RELEASE_COMMIT"
+          elif git ls-remote --exit-code origin "refs/tags/$RELEASE_TAG" >/dev/null 2>&1; then
+            echo "Remote tag exists but was not resolved from the checked source" >&2
+            exit 1
+          fi
+      - name: Create a draft from the verified bytes
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$RELEASE_TAG" release-dist/* \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$RELEASE_COMMIT" \
+            --title "Agent Harnesses $RELEASE_TAG" \
+            --notes-file CHANGELOG.md \
+            --draft
+      - name: Download every draft asset
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir release-download
+          gh release download "$RELEASE_TAG" \
+            --repo "$GITHUB_REPOSITORY" \
+            --dir release-download
+      - name: Verify the exact draft bytes
+        run: python -B tools/build_release.py verify --input release-download --commit "$RELEASE_COMMIT"
+      - name: Hold for human publication
+        run: echo "Draft assets verified. Publish only after the separate human release gate."
