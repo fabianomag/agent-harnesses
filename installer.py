@@ -637,7 +637,9 @@ def _safe_extract(archive, destination):
         if not members:
             raise InstallerFailure("E_CHECKSUM_MISMATCH", "downloaded", "The release archive is empty.", "Fetch the asset again.")
         for member in members:
-            filename = member.filename
+            filename = member.orig_filename
+            if member.filename != filename:
+                raise InstallerFailure("E_CHECKSUM_MISMATCH", "downloaded", "The release archive contains a nonportable entry.", "Discard the archive.")
             directory_suffix = filename.endswith("/")
             portable_name = filename[:-1] if directory_suffix else filename
             relative = _portable_relative_path(portable_name, "downloaded")

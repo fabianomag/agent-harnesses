@@ -565,18 +565,19 @@ class InstallerSafetyTests(unittest.TestCase):
                 archive = self.target / f"synthetic-{index}.zip"
                 extraction = self.target / f"extracted-{index}"
                 extraction.mkdir()
+                portable_name = name.replace(chr(92), "/")
                 with zipfile.ZipFile(archive, "w") as bundle:
-                    # ZipInfo normalizes the host OS separator in its
-                    # constructor. Set the stored name afterwards so this
-                    # test exercises the exact malicious archive bytes on
-                    # Windows as well as POSIX hosts.
-                    member = zipfile.ZipInfo("portable-placeholder.txt")
-                    member.filename = name
-                    member.orig_filename = name
-                    bundle.writestr(member, b"synthetic")
+                    bundle.writestr(portable_name, b"synthetic")
+
+                if portable_name != name:
+                    content = archive.read_bytes()
+                    portable_bytes = portable_name.encode("utf-8")
+                    raw_bytes = name.encode("utf-8")
+                    self.assertEqual(2, content.count(portable_bytes))
+                    archive.write_bytes(content.replace(portable_bytes, raw_bytes))
 
                 with zipfile.ZipFile(archive) as bundle:
-                    self.assertEqual([name], bundle.namelist())
+                    self.assertEqual(name, bundle.infolist()[0].orig_filename)
 
                 with self.assertRaises(installer.InstallerFailure) as context:
                     installer._safe_extract(archive, extraction)
