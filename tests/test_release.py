@@ -4,7 +4,10 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import re
+import subprocess
+import sys
 import tempfile
 import unittest
 import zipfile
@@ -151,6 +154,171 @@ class ReleaseAssetTests(unittest.TestCase):
                 "download/v0.2.0/release-manifest.json"
             )
             self.assertEqual(expected, snapshot["releaseManifest"]["url"])
+
+    def test_exact_package_archives_reach_ready_after_documented_first_use(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            outer = Path(directory).resolve(strict=True)
+            output = self._build(outer, "release")
+            value = product.load_product(REPOSITORY_ROOT)
+            environment = os.environ.copy()
+            environment.update(
+                {
+                    "PYTHONNOUSERSITE": "1",
+                    "PYTHONDONTWRITEBYTECODE": "1",
+                    "PYTHONUTF8": "1",
+                }
+            )
+
+            def run(*arguments: str, cwd: Path) -> subprocess.CompletedProcess[str]:
+                process = subprocess.run(
+                    [sys.executable, "-B", *arguments],
+                    cwd=cwd,
+                    env=environment,
+                    check=False,
+                    capture_output=True,
+                    text=True,
+                )
+                self.assertEqual(
+                    0,
+                    process.returncode,
+                    process.stdout + process.stderr,
+                )
+                return process
+
+            for definition in value["packages"]:
+                package_id = definition["id"]
+                with self.subTest(package_id=package_id):
+                    extracted = outer / f"extracted-{package_id}"
+                    with zipfile.ZipFile(output / definition["asset"]) as archive:
+                        archive.extractall(extracted)
+                    bundle = extracted / f"{package_id}-{value['release']['version']}"
+                    self.assertTrue((bundle / "package" / "README.md").is_file())
+                    target = outer / f"target with spaces {package_id}"
+                    target.mkdir()
+                    if package_id == "workspace-coordination":
+                        (target / "child-alpha").mkdir()
+                        (target / "child-alpha" / "AGENTS.md").write_text(
+                            "# Alpha owner\n", encoding="utf-8"
+                        )
+                    elif package_id == "cross-project":
+                        (target / "projects" / "alpha").mkdir(parents=True)
+
+                    installer = str(bundle / "installer.py")
+                    common = [package_id, "--target", str(target), "--json"]
+                    doctor = run(installer, "doctor", *common, cwd=bundle)
+                    self.assertEqual("downloaded", json.loads(doctor.stdout)["phase"])
+                    dry_run = run(
+                        installer,
+                        "install",
+                        package_id,
+                        "--target",
+                        str(target),
+                        "--dry-run",
+                        "--json",
+                        cwd=bundle,
+                    )
+                    self.assertFalse(json.loads(dry_run.stdout)["ready"])
+                    applied = run(
+                        installer,
+                        "install",
+                        package_id,
+                        "--target",
+                        str(target),
+                        "--apply",
+                        "--json",
+                        cwd=bundle,
+                    )
+                    self.assertEqual("installed", json.loads(applied.stdout)["phase"])
+                    before_init = subprocess.run(
+                        [sys.executable, "-B", installer, "verify", *common],
+                        cwd=bundle,
+                        env=environment,
+                        check=False,
+                        capture_output=True,
+                        text=True,
+                    )
+                    self.assertEqual(2, before_init.returncode)
+                    self.assertEqual("E_NOT_READY", json.loads(before_init.stdout)["code"])
+
+                    runtime = (
+                        target
+                        / ".agent-harnesses"
+                        / "runtime"
+                        / package_id
+                        / value["release"]["version"]
+                    )
+                    if package_id == "project-harness":
+                        executable = str(runtime / "project_harness.py")
+                        run(executable, "init", "--root", str(target), "--dry-run", cwd=runtime)
+                        run(executable, "init", "--root", str(target), cwd=runtime)
+                        run(executable, "verify", "--root", str(target), cwd=runtime)
+                    elif package_id == "workspace-coordination":
+                        executable = str(runtime / "workspace_coordination.py")
+                        prefix = [executable, "--root", str(target)]
+                        run(*prefix, "init", "--dry-run", cwd=runtime)
+                        run(*prefix, "init", "--apply", cwd=runtime)
+                        child = [
+                            "--id",
+                            "alpha",
+                            "--path",
+                            "child-alpha",
+                            "--owner",
+                            "AGENTS.md",
+                        ]
+                        run(*prefix, "add", *child, "--dry-run", cwd=runtime)
+                        run(*prefix, "add", *child, "--apply", cwd=runtime)
+                        run(*prefix, "verify", cwd=runtime)
+                    elif package_id == "cross-project":
+                        executable = str(runtime / "scripts" / "cross_project.py")
+                        registration = [
+                            "--front",
+                            "alpha",
+                            "--name",
+                            "Alpha",
+                            "--path",
+                            "projects/alpha",
+                            "--role",
+                            "Produces one synthetic component",
+                            "--next",
+                            "Validate the first slice",
+                        ]
+                        run(
+                            executable,
+                            "hq-init",
+                            "--root",
+                            str(target),
+                            "--dry-run",
+                            *registration,
+                            cwd=runtime,
+                        )
+                        run(
+                            executable,
+                            "hq-init",
+                            "--root",
+                            str(target),
+                            *registration,
+                            cwd=runtime,
+                        )
+                        run(executable, "hq-sync", "--root", str(target), cwd=runtime)
+                    else:
+                        executable = str(runtime / "hq.py")
+                        prefix = [executable, "--root", str(target), "--json"]
+                        registration = [
+                            "--id",
+                            "alpha",
+                            "--name",
+                            "Alpha",
+                            "--path",
+                            "fronts/alpha",
+                        ]
+                        run(*prefix, "init", *registration, "--dry-run", cwd=runtime)
+                        run(*prefix, "init", *registration, "--apply", cwd=runtime)
+                        run(*prefix, "hq-sync", cwd=runtime)
+
+                    verified = run(installer, "verify", *common, cwd=bundle)
+                    result = json.loads(verified.stdout)
+                    self.assertEqual("ready", result["phase"])
+                    self.assertTrue(result["ready"])
 
     def test_existing_output_is_never_reused_or_overwritten(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
