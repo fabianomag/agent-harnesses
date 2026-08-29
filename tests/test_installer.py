@@ -423,6 +423,7 @@ class InstallerSafetyTests(unittest.TestCase):
         agents = self.target / "AGENTS.md"
         agents.write_bytes(original)
         agents.chmod(0o600)
+        original_mode = agents.stat().st_mode & 0o777
 
         process, _result = _run(self.target, "install", "project", "--apply")
 
@@ -435,7 +436,7 @@ class InstallerSafetyTests(unittest.TestCase):
         )
         marker = installer._onboarding_markers("project-harness")[0]
         self.assertIn(b"external-tail\n\n" + marker, agents.read_bytes())
-        self.assertEqual(0o600, agents.stat().st_mode & 0o777)
+        self.assertEqual(original_mode, agents.stat().st_mode & 0o777)
         receipt = json.loads(
             (
                 installer._runtime_destination(self.target, "project-harness")
@@ -448,7 +449,7 @@ class InstallerSafetyTests(unittest.TestCase):
 
         self.assertEqual(0, removed.returncode)
         self.assertEqual(original, agents.read_bytes())
-        self.assertEqual(0o600, agents.stat().st_mode & 0o777)
+        self.assertEqual(original_mode, agents.stat().st_mode & 0o777)
 
     def test_installed_but_uninitialized_is_not_ready(self) -> None:
         installed, installed_result = _run(self.target, "install", "project", "--apply")

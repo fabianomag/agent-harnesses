@@ -2102,7 +2102,25 @@ def _acquire_onboarding_lock(target):
         try:
             lock.mkdir()
         except FileExistsError:
-            if _is_link_like(lock) or not lock.is_dir():
+            try:
+                metadata = lock.lstat()
+            except FileNotFoundError:
+                # The previous cooperative owner released the directory
+                # between mkdir's EEXIST result and this inspection.
+                continue
+            except OSError as error:
+                raise InstallerFailure(
+                    "E_INITIALIZATION_CONFLICT",
+                    "downloaded",
+                    "The onboarding transaction lock cannot be inspected safely.",
+                    "Keep it unchanged and resolve ownership before retrying.",
+                ) from error
+            attributes = getattr(metadata, "st_file_attributes", 0)
+            reparse = getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0)
+            link_like = stat.S_ISLNK(metadata.st_mode) or bool(
+                reparse and attributes & reparse
+            )
+            if link_like or not stat.S_ISDIR(metadata.st_mode):
                 if boundary_created:
                     try:
                         boundary.rmdir()
