@@ -4,9 +4,13 @@ from __future__ import annotations
 
 import contextlib
 import hashlib
+import importlib
+import importlib.util
 import io
 import json
 import os
+import re
+import shlex
 import shutil
 import subprocess
 import sys
@@ -78,6 +82,18 @@ def _assert_documented(installed_package: Path, literal: str) -> None:
         )
 
 
+def _load_test_module(name: str, path: Path):
+    """Load one package CLI without relying on repository-wide import paths."""
+
+    spec = importlib.util.spec_from_file_location(name, path)
+    if spec is None or spec.loader is None:
+        raise AssertionError(f"could not load CLI module: {path}")
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[name] = module
+    spec.loader.exec_module(module)
+    return module
+
+
 class CatalogIntegrationTests(unittest.TestCase):
     def test_catalog_is_canonical_and_matches_all_manifests(self) -> None:
         checked_path = REPOSITORY_ROOT / catalog.CATALOG_PATH
@@ -94,7 +110,7 @@ class CatalogIntegrationTests(unittest.TestCase):
             [entry["id"] for entry in checked["packages"]],
         )
         self.assertEqual(
-            ["0.2.0", "0.2.0", "0.2.0", "0.2.0"],
+            ["0.2.1", "0.2.1", "0.2.1", "0.2.1"],
             [entry["version"] for entry in checked["packages"]],
         )
         self.assertEqual(
@@ -195,7 +211,15 @@ class CatalogIntegrationTests(unittest.TestCase):
                 any("pending" in claim.lower() for claim in skill_claims)
             )
             self.assertTrue(
-                any("must be bound" in claim.lower() for claim in skill_claims)
+                any(
+                    "optional" in claim.lower()
+                    and "outside" in claim.lower()
+                    and (
+                        "not installed" in claim.lower()
+                        or "no adapter is installed" in claim.lower()
+                    )
+                    for claim in skill_claims
+                )
             )
             self.assertFalse(any("is published" in claim.lower() for claim in skill_claims))
 
@@ -210,9 +234,17 @@ class CatalogIntegrationTests(unittest.TestCase):
         }
         for entry in checked["packages"]:
             self.assertEqual(expected_kinds, set(entry["immutableLinks"]))
-            for link in entry["immutableLinks"].values():
+            for link_name, link in entry["immutableLinks"].items():
+                if link_name == "interactiveDiagram":
+                    self.assertEqual("planned", link["status"])
+                    continue
                 self.assertEqual("published", link["status"])
                 self.assertTrue(link["url"].startswith("https://"))
+            self.assertTrue(
+                entry["immutableLinks"]["interactiveDiagram"]["url"].startswith(
+                    "https://"
+                )
+            )
             self.assertEqual(
                 INTERACTIVE_DIAGRAM_URL,
                 entry["immutableLinks"]["interactiveDiagram"]["url"],
@@ -275,7 +307,7 @@ class CatalogIntegrationTests(unittest.TestCase):
             ),
             "prompt": (
                 "https://github.com/fabianomag/agent-harnesses/releases/"
-                "latest/download/project-harness-0.2.0.zip"
+                "latest/download/project-harness-0.2.1.zip"
             ),
             "source": (
                 "https://github.com/fabianomag/agent-harnesses/tree/main/"
@@ -519,21 +551,21 @@ class CatalogIntegrationTests(unittest.TestCase):
             with self.assertRaises(catalog.CommonContractError):
                 catalog.load_json_strict(path)
 
-    def test_all_packaged_skills_have_valid_frontmatter(self) -> None:
+    def test_optional_skill_adapters_are_valid_and_outside_packages(self) -> None:
         checked = catalog.load_json_strict(REPOSITORY_ROOT / catalog.CATALOG_PATH)
         observed: dict[str, str] = {}
         for entry in checked["packages"]:
-            skill_paths = [
+            packaged_skill_paths = [
                 item["path"]
                 for item in entry["files"]
                 if item["path"].endswith("SKILL.md")
             ]
-            self.assertEqual([catalog.SKILL_PATHS[entry["id"]]], skill_paths)
+            self.assertEqual([], packaged_skill_paths)
+            skill_path = catalog.SKILL_PATHS[entry["id"]]
+            self.assertTrue(skill_path.startswith("adapters/openai/"))
             skill_text = (
                 REPOSITORY_ROOT
-                / "packages"
-                / entry["id"]
-                / skill_paths[0]
+                / skill_path
             ).read_text(encoding="utf-8")
             frontmatter = catalog.parse_skill_frontmatter(
                 skill_text,
@@ -542,7 +574,7 @@ class CatalogIntegrationTests(unittest.TestCase):
             observed[entry["id"]] = frontmatter["description"]
         self.assertEqual(set(catalog.PACKAGE_ORDER), set(observed))
 
-    def test_invalid_packaged_skill_frontmatter_is_rejected(self) -> None:
+    def test_invalid_optional_skill_frontmatter_is_rejected(self) -> None:
         invalid = (
             "# Missing frontmatter\n",
             "---\nname: wrong\ndescription: Synthetic.\n---\n# Body\n",
@@ -600,6 +632,9 @@ class CatalogIntegrationTests(unittest.TestCase):
         self.assertNotIn("releases/latest/download", root_readme)
         self.assertIn("ready", root_readme)
         self.assertIn("private Codex runtime", root_readme)
+        self.assertIn("ZIP with its matching checksum sidecar", root_readme)
+        self.assertIn("ZIP da release", pt_readme)
+        self.assertIn("checksum sidecar correspondente", pt_readme)
 
         issue_form = (
             REPOSITORY_ROOT
@@ -632,6 +667,268 @@ class CatalogIntegrationTests(unittest.TestCase):
             encoding="utf-8"
         )
         self.assertIn("* text=auto eol=lf", attributes)
+
+    def test_pt_br_readmes_preserve_essential_operational_limits(self) -> None:
+        expected = {
+            "project-harness": {
+                "en": (
+                    "Package version and state schema are independent.",
+                    "never coordinates sibling roots or external services",
+                    "uninstall removes only unchanged",
+                ),
+                "ptBr": (
+                    "Package version e state schema são independentes.",
+                    "não coordena roots irmãs nem serviços externos",
+                    "uninstall remove somente bytes inalterados",
+                ),
+            },
+            "workspace-coordination": {
+                "en": (
+                    'open --child "<child-id>"',
+                    "one mutating writer per coordinator root",
+                    "serialize writers",
+                ),
+                "ptBr": (
+                    'open --child "<id-do-projeto-filho>"',
+                    "single writer",
+                    "serialize os writers",
+                ),
+            },
+            "cross-project": {
+                "en": (
+                    "Rollback covers catchable cooperative failures",
+                    "not power loss or adversarial root replacement",
+                ),
+                "ptBr": (
+                    "rollback cobre falhas capturáveis entre processos cooperativos",
+                    "não power loss nem substituição adversarial da raiz",
+                ),
+            },
+            "orchestration": {
+                "en": (
+                    "Mutations use a journal and explicit recovery",
+                    "never executes registered projects",
+                ),
+                "ptBr": (
+                    "As mutações usam journal e recovery explícito",
+                    "nunca executa os projetos cadastrados",
+                ),
+            },
+        }
+        for package_id, locales in expected.items():
+            for language, required in locales.items():
+                name = "README.md" if language == "en" else "README.pt-BR.md"
+                readme = (
+                    REPOSITORY_ROOT / "packages" / package_id / name
+                ).read_text(encoding="utf-8")
+                normalized_readme = " ".join(readme.split())
+                with self.subTest(package_id=package_id, language=language):
+                    for phrase in required:
+                        self.assertIn(phrase, normalized_readme)
+
+        workspace_pt = (
+            REPOSITORY_ROOT
+            / "packages/workspace-coordination/README.pt-BR.md"
+        ).read_text(encoding="utf-8")
+        project_pt = (
+            REPOSITORY_ROOT / "packages/project-harness/README.pt-BR.md"
+        ).read_text(encoding="utf-8")
+        self.assertIn(
+            "todos os projetos filhos e owner paths registrados são",
+            " ".join(workspace_pt.split()),
+        )
+        self.assertNotIn("A\n[guia operacional]", project_pt)
+
+    def test_operator_contracts_are_generated_from_one_schema_two_source(self) -> None:
+        value = product.load_product(REPOSITORY_ROOT)
+        snapshot = product.site_snapshot(value)
+        self.assertEqual(2, value["schemaVersion"])
+        self.assertEqual(2, snapshot["schemaVersion"])
+        snapshot_packages = {item["id"]: item for item in snapshot["packages"]}
+
+        public_text: list[str] = [json.dumps(snapshot, ensure_ascii=False)]
+        readiness_sets: set[tuple[str, ...]] = set()
+        for definition in value["packages"]:
+            package_id = definition["id"]
+            package_root = REPOSITORY_ROOT / "packages" / package_id
+            operations_path = package_root / "operations.json"
+            operations = json.loads(operations_path.read_text(encoding="utf-8"))
+            self.assertEqual(product.operations_document(value, definition), operations)
+            self.assertEqual(
+                product.EXPECTED_OPERATIONS[package_id],
+                tuple(item["command"] for item in operations["operations"]),
+            )
+            self.assertEqual(definition["operator"], snapshot_packages[package_id]["operator"])
+            self.assertEqual(definition["operator"]["memory"], operations["memory"])
+
+            readiness = tuple(definition["operator"]["installationReadiness"]["en"])
+            self.assertGreaterEqual(len(readiness), 3)
+            readiness_sets.add(readiness)
+            for language, guide_name in (
+                ("en", "OPERATOR_GUIDE.md"),
+                ("ptBr", "OPERATOR_GUIDE.pt-BR.md"),
+            ):
+                guide = (package_root / guide_name).read_text(encoding="utf-8")
+                self.assertEqual(
+                    product.operator_guide(value, definition, language).rstrip() + "\n",
+                    guide,
+                )
+                prompt = product.install_prompt(value, definition, language)
+                for item in definition["operator"]["installationReadiness"][language]:
+                    self.assertIn(item, guide)
+                    self.assertIn(item, prompt)
+                public_text.extend((guide, prompt))
+            public_text.extend(
+                (
+                    (package_root / "README.md").read_text(encoding="utf-8"),
+                    (package_root / "README.pt-BR.md").read_text(encoding="utf-8"),
+                )
+            )
+
+        self.assertEqual(4, len(readiness_sets))
+        rendered_public = "\n".join(public_text)
+        self.assertIsNone(re.search(r"\b(?:alpha|beta)\b", rendered_public, re.IGNORECASE))
+        self.assertTrue(value["tutorial"]["requiredAfterReady"])
+        self.assertEqual("conversation", value["tutorial"]["delivery"])
+        smoke_en = value["compatibility"]["smoke"]["description"]["en"]
+        smoke_pt = value["compatibility"]["smoke"]["description"]["ptBr"]
+        self.assertIn("release acceptance requires", smoke_en)
+        self.assertIn("does not claim complete agent equivalence", smoke_en)
+        self.assertIn("a aceitação da release exige", smoke_pt)
+        self.assertIn("não afirma equivalência completa", smoke_pt)
+        self.assertNotIn("validated by a copied-prompt smoke", rendered_public)
+
+    def test_operator_guides_teach_safe_package_lifecycle_in_both_languages(
+        self,
+    ) -> None:
+        value = product.load_product(REPOSITORY_ROOT)
+        for definition in value["packages"]:
+            package_id = definition["id"]
+            receipt = (
+                f".agent-harnesses/runtime/{package_id}/"
+                f"{value['release']['version']}/"
+                ".agent-harness-receipt.json"
+            )
+            dry_run = (
+                f'<python> -B installer.py uninstall {package_id} '
+                '--target "<target>" --dry-run --json'
+            )
+            apply = (
+                f'<python> -B installer.py uninstall {package_id} '
+                '--target "<target>" --apply --json'
+            )
+            for language, guide_name in (
+                ("en", "OPERATOR_GUIDE.md"),
+                ("ptBr", "OPERATOR_GUIDE.pt-BR.md"),
+            ):
+                guide = (
+                    REPOSITORY_ROOT / "packages" / package_id / guide_name
+                ).read_text(encoding="utf-8")
+                normalized_guide = " ".join(guide.split())
+                prompt = product.install_prompt(value, definition, language)
+                with self.subTest(package_id=package_id, language=language):
+                    self.assertIn(receipt, normalized_guide)
+                    self.assertIn(dry_run, normalized_guide)
+                    self.assertIn(apply, normalized_guide)
+                    self.assertIn("ready=true", normalized_guide)
+                    if language == "en":
+                        required = (
+                            "Uninstall removes only the receipt-owned runtime",
+                            "never removes initialized operational state",
+                            "first run this package's verify-or-recover workflow",
+                            "Preserve and report any residual initialized state",
+                            "matching checksum sidecar",
+                            "read its migration notes",
+                            "Do not edit a versioned runtime in place",
+                            "keep the old version until the new one reaches ready=true",
+                            "in the user's language",
+                            "any global agent adapter",
+                        )
+                    else:
+                        required = (
+                            "Uninstall remove somente o runtime pertencente ao receipt",
+                            "nunca remove o estado operacional inicializado",
+                            "primeiro execute o workflow de verify ou recovery",
+                            "Preserve e informe qualquer estado inicializado residual",
+                            "checksum sidecar correspondentes",
+                            "leia as migration notes",
+                            "Não edite um runtime versionado in-place",
+                            "mantenha a versão anterior até a nova chegar a ready=true",
+                            "no idioma do usuário",
+                            "qualquer adapter global de agente",
+                        )
+                    for phrase in required:
+                        self.assertIn(phrase, normalized_guide)
+                    self.assertIn(value["tutorial"]["constraints"][language], prompt)
+
+    def test_every_operator_example_parses_with_the_real_cli(self) -> None:
+        project_cli = _load_test_module(
+            "_operator_example_project_harness",
+            REPOSITORY_ROOT / "packages/project-harness/project_harness.py",
+        )
+        workspace_cli = _load_test_module(
+            "_operator_example_workspace_coordination",
+            REPOSITORY_ROOT
+            / "packages/workspace-coordination/workspace_coordination.py",
+        )
+        cross_project_cli = _load_test_module(
+            "_operator_example_cross_project",
+            REPOSITORY_ROOT / "packages/cross-project/scripts/cross_project.py",
+        )
+        orchestration_root = REPOSITORY_ROOT / "packages/orchestration"
+        with mock.patch.object(
+            sys,
+            "path",
+            [str(orchestration_root), *sys.path],
+        ):
+            orchestration_cli = importlib.import_module("orchestration_harness.cli")
+
+        parsers = {
+            "project-harness": project_cli._parse_args,
+            "workspace-coordination": workspace_cli._build_parser().parse_args,
+            "cross-project": cross_project_cli.parser().parse_args,
+            "orchestration": orchestration_cli._parser().parse_args,
+        }
+        value = product.load_product(REPOSITORY_ROOT)
+        for definition in value["packages"]:
+            package_id = definition["id"]
+            observed_commands: list[str] = []
+            for operation in definition["operator"]["operations"]:
+                with self.subTest(
+                    package_id=package_id,
+                    command=operation["command"],
+                ):
+                    rendered = re.sub(
+                        r"<([^<>]+)>",
+                        lambda match: (
+                            match.group(1).split("|", maxsplit=1)[0]
+                            if "|" in match.group(1)
+                            else "value"
+                        ),
+                        operation["example"],
+                    )
+                    arguments = shlex.split(rendered)
+                    self.assertEqual("value", arguments[0])
+                    self.assertEqual("-B", arguments[1])
+                    self.assertEqual(
+                        definition["operator"]["entrypoint"],
+                        arguments[2],
+                    )
+                    errors = io.StringIO()
+                    try:
+                        with contextlib.redirect_stderr(errors):
+                            parsed = parsers[package_id](arguments[3:])
+                    except SystemExit as error:
+                        self.fail(
+                            "operator example does not parse with its real CLI: "
+                            f"{error}; {errors.getvalue().strip()}"
+                        )
+                    self.assertEqual(operation["command"], parsed.command)
+                    observed_commands.append(parsed.command)
+            self.assertEqual(
+                product.EXPECTED_OPERATIONS[package_id],
+                tuple(observed_commands),
+            )
 
     def test_security_policy_matches_standalone_installer_contract(self) -> None:
         policy = (REPOSITORY_ROOT / "SECURITY.md").read_text(encoding="utf-8")
@@ -722,7 +1019,7 @@ class PackageManagerIntegrationTests(unittest.TestCase):
             planned = package_manager.install_package(
                 root=root,
                 package_id="project-harness",
-                version="0.2.0",
+                version="0.2.1",
                 apply=False,
             )
             destination = root / planned.destination_name
@@ -732,7 +1029,7 @@ class PackageManagerIntegrationTests(unittest.TestCase):
             installed = package_manager.install_package(
                 root=root,
                 package_id="project-harness",
-                version="0.2.0",
+                version="0.2.1",
                 apply=True,
             )
             self.assertEqual("installed", installed.action)
@@ -744,7 +1041,7 @@ class PackageManagerIntegrationTests(unittest.TestCase):
             verified = package_manager.verify_package(
                 root=root,
                 package_id="project-harness",
-                version="0.2.0",
+                version="0.2.1",
             )
             self.assertEqual("verified", verified.action)
 
@@ -752,7 +1049,7 @@ class PackageManagerIntegrationTests(unittest.TestCase):
             unchanged = package_manager.install_package(
                 root=root,
                 package_id="project-harness",
-                version="0.2.0",
+                version="0.2.1",
                 apply=True,
             )
             after = _tree_snapshot(destination)
@@ -761,10 +1058,10 @@ class PackageManagerIntegrationTests(unittest.TestCase):
 
     def test_all_four_exact_package_versions_install_and_verify(self) -> None:
         versions = {
-            "project-harness": "0.2.0",
-            "workspace-coordination": "0.2.0",
-            "cross-project": "0.2.0",
-            "orchestration": "0.2.0",
+            "project-harness": "0.2.1",
+            "workspace-coordination": "0.2.1",
+            "cross-project": "0.2.1",
+            "orchestration": "0.2.1",
         }
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory).resolve(strict=True)
@@ -790,7 +1087,7 @@ class PackageManagerIntegrationTests(unittest.TestCase):
             installed = package_manager.install_package(
                 root=root,
                 package_id="project-harness",
-                version="0.2.0",
+                version="0.2.1",
                 apply=True,
             )
             readme = root / installed.destination_name / "README.md"
@@ -801,7 +1098,7 @@ class PackageManagerIntegrationTests(unittest.TestCase):
                 package_manager.install_package(
                     root=root,
                     package_id="project-harness",
-                    version="0.2.0",
+                    version="0.2.1",
                     apply=True,
                 )
             self.assertEqual(changed, readme.read_bytes())
@@ -812,7 +1109,7 @@ class PackageManagerIntegrationTests(unittest.TestCase):
             installed = package_manager.install_package(
                 root=root,
                 package_id="project-harness",
-                version="0.2.0",
+                version="0.2.1",
                 apply=True,
             )
             destination = root / installed.destination_name
@@ -824,7 +1121,7 @@ class PackageManagerIntegrationTests(unittest.TestCase):
                 package_manager.verify_package(
                     root=root,
                     package_id="project-harness",
-                    version="0.2.0",
+                    version="0.2.1",
                 )
 
     def test_extra_installation_directory_is_rejected(self) -> None:
@@ -833,7 +1130,7 @@ class PackageManagerIntegrationTests(unittest.TestCase):
             installed = package_manager.install_package(
                 root=root,
                 package_id="project-harness",
-                version="0.2.0",
+                version="0.2.1",
                 apply=True,
             )
             destination = root / installed.destination_name
@@ -842,7 +1139,7 @@ class PackageManagerIntegrationTests(unittest.TestCase):
                 package_manager.verify_package(
                     root=root,
                     package_id="project-harness",
-                    version="0.2.0",
+                    version="0.2.1",
                 )
 
     def test_failed_atomic_rename_preserves_stage_for_inspection(self) -> None:
@@ -857,19 +1154,19 @@ class PackageManagerIntegrationTests(unittest.TestCase):
                     package_manager.install_package(
                         root=root,
                         package_id="project-harness",
-                        version="0.2.0",
+                        version="0.2.1",
                         apply=True,
                     )
-            stages = sorted(root.glob(".project-harness-0.2.0.stage-*"))
+            stages = sorted(root.glob(".project-harness-0.2.1.stage-*"))
             self.assertEqual(1, len(stages))
             residual_before = _tree_snapshot(stages[0])
             self.assertTrue((stages[0] / "README.md").is_file())
-            self.assertFalse((root / "project-harness-0.2.0").exists())
+            self.assertFalse((root / "project-harness-0.2.1").exists())
 
             installed = package_manager.install_package(
                 root=root,
                 package_id="project-harness",
-                version="0.2.0",
+                version="0.2.1",
                 apply=True,
             )
             self.assertEqual("installed", installed.action)
@@ -879,7 +1176,7 @@ class PackageManagerIntegrationTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory).resolve(strict=True)
             stage_token = "1" * 32
-            stage = root / f".project-harness-0.2.0.stage-{stage_token}"
+            stage = root / f".project-harness-0.2.1.stage-{stage_token}"
             original_mkdir = Path.mkdir
 
             def create_stage_then_interrupt(
@@ -914,7 +1211,7 @@ class PackageManagerIntegrationTests(unittest.TestCase):
                     package_manager.install_package(
                         root=root,
                         package_id="project-harness",
-                        version="0.2.0",
+                        version="0.2.1",
                         apply=True,
                     )
 
@@ -924,7 +1221,7 @@ class PackageManagerIntegrationTests(unittest.TestCase):
             installed = package_manager.install_package(
                 root=root,
                 package_id="project-harness",
-                version="0.2.0",
+                version="0.2.1",
                 apply=True,
             )
             self.assertEqual("installed", installed.action)
@@ -936,7 +1233,7 @@ class PackageManagerIntegrationTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory).resolve(strict=True)
             stage_token = "3" * 32
-            stage = root / f".project-harness-0.2.0.stage-{stage_token}"
+            stage = root / f".project-harness-0.2.1.stage-{stage_token}"
             original_mkdir = Path.mkdir
 
             def create_stage_then_fail(
@@ -971,7 +1268,7 @@ class PackageManagerIntegrationTests(unittest.TestCase):
                     package_manager.install_package(
                         root=root,
                         package_id="project-harness",
-                        version="0.2.0",
+                        version="0.2.1",
                         apply=True,
                     )
 
@@ -981,7 +1278,7 @@ class PackageManagerIntegrationTests(unittest.TestCase):
             installed = package_manager.install_package(
                 root=root,
                 package_id="project-harness",
-                version="0.2.0",
+                version="0.2.1",
                 apply=True,
             )
             self.assertEqual("installed", installed.action)
@@ -991,7 +1288,7 @@ class PackageManagerIntegrationTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory).resolve(strict=True)
             stage_token = "2" * 32
-            stage = root / f".project-harness-0.2.0.stage-{stage_token}"
+            stage = root / f".project-harness-0.2.1.stage-{stage_token}"
             stage.mkdir(mode=0o711)
             sentinel = stage / "sentinel.txt"
             sentinel.write_bytes(b"synthetic existing stage\n")
@@ -1008,7 +1305,7 @@ class PackageManagerIntegrationTests(unittest.TestCase):
                     package_manager.install_package(
                         root=root,
                         package_id="project-harness",
-                        version="0.2.0",
+                        version="0.2.1",
                         apply=True,
                     )
 
@@ -1022,7 +1319,7 @@ class PackageManagerIntegrationTests(unittest.TestCase):
                 after_metadata.st_mtime_ns,
             )
             self.assertEqual(b"synthetic existing stage\n", sentinel.read_bytes())
-            self.assertFalse((root / "project-harness-0.2.0").exists())
+            self.assertFalse((root / "project-harness-0.2.1").exists())
 
     def test_replaced_stage_is_never_auto_deleted(self) -> None:
         failures = (
@@ -1060,7 +1357,7 @@ class PackageManagerIntegrationTests(unittest.TestCase):
                             package_manager.install_package(
                                 root=root,
                                 package_id="project-harness",
-                                version="0.2.0",
+                                version="0.2.1",
                                 apply=True,
                             )
 
@@ -1081,13 +1378,13 @@ class PackageManagerIntegrationTests(unittest.TestCase):
                         (replacement / "sentinel.txt").read_bytes(),
                     )
                     self.assertFalse(
-                        (root / "project-harness-0.2.0").exists()
+                        (root / "project-harness-0.2.1").exists()
                     )
 
     def test_publish_refuses_destination_created_at_atomic_boundary(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory).resolve(strict=True)
-            destination = root / "project-harness-0.2.0"
+            destination = root / "project-harness-0.2.1"
             original_publish = package_manager._publish_no_replace
             created_metadata: os.stat_result | None = None
             contender_stage: Path | None = None
@@ -1111,7 +1408,7 @@ class PackageManagerIntegrationTests(unittest.TestCase):
                     package_manager.install_package(
                         root=root,
                         package_id="project-harness",
-                        version="0.2.0",
+                        version="0.2.1",
                         apply=True,
                     )
 
@@ -1137,7 +1434,7 @@ class PackageManagerIntegrationTests(unittest.TestCase):
     def test_concurrent_identical_publish_converges_without_overwrite(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory).resolve(strict=True)
-            destination = root / "project-harness-0.2.0"
+            destination = root / "project-harness-0.2.1"
             concurrent_stage = root / ".synthetic-concurrent-stage"
             original_publish = package_manager._publish_no_replace
             contender_stage: Path | None = None
@@ -1161,7 +1458,7 @@ class PackageManagerIntegrationTests(unittest.TestCase):
                 result = package_manager.install_package(
                     root=root,
                     package_id="project-harness",
-                    version="0.2.0",
+                    version="0.2.1",
                     apply=True,
                 )
 
@@ -1176,14 +1473,14 @@ class PackageManagerIntegrationTests(unittest.TestCase):
             verified = package_manager.verify_package(
                 root=root,
                 package_id="project-harness",
-                version="0.2.0",
+                version="0.2.1",
             )
             self.assertEqual("verified", verified.action)
 
     def test_ambiguous_publish_error_leaves_verified_destination(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory).resolve(strict=True)
-            destination = root / "project-harness-0.2.0"
+            destination = root / "project-harness-0.2.1"
             original_publish = package_manager._publish_no_replace
 
             def publish_then_fail(source: Path, target: Path) -> None:
@@ -1199,7 +1496,7 @@ class PackageManagerIntegrationTests(unittest.TestCase):
                     package_manager.install_package(
                         root=root,
                         package_id="project-harness",
-                        version="0.2.0",
+                        version="0.2.1",
                         apply=True,
                     )
 
@@ -1207,13 +1504,13 @@ class PackageManagerIntegrationTests(unittest.TestCase):
             verified = package_manager.verify_package(
                 root=root,
                 package_id="project-harness",
-                version="0.2.0",
+                version="0.2.1",
             )
             self.assertEqual("verified", verified.action)
             unchanged = package_manager.install_package(
                 root=root,
                 package_id="project-harness",
-                version="0.2.0",
+                version="0.2.1",
                 apply=True,
             )
             self.assertEqual("unchanged", unchanged.action)
@@ -1221,7 +1518,7 @@ class PackageManagerIntegrationTests(unittest.TestCase):
     def test_interrupt_after_publish_leaves_verified_destination(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory).resolve(strict=True)
-            destination = root / "project-harness-0.2.0"
+            destination = root / "project-harness-0.2.1"
             original_publish = package_manager._publish_no_replace
 
             def publish_then_interrupt(source: Path, target: Path) -> None:
@@ -1237,7 +1534,7 @@ class PackageManagerIntegrationTests(unittest.TestCase):
                     package_manager.install_package(
                         root=root,
                         package_id="project-harness",
-                        version="0.2.0",
+                        version="0.2.1",
                         apply=True,
                     )
 
@@ -1245,7 +1542,7 @@ class PackageManagerIntegrationTests(unittest.TestCase):
             verified = package_manager.verify_package(
                 root=root,
                 package_id="project-harness",
-                version="0.2.0",
+                version="0.2.1",
             )
             self.assertEqual("verified", verified.action)
 
@@ -1266,17 +1563,17 @@ class PackageManagerIntegrationTests(unittest.TestCase):
                     package_manager.install_package(
                         root=root,
                         package_id="project-harness",
-                        version="0.2.0",
+                        version="0.2.1",
                         apply=True,
                     )
 
-            stages = sorted(root.glob(".project-harness-0.2.0.stage-*"))
+            stages = sorted(root.glob(".project-harness-0.2.1.stage-*"))
             self.assertEqual(1, len(stages))
             residual_before = _tree_snapshot(stages[0])
             installed = package_manager.install_package(
                 root=root,
                 package_id="project-harness",
-                version="0.2.0",
+                version="0.2.1",
                 apply=True,
             )
             self.assertEqual("installed", installed.action)
@@ -1325,10 +1622,10 @@ class PackageManagerIntegrationTests(unittest.TestCase):
                     package_manager.install_package(
                         root=root,
                         package_id="project-harness",
-                        version="0.2.0",
+                        version="0.2.1",
                         apply=True,
                     )
-            stages = sorted(root.glob(".project-harness-0.2.0.stage-*"))
+            stages = sorted(root.glob(".project-harness-0.2.1.stage-*"))
             self.assertEqual(1, len(stages))
             self.assertEqual([], list(stages[0].iterdir()))
             residual_before = _tree_snapshot(stages[0])
@@ -1336,7 +1633,7 @@ class PackageManagerIntegrationTests(unittest.TestCase):
             installed = package_manager.install_package(
                 root=root,
                 package_id="project-harness",
-                version="0.2.0",
+                version="0.2.1",
                 apply=True,
             )
             self.assertEqual("installed", installed.action)
@@ -1344,7 +1641,7 @@ class PackageManagerIntegrationTests(unittest.TestCase):
             verified = package_manager.verify_package(
                 root=root,
                 package_id="project-harness",
-                version="0.2.0",
+                version="0.2.1",
             )
             self.assertEqual("verified", verified.action)
 
@@ -1370,18 +1667,18 @@ class PackageManagerIntegrationTests(unittest.TestCase):
                     package_manager.install_package(
                         root=root,
                         package_id="project-harness",
-                        version="0.2.0",
+                        version="0.2.1",
                         apply=True,
                     )
 
             self.assertTrue(failed)
-            stages = sorted(root.glob(".project-harness-0.2.0.stage-*"))
+            stages = sorted(root.glob(".project-harness-0.2.1.stage-*"))
             self.assertEqual(1, len(stages))
             residual_before = _tree_snapshot(stages[0])
             installed = package_manager.install_package(
                 root=root,
                 package_id="project-harness",
-                version="0.2.0",
+                version="0.2.1",
                 apply=True,
             )
             self.assertEqual("installed", installed.action)
@@ -1410,24 +1707,24 @@ class PackageManagerIntegrationTests(unittest.TestCase):
                     package_manager.install_package(
                         root=root,
                         package_id="project-harness",
-                        version="0.2.0",
+                        version="0.2.1",
                         apply=True,
                     )
 
             self.assertEqual(
-                ["project-harness-0.2.0"],
+                ["project-harness-0.2.1"],
                 sorted(path.name for path in root.iterdir()),
             )
             verified = package_manager.verify_package(
                 root=root,
                 package_id="project-harness",
-                version="0.2.0",
+                version="0.2.1",
             )
             self.assertEqual("verified", verified.action)
             unchanged = package_manager.install_package(
                 root=root,
                 package_id="project-harness",
-                version="0.2.0",
+                version="0.2.1",
                 apply=True,
             )
             self.assertEqual("unchanged", unchanged.action)
@@ -1455,18 +1752,18 @@ class PackageManagerIntegrationTests(unittest.TestCase):
                     package_manager.install_package(
                         root=root,
                         package_id="project-harness",
-                        version="0.2.0",
+                        version="0.2.1",
                         apply=True,
                     )
 
             self.assertEqual(
-                ["project-harness-0.2.0"],
+                ["project-harness-0.2.1"],
                 sorted(path.name for path in root.iterdir()),
             )
             unchanged = package_manager.install_package(
                 root=root,
                 package_id="project-harness",
-                version="0.2.0",
+                version="0.2.1",
                 apply=True,
             )
             self.assertEqual("unchanged", unchanged.action)
@@ -1483,7 +1780,7 @@ class PackageManagerIntegrationTests(unittest.TestCase):
                 package_manager.install_package(
                     root=linked,
                     package_id="project-harness",
-                    version="0.2.0",
+                    version="0.2.1",
                     apply=False,
                 )
 
@@ -1505,7 +1802,7 @@ class PackageManagerIntegrationTests(unittest.TestCase):
                         package_manager.install_package(
                             root=alias_root,
                             package_id="project-harness",
-                            version="0.2.0",
+                            version="0.2.1",
                             apply=apply,
                         )
                     self.assertEqual(before, _tree_snapshot(physical_parent))
@@ -1513,7 +1810,7 @@ class PackageManagerIntegrationTests(unittest.TestCase):
             accepted = package_manager.install_package(
                 root=physical_root,
                 package_id="project-harness",
-                version="0.2.0",
+                version="0.2.1",
                 apply=False,
             )
             self.assertEqual("planned", accepted.action)
@@ -1543,7 +1840,7 @@ class PackageManagerIntegrationTests(unittest.TestCase):
                     "--package",
                     "orchestration",
                     "--version",
-                    "0.2.0",
+                    "0.2.1",
                     "--root",
                     str(root),
                     "--dry-run",
@@ -1558,10 +1855,10 @@ class PackageManagerIntegrationTests(unittest.TestCase):
 
     def test_installed_packages_execute_documented_first_use(self) -> None:
         versions = {
-            "project-harness": "0.2.0",
-            "workspace-coordination": "0.2.0",
-            "cross-project": "0.2.0",
-            "orchestration": "0.2.0",
+            "project-harness": "0.2.1",
+            "workspace-coordination": "0.2.1",
+            "cross-project": "0.2.1",
+            "orchestration": "0.2.1",
         }
         with tempfile.TemporaryDirectory() as directory:
             outer = Path(directory).resolve(strict=True)

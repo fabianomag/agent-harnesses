@@ -1,7 +1,7 @@
 <!-- BEGIN GENERATED:PRODUCT -->
 # Control Plane Harness
 
-[Português do Brasil](README.pt-BR.md) · Version `0.2.0`
+[Português do Brasil](README.pt-BR.md) · Version `0.2.1`
 
 **Best for:** A new control plane whose registry and lifecycle mutations justify transactions and recovery.
 
@@ -11,20 +11,43 @@
 
 Strengths: **Strict registry · Transactions · Recovery**. Complexity: high.
 
+**Ready means:** A new control plane has at least one explicit registered front, the registry and generated lifecycle files are coherent, no recovery is pending, and hq-sync reports clean state.
+
+**Before installation, confirm:**
+
+- The explicit target is a deliberate new Master or control-plane root, not an existing coordination structure to adopt.
+- The initial fronts, their intended relative paths, and their boundaries are already known.
+- The work genuinely requires a transactional registry, validated mutations, rollback, and recovery rather than only project handoffs.
+
 ## Installation
 
 Copy only this prompt:
 
 ```text
-Install Control Plane Harness (`orchestration`) v0.2.0 from https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.0/orchestration-0.2.0.zip. Before any write, confirm the explicit target and resolve exactly one Python 3.10+ executable available to the user or system as `<python>` (for example `python3`, `python`, or `py -3`); reuse only that executable and never use a private Codex runtime. Download the ZIP and its adjacent `.sha256` sidecar into an isolated temporary directory, verify the checksum before extraction or execution, then extract it. From the extracted bundle root run:
+Install Control Plane Harness (`orchestration`) v0.2.1 from https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.1/orchestration-0.2.1.zip.
+
+Before proposing execution, confirm every selected-harness readiness fact:
+- The explicit target is a deliberate new Master or control-plane root, not an existing coordination structure to adopt.
+- The initial fronts, their intended relative paths, and their boundaries are already known.
+- The work genuinely requires a transactional registry, validated mutations, rollback, and recovery rather than only project handoffs.
+If any fact is unknown or false, stop before downloads or target writes, explain what must be organized first, and offer the support contacts below.
+
+If the current mode cannot execute, request a switch to an execution-capable mode only after presenting the plan and receiving confirmation.
+
+Use the agent's native Plan mode and structured questions when available; otherwise present the same plan and questions conversationally. Work in two explicit stages: plan first, then execute only after confirmation. Before any write, including a download or temporary extraction, inspect only the explicit target and available public tooling read-only. Present four separate checklists: (1) fit and target, (2) safety and write plan, (3) initialization and readiness, and (4) tutorial and handoff. State the selected harness, target, one user- or system-available Python 3.10+ executable as `<python>` (for example `python3`, `python`, or `py -3`), expected writes, required initialization inputs, verification, rollback, and tutorial steps; ask the user to confirm that plan. Never use a private Codex runtime. Do not organize, rename, summarize, migrate, or infer the user's project data. Ask for any missing value instead of inventing it. After confirmation, download the ZIP and its adjacent `.sha256` sidecar into an isolated temporary directory, verify the checksum before extraction or execution, and extract it. From the extracted bundle root run:
 `<python> -B installer.py doctor orchestration --target "<target>" --json`
-Stop without writes on a mismatch and only recommend a better fit; never silently substitute another harness. Then run:
+If doctor or any pre-apply readiness check fails, stop with zero target writes, clean only isolated temporary files, and recommend a better fit when applicable; never silently substitute another harness. Then run:
 `<python> -B installer.py install orchestration --target "<target>" --dry-run --json`
+Review the result against the confirmed plan and ask again if the write set or assumptions materially changed. Otherwise run:
 `<python> -B installer.py install orchestration --target "<target>" --apply --json`
-Follow `package/README.md` inside the extracted bundle to initialize the target, then run from the bundle root:
+Follow `package/README.md` to initialize the target, previewing every runtime mutation and using only confirmed user values. If any step fails after the first apply or final readiness is false, stop normal execution and follow the exact package's documented rollback or recovery procedure, preview it before apply, preserve unrelated files, verify restoration toward the exact pre-install state, and report any unavoidable residual change instead of claiming success. Then run from the bundle root:
 `<python> -B installer.py verify orchestration --target "<target>" --json`
-Report success only when this final result contains `ready=true`. Clean up temporary files and report the receipt plus `uninstall`/rollback instructions. Do not edit unrelated documentation, `PATH`, or `.gitignore`, and do not install a global Skill.
+Report installation success only when this final result contains `ready=true`. After readiness, read the installed runtime's `operations.json` and `OPERATOR_GUIDE.md`, then give the user a concise tutorial in the conversation covering every command, the first-use, daily, close-and-resume, and verify-or-recover workflows, safe examples with confirmed values or placeholders, and update/uninstall guidance. Do not create tutorial files. Clean temporary files and report the receipt, readiness evidence, rollback status, and runtime location. Offer support through LinkedIn at https://www.linkedin.com/in/fabianomag/ or email at fm@fabianomag.com. Do not edit unrelated documentation, `PATH`, or `.gitignore`, and do not install a global Skill.
+
+Deliver the tutorial in the user's language and in the conversation without creating project documentation. Use only values explicitly supplied by the user; otherwise retain placeholders. Do not install or instruct the installation of any global agent adapter.
 ```
+
+The installed runtime includes `operations.json` plus `OPERATOR_GUIDE.md`; after `ready=true`, the coding agent must read both and teach the user the complete operating cycle in the conversation.
 <!-- END GENERATED:PRODUCT -->
 
 `doctor` and `install --dry-run` stop without writes when the target looks like
@@ -32,15 +55,17 @@ an existing Master or contains projects that this package cannot safely adopt.
 
 ## First use
 
-Use a new empty workspace and the same public Python 3.10+ executable resolved
-by the install prompt as `<python>`. From the installed runtime directory:
+Use a deliberate new control-plane root and only confirmed front values. Do not
+adopt an existing structure or create sample fronts. Use the same public Python
+3.10+ executable resolved by the install prompt as `<python>`. From the
+installed runtime directory:
 
-`<workspace>/.agent-harnesses/runtime/orchestration/0.2.0`
+`<workspace>/.agent-harnesses/runtime/orchestration/0.2.1`
 
 ```text
 <python> -B hq.py --root "<workspace>" --json bom-dia
-<python> -B hq.py --root "<workspace>" --json init --id alpha --name "Alpha" --path fronts/alpha --dry-run
-<python> -B hq.py --root "<workspace>" --json init --id alpha --name "Alpha" --path fronts/alpha --apply
+<python> -B hq.py --root "<workspace>" --json init --id "<front-id>" --name "<front-name>" --path "<front-path>" --dry-run
+<python> -B hq.py --root "<workspace>" --json init --id "<front-id>" --name "<front-name>" --path "<front-path>" --apply
 <python> -B hq.py --root "<workspace>" --json hq-sync
 ```
 
@@ -53,5 +78,6 @@ orchestration --target "<workspace>" --json`; only `"ready": true` is success.
 Schema `1` remains supported. Mutations use a journal and explicit recovery,
 but the harness never executes registered projects. See the
 [advanced reference](docs/REFERENCE.md),
-[catalog](https://github.com/fabianomag/agent-harnesses/blob/v0.2.0/catalog/harnesses.json),
-and [graph](https://github.com/fabianomag/agent-harnesses/blob/v0.2.0/graphs/orchestration.graph.json).
+[operator guide](OPERATOR_GUIDE.md),
+[catalog](https://github.com/fabianomag/agent-harnesses/blob/v0.2.1/catalog/harnesses.json),
+and [graph](https://github.com/fabianomag/agent-harnesses/blob/v0.2.1/graphs/orchestration.graph.json).

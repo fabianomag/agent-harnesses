@@ -16,7 +16,11 @@ from orchestration_harness.errors import (
     ValidationError,
 )
 from orchestration_harness.model import parse_manifest
-from orchestration_harness.service import MANIFEST_RELATIVE, ControlPlane
+from orchestration_harness.service import (
+    MANIFEST_RELATIVE,
+    ControlPlane,
+    _installer_onboarding_block,
+)
 
 from helpers import initialize, snapshot
 
@@ -55,6 +59,68 @@ class InitializationTests(unittest.TestCase):
             )
             self.assertEqual(1, manifest.revision)
             self.assertEqual("sample-front", manifest.active_focus)
+
+    def test_first_init_preserves_exact_installer_onboarding_block(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            block = _installer_onboarding_block()
+            (root / "AGENTS.md").write_text(block, encoding="utf-8")
+            control = initialize(root)
+            agents = (root / "AGENTS.md").read_text(encoding="utf-8")
+            self.assertTrue(agents.startswith(block + "\n"))
+            self.assertIn("# Master Operating Contract", agents)
+
+    def test_first_init_preserves_external_agents_bytes_around_onboarding(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            before = (
+                "# Existing user instructions\n\n"
+                + _installer_onboarding_block()
+                + "\nUser-owned tail without a final newline"
+            )
+            (root / "AGENTS.md").write_text(before, encoding="utf-8")
+            control = ControlPlane(root)
+
+            preview = control.plan_init(
+                front_id="confirmed-front",
+                display_name="Confirmed front",
+                path="fronts/confirmed-front",
+                aliases=(),
+            )
+            self.assertTrue(preview["changed"])
+            self.assertEqual(before, (root / "AGENTS.md").read_text(encoding="utf-8"))
+
+            applied = control.init(
+                front_id="confirmed-front",
+                display_name="Confirmed front",
+                path="fronts/confirmed-front",
+                aliases=(),
+            )
+            self.assertTrue(applied["changed"])
+            agents = (root / "AGENTS.md").read_text(encoding="utf-8")
+            self.assertTrue(agents.startswith(before))
+            self.assertIn("# Master Operating Contract", agents)
+            self.assertTrue(control.sync()["clean"])
+
+    def test_first_init_rejects_modified_onboarding_block_without_writes(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "AGENTS.md").write_text(
+                _installer_onboarding_block().replace(
+                    "Use only the operations declared",
+                    "Use every operation, including undeclared ones",
+                ),
+                encoding="utf-8",
+            )
+            before = snapshot(root)
+            with self.assertRaises(CollisionError):
+                ControlPlane(root).init(
+                    front_id="sample-front",
+                    display_name="Sample Front",
+                    path="fronts/sample-front",
+                    aliases=("sample",),
+                )
+            self.assertEqual(before, snapshot(root))
 
     def test_second_identical_init_is_exact_noop(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

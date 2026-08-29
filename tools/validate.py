@@ -52,6 +52,7 @@ IGNORED_DIRECTORY_NAMES = {".git"}
 MAX_TEXT_FILE_BYTES = 1_000_000
 MAX_PRIVATE_PATTERN_FILE_BYTES = 256_000
 MAX_PRIVATE_PATTERNS = 1_000
+PUBLIC_CONTACT_EMAILS = frozenset({"fm@fabianomag.com"})
 
 
 @dataclass(frozen=True, order=True)
@@ -528,6 +529,11 @@ def scan_text(
     seen: set[tuple[str, int]] = set()
     for code, pattern in _built_in_safety_patterns():
         for match in pattern.finditer(text):
+            if (
+                code == "EMAIL"
+                and match.group(0).casefold() in PUBLIC_CONTACT_EMAILS
+            ):
+                continue
             line = text.count("\n", 0, match.start()) + 1
             key = (code, line)
             if key not in seen:

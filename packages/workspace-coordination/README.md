@@ -1,7 +1,7 @@
 <!-- BEGIN GENERATED:PRODUCT -->
 # Workspace Harness
 
-[Português do Brasil](README.pt-BR.md) · Version `0.2.0`
+[Português do Brasil](README.pt-BR.md) · Version `0.2.1`
 
 **Best for:** Contained child projects that share one workspace boundary and a small shared index.
 
@@ -11,37 +11,61 @@
 
 Strengths: **Child index · Ownership boundaries · Shared workspace view**. Complexity: medium.
 
+**Ready means:** The coordinator is initialized, every registered child and owner path is explicit and valid, and canonical plus generated workspace state verifies cleanly.
+
+**Before installation, confirm:**
+
+- The explicit target is the container workspace, not one of its child projects.
+- The existing contained child projects to register are already known.
+- Each selected child has an explicit local owner file and its detailed state will remain locally owned.
+
 ## Installation
 
 Copy only this prompt:
 
 ```text
-Install Workspace Harness (`workspace-coordination`) v0.2.0 from https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.0/workspace-coordination-0.2.0.zip. Before any write, confirm the explicit target and resolve exactly one Python 3.10+ executable available to the user or system as `<python>` (for example `python3`, `python`, or `py -3`); reuse only that executable and never use a private Codex runtime. Download the ZIP and its adjacent `.sha256` sidecar into an isolated temporary directory, verify the checksum before extraction or execution, then extract it. From the extracted bundle root run:
+Install Workspace Harness (`workspace-coordination`) v0.2.1 from https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.1/workspace-coordination-0.2.1.zip.
+
+Before proposing execution, confirm every selected-harness readiness fact:
+- The explicit target is the container workspace, not one of its child projects.
+- The existing contained child projects to register are already known.
+- Each selected child has an explicit local owner file and its detailed state will remain locally owned.
+If any fact is unknown or false, stop before downloads or target writes, explain what must be organized first, and offer the support contacts below.
+
+If the current mode cannot execute, request a switch to an execution-capable mode only after presenting the plan and receiving confirmation.
+
+Use the agent's native Plan mode and structured questions when available; otherwise present the same plan and questions conversationally. Work in two explicit stages: plan first, then execute only after confirmation. Before any write, including a download or temporary extraction, inspect only the explicit target and available public tooling read-only. Present four separate checklists: (1) fit and target, (2) safety and write plan, (3) initialization and readiness, and (4) tutorial and handoff. State the selected harness, target, one user- or system-available Python 3.10+ executable as `<python>` (for example `python3`, `python`, or `py -3`), expected writes, required initialization inputs, verification, rollback, and tutorial steps; ask the user to confirm that plan. Never use a private Codex runtime. Do not organize, rename, summarize, migrate, or infer the user's project data. Ask for any missing value instead of inventing it. After confirmation, download the ZIP and its adjacent `.sha256` sidecar into an isolated temporary directory, verify the checksum before extraction or execution, and extract it. From the extracted bundle root run:
 `<python> -B installer.py doctor workspace-coordination --target "<target>" --json`
-Stop without writes on a mismatch and only recommend a better fit; never silently substitute another harness. Then run:
+If doctor or any pre-apply readiness check fails, stop with zero target writes, clean only isolated temporary files, and recommend a better fit when applicable; never silently substitute another harness. Then run:
 `<python> -B installer.py install workspace-coordination --target "<target>" --dry-run --json`
+Review the result against the confirmed plan and ask again if the write set or assumptions materially changed. Otherwise run:
 `<python> -B installer.py install workspace-coordination --target "<target>" --apply --json`
-Follow `package/README.md` inside the extracted bundle to initialize the target, then run from the bundle root:
+Follow `package/README.md` to initialize the target, previewing every runtime mutation and using only confirmed user values. If any step fails after the first apply or final readiness is false, stop normal execution and follow the exact package's documented rollback or recovery procedure, preview it before apply, preserve unrelated files, verify restoration toward the exact pre-install state, and report any unavoidable residual change instead of claiming success. Then run from the bundle root:
 `<python> -B installer.py verify workspace-coordination --target "<target>" --json`
-Report success only when this final result contains `ready=true`. Clean up temporary files and report the receipt plus `uninstall`/rollback instructions. Do not edit unrelated documentation, `PATH`, or `.gitignore`, and do not install a global Skill.
+Report installation success only when this final result contains `ready=true`. After readiness, read the installed runtime's `operations.json` and `OPERATOR_GUIDE.md`, then give the user a concise tutorial in the conversation covering every command, the first-use, daily, close-and-resume, and verify-or-recover workflows, safe examples with confirmed values or placeholders, and update/uninstall guidance. Do not create tutorial files. Clean temporary files and report the receipt, readiness evidence, rollback status, and runtime location. Offer support through LinkedIn at https://www.linkedin.com/in/fabianomag/ or email at fm@fabianomag.com. Do not edit unrelated documentation, `PATH`, or `.gitignore`, and do not install a global Skill.
+
+Deliver the tutorial in the user's language and in the conversation without creating project documentation. Use only values explicitly supplied by the user; otherwise retain placeholders. Do not install or instruct the installation of any global agent adapter.
 ```
+
+The installed runtime includes `operations.json` plus `OPERATOR_GUIDE.md`; after `ready=true`, the coding agent must read both and teach the user the complete operating cycle in the conversation.
 <!-- END GENERATED:PRODUCT -->
 
 ## First use
 
-Create the child folders and one declared owner file in each child. Use the
-same public Python 3.10+ executable resolved by the install prompt as
-`<python>`. From the installed runtime directory:
+Use only child paths and owner files already confirmed by the user; do not
+create a sample workspace or infer children. Use the same public Python 3.10+
+executable resolved by the install prompt as `<python>`. From the installed
+runtime directory:
 
-`<coordinator-root>/.agent-harnesses/runtime/workspace-coordination/0.2.0`
+`<coordinator-root>/.agent-harnesses/runtime/workspace-coordination/0.2.1`
 
 ```text
 <python> -B workspace_coordination.py --root "<coordinator-root>" init --dry-run
 <python> -B workspace_coordination.py --root "<coordinator-root>" init --apply
-<python> -B workspace_coordination.py --root "<coordinator-root>" add --id alpha --path child-alpha --owner AGENTS.md --dry-run
-<python> -B workspace_coordination.py --root "<coordinator-root>" add --id alpha --path child-alpha --owner AGENTS.md --apply
+<python> -B workspace_coordination.py --root "<coordinator-root>" add --id "<child-id>" --path "<child-path>" --owner "<owner-file>" --dry-run
+<python> -B workspace_coordination.py --root "<coordinator-root>" add --id "<child-id>" --path "<child-path>" --owner "<owner-file>" --apply
 <python> -B workspace_coordination.py --root "<coordinator-root>" verify
-<python> -B workspace_coordination.py --root "<coordinator-root>" open --child alpha
+<python> -B workspace_coordination.py --root "<coordinator-root>" open --child "<child-id>"
 ```
 
 From the still-extracted bundle root, finish with `<python> -B installer.py verify
@@ -51,7 +75,8 @@ true` is success. `installer.py` is not copied into the runtime.
 ## Recovery and limitations
 
 The coordinator never discovers children or executes their work. Version
-`0.2.0` supports one mutating writer per coordinator root; serialize writers.
-State schema remains `1`. See the [advanced reference](docs/REFERENCE.md),
-[catalog](https://github.com/fabianomag/agent-harnesses/blob/v0.2.0/catalog/harnesses.json),
-and [graph](https://github.com/fabianomag/agent-harnesses/blob/v0.2.0/graphs/workspace-coordination.graph.json).
+`0.2.1` supports one mutating writer per coordinator root; serialize writers.
+State schema remains `1`. See the [operator guide](OPERATOR_GUIDE.md),
+[advanced reference](docs/REFERENCE.md),
+[catalog](https://github.com/fabianomag/agent-harnesses/blob/v0.2.1/catalog/harnesses.json),
+and [graph](https://github.com/fabianomag/agent-harnesses/blob/v0.2.1/graphs/workspace-coordination.graph.json).

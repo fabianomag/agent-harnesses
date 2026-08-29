@@ -214,6 +214,19 @@ class SafetyContractTests(unittest.TestCase):
             }.issubset(codes)
         )
 
+    def test_only_the_declared_public_support_email_is_allowed(self) -> None:
+        allowed = validate.scan_text(
+            "PUBLIC.md",
+            "Support: " + "fm" + "@" + "fabianomag.com",
+        )
+        self.assertFalse(any(issue.code == "EMAIL" for issue in allowed))
+
+        rejected = validate.scan_text(
+            "PUBLIC.md",
+            "Contact: " + "someone" + "@" + "example.invalid",
+        )
+        self.assertTrue(any(issue.code == "EMAIL" for issue in rejected))
+
     def test_external_pattern_is_not_disclosed_in_finding(self) -> None:
         marker = "synthetic-" + "private-marker"
         with tempfile.TemporaryDirectory() as directory:

@@ -1,7 +1,7 @@
 # Project Harness — advanced reference
 
 - Package ID: `project-harness`
-- Version: `0.2.0`
+- Version: `0.2.1`
 - Artifact status: implemented, published
 - Runtime: Python 3.10 or newer, standard library only
 
@@ -54,18 +54,18 @@ blocks; existing directories and unrelated files are preserved.
 From the source repository root, preview, install, and verify the exact package:
 
 ```text
-<python> -B tools/package_manager.py install --package project-harness --version 0.2.0 --root "<install-root>" --dry-run
-<python> -B tools/package_manager.py install --package project-harness --version 0.2.0 --root "<install-root>" --apply
-<python> -B tools/package_manager.py verify --package project-harness --version 0.2.0 --root "<install-root>"
+<python> -B tools/package_manager.py install --package project-harness --version 0.2.1 --root "<install-root>" --dry-run
+<python> -B tools/package_manager.py install --package project-harness --version 0.2.1 --root "<install-root>" --apply
+<python> -B tools/package_manager.py verify --package project-harness --version 0.2.1 --root "<install-root>"
 ```
 
-The installed copy is `<install-root>/project-harness-0.2.0/`. The common
+The installed copy is `<install-root>/project-harness-0.2.1/`. The common
 package manager does not create a global command and does not invoke the
 package runtime during installation.
 
 ## Preflight
 
-Enter the installed `project-harness-0.2.0/` directory and preview the complete
+Enter the installed `project-harness-0.2.1/` directory and preview the complete
 runtime write set:
 
 ```text
@@ -88,7 +88,7 @@ Verify managed runtime state from the installed package root:
 Verify package bytes from the source repository root with the common verifier:
 
 ```text
-<python> -B tools/package_manager.py verify --package project-harness --version 0.2.0 --root "<install-root>"
+<python> -B tools/package_manager.py verify --package project-harness --version 0.2.1 --root "<install-root>"
 ```
 
 Package-local automated and structural checks can be run from the installed
@@ -185,9 +185,8 @@ A process or machine stop cannot make a multi-file batch globally atomic:
   package tests. This README does not self-attest a candidate-bound result.
 - **Structural — defined:** `tests/validate_generated_fixture.py` checks an
   isolated generated project.
-- **Manual Codex — verified:** a fresh Project Harness walkthrough passed for
-  this exact release bundle and candidate. The immutable evidence is
-  [published with the release](https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.0/manual-codex-evidence.json).
+- **Manual Codex — pending:** a fresh Project Harness walkthrough must run
+  against the exact release candidate before publication.
 
 The local runner does not execute manual evidence. Publishable results must
 come from a release manifest or evidence asset bound to the exact published
@@ -195,13 +194,12 @@ package version and commit.
 
 ## Version and immutable links
 
-Version `0.2.0` is published from the immutable
-`v0.2.0` release tag.
+Version `0.2.1` is bound to the immutable `v0.2.1` release tag.
 
-- Immutable documentation URL: https://github.com/fabianomag/agent-harnesses/blob/v0.2.0/packages/project-harness/README.md
-- Immutable install prompt: `Install this harness for me: https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.0/project-harness-0.2.0.zip`
-- Immutable source URL: https://github.com/fabianomag/agent-harnesses/tree/v0.2.0/packages/project-harness
-- Release URL: https://github.com/fabianomag/agent-harnesses/releases/tag/v0.2.0
+- Immutable documentation URL: https://github.com/fabianomag/agent-harnesses/blob/v0.2.1/packages/project-harness/README.md
+- Immutable install prompt: `Install this harness for me: https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.1/project-harness-0.2.1.zip`
+- Immutable source URL: https://github.com/fabianomag/agent-harnesses/tree/v0.2.1/packages/project-harness
+- Release URL: https://github.com/fabianomag/agent-harnesses/releases/tag/v0.2.1
 - Installation report: https://github.com/fabianomag/agent-harnesses/issues/new?template=installation-report.yml
 
 Do not substitute a mutable branch URL for the version-bound fields.
@@ -209,7 +207,7 @@ Do not substitute a mutable branch URL for the version-bound fields.
 ## Diagrams
 
 - Graph ID: `project-harness-flow`
-- Immutable spec: https://github.com/fabianomag/agent-harnesses/blob/v0.2.0/graphs/project-harness.graph.json
+- Immutable spec: https://github.com/fabianomag/agent-harnesses/blob/v0.2.1/graphs/project-harness.graph.json
 - Source-tree static asset: `assets/project-harness.svg`
 - Interactive diagram: https://fabianomag.com/projects/agent-harnesses
 

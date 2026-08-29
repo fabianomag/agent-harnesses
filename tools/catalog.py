@@ -42,10 +42,10 @@ PUBLIC_REPOSITORY_URL = "https://github.com/fabianomag/agent-harnesses"
 BADGE_NAMES = ("Context", "Skill", "Harness", "Loop", "Guardrails")
 BADGE_LEVELS = ("absent", "basic", "partial", "strong", "verified")
 SKILL_PATHS = {
-    "project-harness": "skills/project-harness/SKILL.md",
-    "workspace-coordination": "SKILL.md",
-    "cross-project": "SKILL.md",
-    "orchestration": "SKILL.md",
+    "project-harness": "adapters/openai/project-harness/SKILL.md",
+    "workspace-coordination": "adapters/openai/workspace-coordination/SKILL.md",
+    "cross-project": "adapters/openai/cross-project/SKILL.md",
+    "orchestration": "adapters/openai/orchestration/SKILL.md",
 }
 SEMVER_PATTERN = re.compile(
     r"^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)"
@@ -244,14 +244,12 @@ PACKAGE_PROFILES: dict[str, dict[str, Any]] = {
                     {
                         "method": "structural",
                         "path": (
-                            "packages/project-harness/skills/"
-                            "project-harness/SKILL.md"
+                            "adapters/openai/project-harness/SKILL.md"
                         ),
                         "claim": (
-                            "Packages a Codex Skill with validated name and "
-                            "description frontmatter; manual Codex evidence "
-                            "must be bound to the exact release before any "
-                            "verified claim."
+                            "Provides an optional Codex Skill adapter outside "
+                            "the agent-agnostic core package; no adapter is "
+                            "installed by the default release flow."
                         ),
                     }
                 ],
@@ -373,7 +371,7 @@ PACKAGE_PROFILES: dict[str, dict[str, Any]] = {
                 "dispatch agents, or execute child work."
             ),
             (
-                "Version 0.2.0 supports one mutating writer per coordinator "
+                "Version 0.2.1 supports one mutating writer per coordinator "
                 "root."
             ),
         ],
@@ -399,12 +397,13 @@ PACKAGE_PROFILES: dict[str, dict[str, Any]] = {
                 "evidence": [
                     {
                         "method": "structural",
-                        "path": "packages/workspace-coordination/SKILL.md",
+                        "path": (
+                            "adapters/openai/workspace-coordination/SKILL.md"
+                        ),
                         "claim": (
-                            "Packages a Codex Skill with validated name and "
-                            "description frontmatter; manual Codex evidence "
-                            "must be bound to the exact release before any "
-                            "verified claim."
+                            "Provides an optional Codex Skill adapter outside "
+                            "the agent-agnostic core package; no adapter is "
+                            "installed by the default release flow."
                         ),
                     }
                 ],
@@ -555,12 +554,11 @@ PACKAGE_PROFILES: dict[str, dict[str, Any]] = {
                 "evidence": [
                     {
                         "method": "structural",
-                        "path": "packages/cross-project/SKILL.md",
+                        "path": "adapters/openai/cross-project/SKILL.md",
                         "claim": (
-                            "Packages a Codex Skill with validated name and "
-                            "description frontmatter; manual Codex evidence "
-                            "must be bound to the exact release before any "
-                            "verified claim."
+                            "Provides an optional Codex Skill adapter outside "
+                            "the agent-agnostic core package; no adapter is "
+                            "installed by the default release flow."
                         ),
                     }
                 ],
@@ -710,12 +708,11 @@ PACKAGE_PROFILES: dict[str, dict[str, Any]] = {
                 "evidence": [
                     {
                         "method": "structural",
-                        "path": "packages/orchestration/SKILL.md",
+                        "path": "adapters/openai/orchestration/SKILL.md",
                         "claim": (
-                            "Packages a Codex Skill with validated name and "
-                            "description frontmatter; manual Codex evidence "
-                            "must be bound to the exact release before any "
-                            "verified claim."
+                            "Provides an optional Codex Skill adapter outside "
+                            "the agent-agnostic core package; no adapter is "
+                            "installed by the default release flow."
                         ),
                     }
                 ],
@@ -1083,7 +1080,9 @@ def _published_immutable_links(
         },
         "release": {"status": "published", "url": release_url},
         "interactiveDiagram": {
-            "status": "published",
+            # The site is deployed by a separate single-writer task after this
+            # immutable repository snapshot is handed off.
+            "status": "planned",
             "url": interactive_url,
         },
     }
@@ -1105,9 +1104,10 @@ def _agent_compatibility() -> dict[str, Any]:
             "verification": "pending",
             "verifiedEligible": False,
             "scope": (
-                "Packaged Codex Skills plus explicit CLI and Markdown "
-                "contracts; a fresh walkthrough of the exact v0.2.0 release "
-                "assets is still pending."
+                "The agent-agnostic CLI, operations contract, and Markdown "
+                "guides are primary. Optional Codex adapters remain outside "
+                "the core assets; a fresh walkthrough of the exact v0.2.1 "
+                "release assets is still pending."
             ),
         },
         "otherAgents": {
@@ -1115,8 +1115,9 @@ def _agent_compatibility() -> dict[str, Any]:
             "verification": "unverified",
             "verifiedEligible": False,
             "scope": (
-                "Explicit CLI and Markdown contracts only; no agent-specific "
-                "integration evaluation or Skill behavior is claimed."
+                "The core uses explicit CLI, JSON, and Markdown contracts. "
+                "Claude Code Desktop receives a bounded compatibility smoke; "
+                "no generic agent-specific Skill behavior is claimed."
             ),
         },
     }
@@ -1196,12 +1197,12 @@ def expected_catalog(repository_root: Path) -> dict[str, Any]:
         )
         if manifest["version"] != release["version"]:
             raise CommonContractError("package version differs from collection release")
-        skill_path = package_root / SKILL_PATHS[package_id]
+        skill_path = repository_root / SKILL_PATHS[package_id]
         try:
             skill_text = skill_path.read_text(encoding="utf-8")
         except (OSError, UnicodeError) as error:
             raise CommonContractError(
-                "packaged Skill is not readable UTF-8"
+                "optional Skill adapter is not readable UTF-8"
             ) from error
         parse_skill_frontmatter(skill_text, package_id=package_id)
         profile = _validated_profile(repository_root, package_id=package_id)

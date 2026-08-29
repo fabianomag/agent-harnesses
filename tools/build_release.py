@@ -34,6 +34,15 @@ CHANGELOG_NAME = "CHANGELOG.md"
 FIXED_ZIP_TIME = (1980, 1, 1, 0, 0, 0)
 COMMIT_PATTERN = re.compile(r"^[0-9a-f]{40}$")
 DIGEST_PATTERN = re.compile(r"^[0-9a-f]{64}$")
+CORE_OPERATION_FILES = frozenset(
+    {
+        "operations.json",
+        "OPERATOR_GUIDE.md",
+        "OPERATOR_GUIDE.pt-BR.md",
+    }
+)
+AGENT_ADAPTER_FILENAMES = frozenset({"skill.md", "openai.yaml"})
+AGENT_ADAPTER_DIRECTORIES = frozenset({"adapters", "agents", "skills"})
 
 
 class ReleaseBuildError(ValueError):
@@ -101,6 +110,45 @@ def _portable_path(value: str) -> PurePosixPath:
     ):
         raise ReleaseBuildError("package inventory contains an unsafe path")
     return path
+
+
+def _is_agent_adapter_path(path: PurePosixPath) -> bool:
+    """Return whether a package-relative path belongs to a vendor adapter."""
+
+    return path.name.casefold() in AGENT_ADAPTER_FILENAMES or any(
+        part.casefold() in AGENT_ADAPTER_DIRECTORIES for part in path.parts[:-1]
+    )
+
+
+def _validate_core_operation_files(
+    package_id: str,
+    payload: Mapping[str, bytes],
+) -> None:
+    missing = CORE_OPERATION_FILES - set(payload)
+    if missing:
+        rendered = ", ".join(sorted(missing))
+        raise ReleaseBuildError(
+            f"{package_id} package is missing portable operation files: {rendered}"
+        )
+
+    operations = _loads_strict(
+        payload["operations.json"],
+        label=f"{package_id} operations contract",
+    )
+    if not isinstance(operations, dict):
+        raise ReleaseBuildError("package operations contract must be a JSON object")
+    if payload["operations.json"] != _canonical_json_bytes(operations):
+        raise ReleaseBuildError("package operations contract is not canonical JSON")
+
+    for guide_name in ("OPERATOR_GUIDE.md", "OPERATOR_GUIDE.pt-BR.md"):
+        try:
+            guide = payload[guide_name].decode("utf-8")
+        except UnicodeError as error:
+            raise ReleaseBuildError(
+                f"{package_id} {guide_name} must be UTF-8"
+            ) from error
+        if not guide.strip():
+            raise ReleaseBuildError(f"{package_id} {guide_name} must not be empty")
 
 
 def _checked_sources(
@@ -183,6 +231,10 @@ def _package_payload(
             raise ReleaseBuildError("catalog package inventory is invalid")
         relative = _portable_path(item["path"])
         relative_text = relative.as_posix()
+        if _is_agent_adapter_path(relative):
+            raise ReleaseBuildError(
+                f"{package_id} core inventory contains an agent-specific adapter"
+            )
         if relative_text in seen or relative_text == "LICENSE":
             raise ReleaseBuildError("catalog package inventory contains a collision")
         content = _regular_file_bytes(
@@ -194,6 +246,8 @@ def _package_payload(
         seen.add(relative_text)
         payload[relative_text] = content
         inventory.append({"path": relative_text, "sha256": item["sha256"]})
+
+    _validate_core_operation_files(package_id, payload)
 
     license_item = catalog_value.get("licenseFile")
     if (

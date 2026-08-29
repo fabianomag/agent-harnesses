@@ -3,6 +3,22 @@
 All notable public changes to Agent Harnesses are recorded here. Historical
 `0.1.x` package tags remain immutable; collection releases begin at `v0.2.0`.
 
+## [0.2.1] - 2026-08-29
+
+- Make the core packages explicitly agent-agnostic: each package ships its
+  complete local runtime, a machine-readable `operations.json`, and operator
+  guides in English and PT-BR without requiring an agent-specific Skill.
+- Require the Copy Install flow to finish with a conversational tutorial that
+  explains the selected harness's operations, persistence, resumption,
+  verification, recovery, and removal without writing synthetic onboarding
+  records into the user's target.
+- Separate optional OpenAI adapters under `adapters/openai/`; they remain
+  manual, opt-in integrations and are excluded from the installer, core ZIPs,
+  and primary site snapshot.
+- Distinguish package installation and structural readiness from completed
+  human onboarding, and extend deterministic release tests around the portable
+  operating contract.
+
 ## [0.2.0] - 2026-08-29
 
 - Rename the public choices to Project Harness, Workspace Harness,
