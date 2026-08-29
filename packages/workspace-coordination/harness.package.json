@@ -2,8 +2,8 @@
   "$schema": "../../schemas/harness-package.schema.json",
   "schemaVersion": 1,
   "id": "workspace-coordination",
-  "displayName": "Workspace Coordination Harness",
-  "version": "0.1.0",
+  "displayName": "Workspace Harness",
+  "version": "0.2.0",
   "license": "MIT",
   "status": "implemented",
   "readme": "README.md"

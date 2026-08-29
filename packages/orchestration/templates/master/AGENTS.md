@@ -1,6 +1,6 @@
 # Master Operating Contract
 
-This root coordinates registered fronts through the Orchestration Harness.
+This root coordinates registered fronts through the Control Plane Harness.
 
 - Begin with a read-only `bom-dia`.
 - Treat `FRONTS.md` as generated output.

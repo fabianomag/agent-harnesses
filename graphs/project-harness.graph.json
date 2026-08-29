@@ -4,7 +4,7 @@
   "package": {
     "id": "project-harness",
     "displayName": "Project Harness",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "artifactStatus": {
       "implementation": "implemented",
       "publication": "published"
@@ -14,9 +14,9 @@
     "catalog": "catalog/harnesses.json",
     "spec": "graphs/project-harness.graph.json",
     "staticAsset": "assets/project-harness.svg",
-    "interactiveDiagram": "https://fabianomag.vercel.app/artifacts/agent-harnesses"
+    "interactiveDiagram": "https://fabianomag.com/projects/agent-harnesses"
   },
-  "purpose": "Preserve durable context and a resumable work cycle inside one explicitly selected local project.",
+  "purpose": "A small project-local lifecycle for durable context and the next action.",
   "meaning": "Package-specific conceptual flow. Edges show operating sequence, not package ranking or dependency.",
   "nodes": [
     {

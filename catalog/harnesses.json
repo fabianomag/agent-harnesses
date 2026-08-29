@@ -28,9 +28,9 @@
     "description": "Agent compatibility is separate from package capability badges and from published-version verification.",
     "codex": {
       "status": "compatible",
-      "verification": "verified",
-      "verifiedEligible": true,
-      "scope": "Packaged Codex Skills plus explicit CLI and Markdown contracts; fresh walkthrough evidence is bound to every exact immutable release bundle."
+      "verification": "pending",
+      "verifiedEligible": false,
+      "scope": "Packaged Codex Skills plus explicit CLI and Markdown contracts; a fresh walkthrough of the exact v0.2.0 release assets is still pending."
     },
     "otherAgents": {
       "status": "compatible",
@@ -43,17 +43,17 @@
     {
       "id": "project-harness",
       "displayName": "Project Harness",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "license": "MIT",
       "artifactStatus": {
         "implementation": "implemented",
         "publication": "published"
       },
       "manifest": "packages/project-harness/harness.package.json",
-      "purpose": "Preserve durable context and a resumable work cycle inside one explicitly selected local project.",
+      "purpose": "A small project-local lifecycle for durable context and the next action.",
       "complexity": {
-        "level": "low-to-intermediate",
-        "description": "One root, one canonical state file, and one project-local lifecycle."
+        "level": "low",
+        "description": "One explicit project that needs checkpoints, closeout, and reliable resumption."
       },
       "evolutionaryPosition": {
         "boundary": "single-project",
@@ -62,7 +62,7 @@
       },
       "audience": {
         "primary": "project-maintainers",
-        "description": "People or agents maintaining one local project with explicit context, decisions, and next actions."
+        "description": "One explicit project that needs checkpoints, closeout, and reliable resumption."
       },
       "badges": {
         "Context": {
@@ -81,7 +81,7 @@
             {
               "method": "structural",
               "path": "packages/project-harness/skills/project-harness/SKILL.md",
-              "claim": "Packages a Codex Skill with validated name and description frontmatter; manual Codex evidence is published with the exact release."
+              "claim": "Packages a Codex Skill with validated name and description frontmatter; manual Codex evidence must be bound to the exact release before any verified claim."
             }
           ]
         },
@@ -117,6 +117,7 @@
         }
       },
       "limitations": [
+        "Coordination across workspace children or independent project roots.",
         "It does not coordinate workspaces, sibling projects, external services, releases, or publication.",
         "Multi-file operations are not crash-atomic, and hostile concurrent writers are unsupported."
       ],
@@ -160,23 +161,23 @@
       "immutableLinks": {
         "documentation": {
           "status": "published",
-          "url": "https://github.com/fabianomag/agent-harnesses/blob/project-harness-v0.1.0/packages/project-harness/README.md"
+          "url": "https://github.com/fabianomag/agent-harnesses/blob/v0.2.0/packages/project-harness/README.md"
         },
         "prompt": {
           "status": "published",
-          "url": "https://github.com/fabianomag/agent-harnesses/releases/download/project-harness-v0.1.0/project-harness-0.1.0.zip"
+          "url": "https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.0/project-harness-0.2.0.zip"
         },
         "source": {
           "status": "published",
-          "url": "https://github.com/fabianomag/agent-harnesses/tree/project-harness-v0.1.0/packages/project-harness"
+          "url": "https://github.com/fabianomag/agent-harnesses/tree/v0.2.0/packages/project-harness"
         },
         "release": {
           "status": "published",
-          "url": "https://github.com/fabianomag/agent-harnesses/releases/tag/project-harness-v0.1.0"
+          "url": "https://github.com/fabianomag/agent-harnesses/releases/tag/v0.2.0"
         },
         "interactiveDiagram": {
           "status": "published",
-          "url": "https://fabianomag.vercel.app/artifacts/agent-harnesses"
+          "url": "https://fabianomag.com/projects/agent-harnesses"
         }
       },
       "evidence": {
@@ -198,29 +199,33 @@
         },
         "manualCodex": {
           "method": "manual-codex",
-          "status": "verified",
+          "status": "pending",
           "references": [
             "packages/project-harness/README.md"
           ],
-          "description": "A fresh Codex walkthrough passed against the exact release bundle; the immutable evidence asset binds the candidate commit, archive digest, installation cycle, and First use result.",
-          "publication": {
-            "status": "published",
-            "url": "https://github.com/fabianomag/agent-harnesses/releases/download/project-harness-v0.1.0/manual-codex-evidence.json"
-          }
+          "description": "A fresh Project Harness walkthrough must be executed against the next candidate; no manual result is claimed here."
         }
       },
       "files": [
         {
           "path": "README.md",
-          "sha256": "754a1d7472a7c742f7375daebfa71f8d10f00620d61feea0190496b1d45d271c"
+          "sha256": "8dd059706d1e50a684cc825b13b8e901e64ec47d05903b59535b5a88c5118fe7"
+        },
+        {
+          "path": "README.pt-BR.md",
+          "sha256": "0b6b727806ee08c5e04d7b5a7b464297ba852b4d9b8cd30eece8bb4b9a84ee77"
+        },
+        {
+          "path": "docs/REFERENCE.md",
+          "sha256": "dd8684b50ae83ff56ef47383aaca1b610a8a5bae8d8313f324c5d55231021d8c"
         },
         {
           "path": "harness.package.json",
-          "sha256": "7dec653db0094064b6b8cf391a75f4ea00a2c6167fb20b8f1eb6ca9fa62a8385"
+          "sha256": "f588bbdc7a1dd953fe1fcb761954c16b8ae379d74d7ec09add6a62012a037477"
         },
         {
           "path": "project_harness.py",
-          "sha256": "d0a7ad0396727de8e7ee97f14f47d9eca375f4dbdfad7646070cf03336a455fb"
+          "sha256": "7096cffbadec9338e1a8f20497bb7e9d49cc1f50a0d9cf549daa07828f132e53"
         },
         {
           "path": "skills/project-harness/SKILL.md",
@@ -228,7 +233,7 @@
         },
         {
           "path": "tests/test_project_harness.py",
-          "sha256": "5cb1d2c32faa2b6d93c6de659ca193fca998909961fffb7ee0d53c9d949d5e03"
+          "sha256": "d8dcfe4f3ab55f4fb4e976cd8f90ab438564c0a512de212d1ecb0b42c062a060"
         },
         {
           "path": "tests/validate_generated_fixture.py",
@@ -238,18 +243,18 @@
     },
     {
       "id": "workspace-coordination",
-      "displayName": "Workspace Coordination Harness",
-      "version": "0.1.0",
+      "displayName": "Workspace Harness",
+      "version": "0.2.0",
       "license": "MIT",
       "artifactStatus": {
         "implementation": "implemented",
         "publication": "published"
       },
       "manifest": "packages/workspace-coordination/harness.package.json",
-      "purpose": "Coordinate explicitly registered autonomous child folders inside one containing workspace while preserving child-local ownership.",
+      "purpose": "A coordinator index that preserves child-local ownership.",
       "complexity": {
-        "level": "intermediate",
-        "description": "One coordinator plus explicit child ownership and shared governance boundaries."
+        "level": "medium",
+        "description": "Contained child projects that share one workspace boundary and a small shared index."
       },
       "evolutionaryPosition": {
         "boundary": "contained-workspace",
@@ -258,7 +263,7 @@
       },
       "audience": {
         "primary": "workspace-coordinators",
-        "description": "Operators coordinating autonomous child folders contained by one explicit local root."
+        "description": "Contained child projects that share one workspace boundary and a small shared index."
       },
       "badges": {
         "Context": {
@@ -277,7 +282,7 @@
             {
               "method": "structural",
               "path": "packages/workspace-coordination/SKILL.md",
-              "claim": "Packages a Codex Skill with validated name and description frontmatter; manual Codex evidence is published with the exact release."
+              "claim": "Packages a Codex Skill with validated name and description frontmatter; manual Codex evidence must be bound to the exact release before any verified claim."
             }
           ]
         },
@@ -313,8 +318,9 @@
         }
       },
       "limitations": [
+        "Independent repositories or a single project with no child coordination.",
         "It does not discover children, scan adjacent folders, dispatch agents, or execute child work.",
-        "Version 0.1.0 supports one mutating writer per coordinator root."
+        "Version 0.2.0 supports one mutating writer per coordinator root."
       ],
       "graph": {
         "id": "workspace-coordination-flow",
@@ -351,23 +357,23 @@
       "immutableLinks": {
         "documentation": {
           "status": "published",
-          "url": "https://github.com/fabianomag/agent-harnesses/blob/workspace-coordination-v0.1.0/packages/workspace-coordination/README.md"
+          "url": "https://github.com/fabianomag/agent-harnesses/blob/v0.2.0/packages/workspace-coordination/README.md"
         },
         "prompt": {
           "status": "published",
-          "url": "https://github.com/fabianomag/agent-harnesses/releases/download/workspace-coordination-v0.1.0/workspace-coordination-0.1.0.zip"
+          "url": "https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.0/workspace-coordination-0.2.0.zip"
         },
         "source": {
           "status": "published",
-          "url": "https://github.com/fabianomag/agent-harnesses/tree/workspace-coordination-v0.1.0/packages/workspace-coordination"
+          "url": "https://github.com/fabianomag/agent-harnesses/tree/v0.2.0/packages/workspace-coordination"
         },
         "release": {
           "status": "published",
-          "url": "https://github.com/fabianomag/agent-harnesses/releases/tag/workspace-coordination-v0.1.0"
+          "url": "https://github.com/fabianomag/agent-harnesses/releases/tag/v0.2.0"
         },
         "interactiveDiagram": {
           "status": "published",
-          "url": "https://fabianomag.vercel.app/artifacts/agent-harnesses"
+          "url": "https://fabianomag.com/projects/agent-harnesses"
         }
       },
       "evidence": {
@@ -390,29 +396,33 @@
         },
         "manualCodex": {
           "method": "manual-codex",
-          "status": "verified",
+          "status": "pending",
           "references": [
             "packages/workspace-coordination/README.md"
           ],
-          "description": "A fresh Codex walkthrough passed against the exact release bundle; the immutable evidence asset binds the candidate commit, archive digest, installation cycle, and First use result.",
-          "publication": {
-            "status": "published",
-            "url": "https://github.com/fabianomag/agent-harnesses/releases/download/workspace-coordination-v0.1.0/manual-codex-evidence.json"
-          }
+          "description": "A fresh Workspace Coordination walkthrough must be executed against the next candidate; no manual result is claimed here."
         }
       },
       "files": [
         {
           "path": "README.md",
-          "sha256": "617eb0c787544f9fd36eee56c6fc46cca2310fc473eaeb2895167e2a6b98242f"
+          "sha256": "9fd5016b7e6cde6f14cc7348c05996538b99fd2bd64e623de53af98251776830"
+        },
+        {
+          "path": "README.pt-BR.md",
+          "sha256": "7607a03b7a1267103e30982e1d51d6556aa2f81b4c79c2abd6c44fabd39001be"
         },
         {
           "path": "SKILL.md",
-          "sha256": "bfd1f78e2b7d11930a5ecd915f282f808d5f8e250a73e49adf0f3ac894567c04"
+          "sha256": "f8f438dcc26912d8a0faff7952c7306bb9ac1a0ddae1ea525a9f37393abf6df3"
+        },
+        {
+          "path": "docs/REFERENCE.md",
+          "sha256": "bc1f1dff44bddaee6b7f5861c3ebac50c63a90a8c5f17b664d40c02c1069a577"
         },
         {
           "path": "harness.package.json",
-          "sha256": "4a464bdc3a6c8bdadfa38ebc9e8f0e189401f195e7f2f34914724a7e2cd4228e"
+          "sha256": "9b5578a4569042b28b470eb6fec8f689ea1f1ab9c44581c92e4a41373ca4f0e7"
         },
         {
           "path": "tests/fixtures/coordinator/child-alpha/AGENTS.md",
@@ -428,7 +438,7 @@
         },
         {
           "path": "tests/test_workspace_coordination.py",
-          "sha256": "b5dd5aabbed8caead4c8cc96dc93c9adfd1ceeca96237430deb2ee3b5f42df22"
+          "sha256": "2d652a809e87ca918de8ab62b9ebef551c504dc9632d9f8183fab4bc3ec97fd0"
         },
         {
           "path": "workspace_coordination.py",
@@ -438,18 +448,18 @@
     },
     {
       "id": "cross-project",
-      "displayName": "Cross-Project Harness",
-      "version": "0.1.1",
+      "displayName": "Multi-Project Harness",
+      "version": "0.2.0",
       "license": "MIT",
       "artifactStatus": {
         "implementation": "implemented",
         "publication": "published"
       },
       "manifest": "packages/cross-project/harness.package.json",
-      "purpose": "Coordinate explicit named projects through canonical transversal state, structural sync, and bounded reflection.",
+      "purpose": "A canonical cross-project manifest with bounded reflection and structural sync.",
       "complexity": {
-        "level": "high",
-        "description": "Named independent fronts, transversal state, cooperative locking, and rollback-protected multi-file updates."
+        "level": "medium",
+        "description": "Existing independent project roots that need explicit handoffs and transversal coordination."
       },
       "evolutionaryPosition": {
         "boundary": "independent-projects",
@@ -458,7 +468,7 @@
       },
       "audience": {
         "primary": "cross-project-coordinators",
-        "description": "Operators managing named handoffs and shared state across independent local projects."
+        "description": "Existing independent project roots that need explicit handoffs and transversal coordination."
       },
       "badges": {
         "Context": {
@@ -477,7 +487,7 @@
             {
               "method": "structural",
               "path": "packages/cross-project/SKILL.md",
-              "claim": "Packages a Codex Skill with validated name and description frontmatter; manual Codex evidence is published with the exact release."
+              "claim": "Packages a Codex Skill with validated name and description frontmatter; manual Codex evidence must be bound to the exact release before any verified claim."
             }
           ]
         },
@@ -513,6 +523,7 @@
         }
       },
       "limitations": [
+        "A contained child index or a new strict registry with journaled recovery.",
         "Rollback and coherence cover catchable failures and cooperative readers, not physical crash-safe multi-file atomicity after process kill or power loss.",
         "Adversarial replacement of the selected root inode remains a residual risk."
       ],
@@ -556,23 +567,23 @@
       "immutableLinks": {
         "documentation": {
           "status": "published",
-          "url": "https://github.com/fabianomag/agent-harnesses/blob/cross-project-v0.1.1/packages/cross-project/README.md"
+          "url": "https://github.com/fabianomag/agent-harnesses/blob/v0.2.0/packages/cross-project/README.md"
         },
         "prompt": {
           "status": "published",
-          "url": "https://github.com/fabianomag/agent-harnesses/releases/download/cross-project-v0.1.1/cross-project-0.1.1.zip"
+          "url": "https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.0/cross-project-0.2.0.zip"
         },
         "source": {
           "status": "published",
-          "url": "https://github.com/fabianomag/agent-harnesses/tree/cross-project-v0.1.1/packages/cross-project"
+          "url": "https://github.com/fabianomag/agent-harnesses/tree/v0.2.0/packages/cross-project"
         },
         "release": {
           "status": "published",
-          "url": "https://github.com/fabianomag/agent-harnesses/releases/tag/cross-project-v0.1.1"
+          "url": "https://github.com/fabianomag/agent-harnesses/releases/tag/v0.2.0"
         },
         "interactiveDiagram": {
           "status": "published",
-          "url": "https://fabianomag.vercel.app/artifacts/agent-harnesses"
+          "url": "https://fabianomag.com/projects/agent-harnesses"
         }
       },
       "evidence": {
@@ -595,33 +606,37 @@
         },
         "manualCodex": {
           "method": "manual-codex",
-          "status": "verified",
+          "status": "pending",
           "references": [
             "packages/cross-project/tests/manual_walkthrough.sh"
           ],
-          "description": "A fresh Codex walkthrough passed against the exact release bundle; the immutable evidence asset binds the candidate commit, archive digest, installation cycle, and First use result.",
-          "publication": {
-            "status": "published",
-            "url": "https://github.com/fabianomag/agent-harnesses/releases/download/cross-project-v0.1.1/manual-codex-evidence.json"
-          }
+          "description": "A fresh Cross-Project walkthrough must be executed against the next candidate; the procedure is not evidence of execution."
         }
       },
       "files": [
         {
           "path": "README.md",
-          "sha256": "d9651a4dfde882f1fbb05d6d5050e6617cefb4107c71f9582652f02c27041d76"
+          "sha256": "df24f49ab6baa04e46fad33c06ccb8ad2b9d27b6aa5d2ebf5b989c4c9638ffd4"
+        },
+        {
+          "path": "README.pt-BR.md",
+          "sha256": "642b1dec34f039846177ac8266924537d94aa756c623367f37f74aee129bab8b"
         },
         {
           "path": "SKILL.md",
-          "sha256": "57daa3f170702dc6b609e50c6a8954a4f689b6823a8cecdaf2bbb3cb0aceb1aa"
+          "sha256": "2b1e8f6e19d6c3aeba7a46c5660c294f23c13da9e47caf260f6014f16c316fbf"
         },
         {
           "path": "agents/openai.yaml",
-          "sha256": "24b5b416afe45e052e93add6068f9a0bf11795bdbc3c72d22d33d905c9b2bc3c"
+          "sha256": "30dd81cde03ccb4bf10ceaef4c5146fb9a9df54a5f475b18ab1a781a5b7e98b0"
+        },
+        {
+          "path": "docs/REFERENCE.md",
+          "sha256": "a23ce6634bf19e41372d4302c50d1b4d0418c0147621360d9ebae16e6aa7f499"
         },
         {
           "path": "harness.package.json",
-          "sha256": "6eaebcd7ad58ef0a05a9692d1f4302f34906c6465ddbcbcc596eecc9a1b6f690"
+          "sha256": "5eaccce8156f0d0f559cc089355482e48d19f66b0541c834e6d593615fccf8ef"
         },
         {
           "path": "scripts/cross_project.py",
@@ -633,24 +648,24 @@
         },
         {
           "path": "tests/test_cross_project.py",
-          "sha256": "342b14c20aae7df960bec9f32a181c6798bead7f20af1ba950c35346eb0b250e"
+          "sha256": "2fbc0ec4196a158169f0621c75e29b15e70e1c55a20565621db712875a4f1fe2"
         }
       ]
     },
     {
       "id": "orchestration",
-      "displayName": "Orchestration Harness",
-      "version": "0.1.0",
+      "displayName": "Control Plane Harness",
+      "version": "0.2.0",
       "license": "MIT",
       "artifactStatus": {
         "implementation": "implemented",
         "publication": "published"
       },
       "manifest": "packages/orchestration/harness.package.json",
-      "purpose": "Operate a transactional local control plane with a strict registry, explicit lifecycle records, recovery, and structural sync.",
+      "purpose": "A transactional local control plane for a deliberate new Master structure.",
       "complexity": {
-        "level": "advanced",
-        "description": "A strict registry, journaled transactions, explicit recovery, and validated lifecycle coordination."
+        "level": "high",
+        "description": "A new control plane whose registry and lifecycle mutations justify transactions and recovery."
       },
       "evolutionaryPosition": {
         "boundary": "transactional-orchestration",
@@ -659,7 +674,7 @@
       },
       "audience": {
         "primary": "orchestration-operators",
-        "description": "Operators who need a transactional local registry, explicit front focus, lifecycle records, and journal recovery."
+        "description": "A new control plane whose registry and lifecycle mutations justify transactions and recovery."
       },
       "badges": {
         "Context": {
@@ -678,7 +693,7 @@
             {
               "method": "structural",
               "path": "packages/orchestration/SKILL.md",
-              "claim": "Packages a Codex Skill with validated name and description frontmatter; manual Codex evidence is published with the exact release."
+              "claim": "Packages a Codex Skill with validated name and description frontmatter; manual Codex evidence must be bound to the exact release before any verified claim."
             }
           ]
         },
@@ -714,6 +729,7 @@
         }
       },
       "limitations": [
+        "Adopting an existing project layout, dispatching agents, or executing project work.",
         "It does not call a model, dispatch agents, execute project commands, publish content, or infer reflections.",
         "Its transactional guarantees remain bounded by cooperative local filesystem and recovery assumptions."
       ],
@@ -757,23 +773,23 @@
       "immutableLinks": {
         "documentation": {
           "status": "published",
-          "url": "https://github.com/fabianomag/agent-harnesses/blob/orchestration-v0.1.0/packages/orchestration/README.md"
+          "url": "https://github.com/fabianomag/agent-harnesses/blob/v0.2.0/packages/orchestration/README.md"
         },
         "prompt": {
           "status": "published",
-          "url": "https://github.com/fabianomag/agent-harnesses/releases/download/orchestration-v0.1.0/orchestration-0.1.0.zip"
+          "url": "https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.0/orchestration-0.2.0.zip"
         },
         "source": {
           "status": "published",
-          "url": "https://github.com/fabianomag/agent-harnesses/tree/orchestration-v0.1.0/packages/orchestration"
+          "url": "https://github.com/fabianomag/agent-harnesses/tree/v0.2.0/packages/orchestration"
         },
         "release": {
           "status": "published",
-          "url": "https://github.com/fabianomag/agent-harnesses/releases/tag/orchestration-v0.1.0"
+          "url": "https://github.com/fabianomag/agent-harnesses/releases/tag/v0.2.0"
         },
         "interactiveDiagram": {
           "status": "published",
-          "url": "https://fabianomag.vercel.app/artifacts/agent-harnesses"
+          "url": "https://fabianomag.com/projects/agent-harnesses"
         }
       },
       "evidence": {
@@ -797,21 +813,21 @@
         },
         "manualCodex": {
           "method": "manual-codex",
-          "status": "verified",
+          "status": "pending",
           "references": [
             "packages/orchestration/README.md"
           ],
-          "description": "A fresh Codex walkthrough passed against the exact release bundle; the immutable evidence asset binds the candidate commit, archive digest, installation cycle, and First use result.",
-          "publication": {
-            "status": "published",
-            "url": "https://github.com/fabianomag/agent-harnesses/releases/download/orchestration-v0.1.0/manual-codex-evidence.json"
-          }
+          "description": "A fresh Orchestration walkthrough must be executed against the next candidate; no manual result is claimed here."
         }
       },
       "files": [
         {
           "path": "README.md",
-          "sha256": "688dad4806e5f7e81a8a666b84b25ce21a286154ffc107cce983353a789c16bf"
+          "sha256": "1b8a1dac8f11ed8da345cd150623d2d6fb5022461a92e5278185b7b6797054ea"
+        },
+        {
+          "path": "README.pt-BR.md",
+          "sha256": "9f993c3ed6108dc24e55fc0a23a2d691365cb5ea4d13dc1b78366c2a250efdbe"
         },
         {
           "path": "SKILL.md",
@@ -819,19 +835,23 @@
         },
         {
           "path": "agents/openai.yaml",
-          "sha256": "001c6473ce8e209cf26811510c766003bd513cc54caa3254ca3e1fa8a6ed51a6"
+          "sha256": "abae30564b1f3049cbeb8b36efe1be36ddfadb576dd7a66909c17173c67bea0b"
+        },
+        {
+          "path": "docs/REFERENCE.md",
+          "sha256": "815e2c44d0e295e5372f9ab267339b6ea77b6de4b53669ccba29a89dd8aa3446"
         },
         {
           "path": "harness.package.json",
-          "sha256": "c8bba2ef2bcaaf8f83d5ec4487f67de01f4c34e452a41f29307d6410efd91be0"
+          "sha256": "471236de90124a022e2c900da6b911e8e6d3d87cef1437ee418b00b91989d6eb"
         },
         {
           "path": "hq.py",
-          "sha256": "4e1619b94ff2d1b10fafc6a1daa04ff32f92a8ce1c2924bdf0552f11c61491d1"
+          "sha256": "25c3356786e0dabf3a8971a34b84c6ea33e73d7d066ae3390f9ac8025117a0ae"
         },
         {
           "path": "orchestration_harness/__init__.py",
-          "sha256": "84058549e2cb51365c048f9360367217e9d8210d79896355c6ebf22bcd367fc8"
+          "sha256": "69727564f3743a1c01aec03c6b1f1b6eb88061c97c28276afeaf473df1b13b12"
         },
         {
           "path": "orchestration_harness/cli.py",
@@ -863,7 +883,7 @@
         },
         {
           "path": "orchestration_harness/verifier.py",
-          "sha256": "6bf2535caea85417d268163ec05d6823540377dbb7e64e9f0c142b3b004261b3"
+          "sha256": "382c715eb73627969678b28fde03648aff31f5e360fcd908fcfc5c1254e03daf"
         },
         {
           "path": "scripts/structural_check.py",
@@ -875,7 +895,7 @@
         },
         {
           "path": "templates/master/AGENTS.md",
-          "sha256": "1734d1e12c93c4239780df8069fea616cb186114f9f99c944f3edae533ec4481"
+          "sha256": "4c01a278b2e516029f33582b06974da1a76db3266869604c71fe9a2de74e982e"
         },
         {
           "path": "templates/master/ARCHITECTURE.md",
@@ -907,7 +927,7 @@
         },
         {
           "path": "tests/__init__.py",
-          "sha256": "3aa45d6e911c7ba8a2ea338c6562330c84d3d918287806f351dda2f2bc45cc91"
+          "sha256": "dd9e034b9004c08576a400dd7783d418a6d9e2f13958df11cfcf6bd9cc01618a"
         },
         {
           "path": "tests/_bootstrap.py",

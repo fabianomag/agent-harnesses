@@ -1,4 +1,4 @@
 interface:
-  display_name: "Cross-Project Harness"
+  display_name: "Multi-Project Harness"
   short_description: "Coordinate local projects with bounded state"
   default_prompt: "Use $cross-project to orient and coordinate this local multi-project root."

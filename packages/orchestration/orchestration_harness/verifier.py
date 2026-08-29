@@ -76,7 +76,7 @@ def verify_package(package_root: Path | None = None) -> list[str]:
                 "id": "orchestration",
                 "license": "MIT",
                 "status": "implemented",
-                "version": "0.1.0",
+                "version": "0.2.0",
             }
             if not isinstance(manifest, dict) or any(
                 manifest.get(key) != value for key, value in expected.items()
@@ -111,7 +111,7 @@ def verify_package(package_root: Path | None = None) -> list[str]:
             issues.append("SKILL:agents")
         else:
             required_values = (
-                'display_name: "Orchestration Harness"',
+                'display_name: "Control Plane Harness"',
                 'short_description: "Run safe local Master and front workflows"',
                 "default_prompt:",
                 "$orchestration",

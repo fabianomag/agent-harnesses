@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "source": "catalog/harnesses.json",
-  "interactiveDiagram": "https://fabianomag.vercel.app/artifacts/agent-harnesses",
+  "interactiveDiagram": "https://fabianomag.com/projects/agent-harnesses",
   "meaning": "Collection membership only; no dependency or ranking.",
   "nodes": [
     {
@@ -13,7 +13,7 @@
       "id": "project-harness",
       "kind": "package",
       "label": "Project Harness",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "artifactStatus": {
         "implementation": "implemented",
         "publication": "published"
@@ -22,8 +22,8 @@
     {
       "id": "workspace-coordination",
       "kind": "package",
-      "label": "Workspace Coordination Harness",
-      "version": "0.1.0",
+      "label": "Workspace Harness",
+      "version": "0.2.0",
       "artifactStatus": {
         "implementation": "implemented",
         "publication": "published"
@@ -32,8 +32,8 @@
     {
       "id": "cross-project",
       "kind": "package",
-      "label": "Cross-Project Harness",
-      "version": "0.1.1",
+      "label": "Multi-Project Harness",
+      "version": "0.2.0",
       "artifactStatus": {
         "implementation": "implemented",
         "publication": "published"
@@ -42,8 +42,8 @@
     {
       "id": "orchestration",
       "kind": "package",
-      "label": "Orchestration Harness",
-      "version": "0.1.0",
+      "label": "Control Plane Harness",
+      "version": "0.2.0",
       "artifactStatus": {
         "implementation": "implemented",
         "publication": "published"

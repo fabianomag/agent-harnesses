@@ -1,217 +1,57 @@
-# Workspace Coordination Harness
+<!-- BEGIN GENERATED:PRODUCT -->
+# Workspace Harness
 
-- Package ID: `workspace-coordination`
-- Version: `0.1.0`
-- Artifact status: implemented, published
-- Runtime: Python 3.10 or newer, standard library only
+[Português do Brasil](README.pt-BR.md) · Version `0.2.0`
 
-## Purpose
+**Best for:** Contained child projects that share one workspace boundary and a small shared index.
 
-Workspace Coordination Harness coordinates autonomous child folders contained
-by one explicit local root. The coordinator owns a small child index, shared
-boundaries, and concise shared deltas. Detailed context, execution evidence,
-and continuity remain with each child-local owner.
+**Not for:** Independent repositories or a single project with no child coordination.
 
-Use it when one containing workspace needs explicit child selection and shared
-governance. Do not use it for a single project, independent projects without a
-containing coordinator, or a transactional Master control plane.
+**What it changes:** Creates a workspace control directory and child-local coordination records.
 
-The four packages are boundary choices, not a capability ranking:
-
-- Project Harness keeps one project-local context and cycle.
-- Workspace Coordination Harness indexes contained autonomous children.
-- Cross-Project Harness coordinates named independent projects and transversal
-  handoffs.
-- Orchestration Harness provides a transactional local control plane with a
-  strict registry, explicit lifecycle records, structural sync, and recovery.
-  It does not dispatch agents or execute projects.
-
-## Prerequisites
-
-- Python 3.10 or newer.
-- An existing real installation root for the common package manager.
-- An existing real coordinator root for runtime commands.
-- Each child must already exist below that root and contain its declared owner
-  file before `add`.
-- No managed root, child path, owner path, or path component may be link-like.
-- Root validation walks existing lexical components before canonicalization.
-- A source checkout is required only for repository-level installation,
-  verification, and shared checks.
-
-## Structure
-
-`init` creates only:
-
-```text
-WORKSPACE_COORDINATION.md
-.workspace-coordination/
-  BOUNDARIES.md
-  INDEX.md
-  SHARED_DELTAS.md
-  workspace.json
-```
-
-`workspace.json` is canonical. It stores schema version `1`, registered
-children, and concise shared deltas with normalized root-relative POSIX paths.
-The Markdown files are deterministic managed views. Detailed continuity is
-stored only under the selected child at
-`.workspace-coordination/local-state.json`.
-
-Keys are portable lowercase slugs and idempotency keys. Repeating one with
-identical content is a no-op; reusing it with different content is a collision.
+Strengths: **Child index · Ownership boundaries · Shared workspace view**. Complexity: medium.
 
 ## Installation
 
-From the source repository root:
+Copy only this prompt:
 
 ```text
-python3 -B tools/package_manager.py install --package workspace-coordination --version 0.1.0 --root <install-root> --dry-run
-python3 -B tools/package_manager.py install --package workspace-coordination --version 0.1.0 --root <install-root> --apply
-python3 -B tools/package_manager.py verify --package workspace-coordination --version 0.1.0 --root <install-root>
+Install Workspace Harness (`workspace-coordination`) v0.2.0 from https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.0/workspace-coordination-0.2.0.zip. Before any write, confirm the explicit target and resolve exactly one Python 3.10+ executable available to the user or system as `<python>` (for example `python3`, `python`, or `py -3`); reuse only that executable and never use a private Codex runtime. Download the ZIP and its adjacent `.sha256` sidecar into an isolated temporary directory, verify the checksum before extraction or execution, then extract it. From the extracted bundle root run:
+`<python> -B installer.py doctor workspace-coordination --target "<target>" --json`
+Stop without writes on a mismatch and only recommend a better fit; never silently substitute another harness. Then run:
+`<python> -B installer.py install workspace-coordination --target "<target>" --dry-run --json`
+`<python> -B installer.py install workspace-coordination --target "<target>" --apply --json`
+Follow `package/README.md` inside the extracted bundle to initialize the target, then run from the bundle root:
+`<python> -B installer.py verify workspace-coordination --target "<target>" --json`
+Report success only when this final result contains `ready=true`. Clean up temporary files and report the receipt plus `uninstall`/rollback instructions. Do not edit unrelated documentation, `PATH`, or `.gitignore`, and do not install a global Skill.
 ```
-
-The installed copy is
-`<install-root>/workspace-coordination-0.1.0/`. The common package manager does
-not create a global command or invoke the runtime.
-
-## Preflight
-
-Enter the installed package root. Every mutating runtime command requires
-exactly one of `--dry-run` or `--apply`. Begin with:
-
-```text
-python3 -B workspace_coordination.py --root <coordinator-root> init --dry-run
-```
-
-Preflight validates the complete root-relative write set and writes nothing.
-It never discovers children, scans adjacent folders, or searches a home
-directory or disk.
-
-Preview each registration before applying it:
-
-```text
-python3 -B workspace_coordination.py --root <coordinator-root> add --id alpha --path child-alpha --owner AGENTS.md --dry-run
-```
-
-## Verify
-
-Verify runtime state from the installed package root:
-
-```text
-python3 -B workspace_coordination.py --root <coordinator-root> verify
-```
-
-Verify installed package bytes from the source repository root:
-
-```text
-python3 -B tools/package_manager.py verify --package workspace-coordination --version 0.1.0 --root <install-root>
-```
-
-Run package-local automated checks from the installed package root:
-
-```text
-python3 -B -m unittest discover -s tests -v
-```
+<!-- END GENERATED:PRODUCT -->
 
 ## First use
 
-Before these commands, create `<coordinator-root>/child-alpha/AGENTS.md` and
-`<coordinator-root>/child-beta/OWNER.md` as regular UTF-8 files. Then, from the
-installed package root:
+Create the child folders and one declared owner file in each child. Use the
+same public Python 3.10+ executable resolved by the install prompt as
+`<python>`. From the installed runtime directory:
+
+`<coordinator-root>/.agent-harnesses/runtime/workspace-coordination/0.2.0`
 
 ```text
-python3 -B workspace_coordination.py --root <coordinator-root> init --dry-run
-python3 -B workspace_coordination.py --root <coordinator-root> init --apply
-
-python3 -B workspace_coordination.py --root <coordinator-root> add --id alpha --path child-alpha --owner AGENTS.md --dry-run
-python3 -B workspace_coordination.py --root <coordinator-root> add --id alpha --path child-alpha --owner AGENTS.md --apply
-python3 -B workspace_coordination.py --root <coordinator-root> add --id beta --path child-beta --owner OWNER.md --dry-run
-python3 -B workspace_coordination.py --root <coordinator-root> add --id beta --path child-beta --owner OWNER.md --apply
-
-python3 -B workspace_coordination.py --root <coordinator-root> open
-python3 -B workspace_coordination.py --root <coordinator-root> open --child alpha
-python3 -B workspace_coordination.py --root <coordinator-root> digest --child alpha
-
-python3 -B workspace_coordination.py --root <coordinator-root> record --child alpha --key cycle-001 --kind decision --summary "Keep this implementation local to alpha." --next "Run the local fixture." --dry-run
-python3 -B workspace_coordination.py --root <coordinator-root> record --child alpha --key cycle-001 --kind decision --summary "Keep this implementation local to alpha." --next "Run the local fixture." --apply
-python3 -B workspace_coordination.py --root <coordinator-root> reflect --child alpha --key shared-001 --summary "Both children share one fixture naming boundary." --dry-run
-python3 -B workspace_coordination.py --root <coordinator-root> reflect --child alpha --key shared-001 --summary "Both children share one fixture naming boundary." --apply
-python3 -B workspace_coordination.py --root <coordinator-root> record --child alpha --key cycle-002 --kind close --summary "The local cycle is closed." --next "Reopen alpha from its recorded next action." --dry-run
-python3 -B workspace_coordination.py --root <coordinator-root> record --child alpha --key cycle-002 --kind close --summary "The local cycle is closed." --next "Reopen alpha from its recorded next action." --apply
-
-python3 -B workspace_coordination.py --root <coordinator-root> verify
-python3 -B workspace_coordination.py --root <coordinator-root> open --child alpha
+<python> -B workspace_coordination.py --root "<coordinator-root>" init --dry-run
+<python> -B workspace_coordination.py --root "<coordinator-root>" init --apply
+<python> -B workspace_coordination.py --root "<coordinator-root>" add --id alpha --path child-alpha --owner AGENTS.md --dry-run
+<python> -B workspace_coordination.py --root "<coordinator-root>" add --id alpha --path child-alpha --owner AGENTS.md --apply
+<python> -B workspace_coordination.py --root "<coordinator-root>" verify
+<python> -B workspace_coordination.py --root "<coordinator-root>" open --child alpha
 ```
 
-When working from the source repository root, replace
-`workspace_coordination.py` with
-`packages/workspace-coordination/workspace_coordination.py`. Do not mix path
-contexts.
+From the still-extracted bundle root, finish with `<python> -B installer.py verify
+workspace-coordination --target "<coordinator-root>" --json`; only `"ready":
+true` is success. `installer.py` is not copied into the runtime.
 
-`open` lists explicit choices or reads one child owner. `digest` reads only the
-declared owner, managed local state, and coordinator deltas. `record` writes
-detailed continuity locally. `reflect` accepts only one explicit concise shared
-delta and never copies child state automatically. `remove` unregisters a child
-without deleting or editing it.
+## Recovery and limitations
 
-## Recovery
-
-Multi-file updates stage files beside their targets, recheck expected bytes,
-replace each file atomically, and roll back already committed files after a
-catchable later failure.
-
-1. Run `verify`.
-2. Run `recover --dry-run` only when verification identifies recoverable
-   generated or canonical drift.
-3. Run `recover --apply` to regenerate managed views and canonicalize
-   semantically valid JSON.
-4. Stop on corrupt source JSON, a symlink, or a non-file collision. Restore
-   from an independent known-good source instead of inventing state.
-
-## Limitations
-
-- Version `0.1.0` supports one mutating writer per coordinator root; serialize
-  writers externally.
-- Children must be explicitly registered and contained by one coordinator.
-- The harness does not execute child work or dispatch agents.
-- It does not coordinate independent roots without a containing workspace.
-- Link-like Windows reparse metadata is rejected when exposed by the host, but
-  this candidate has not been manually exercised on Windows.
-- Remote operations and publication are outside the package.
-
-## Evidence
-
-- **Automated — defined:** `tests/test_workspace_coordination.py` contains
-  repeatable package tests over synthetic two-child fixtures.
-- **Structural — defined:** common installed-copy and repository validation
-  procedures are present; this README does not self-attest a result.
-- **Manual Codex — verified:** a fresh Workspace Coordination walkthrough
-  passed for this exact release bundle and candidate. The immutable evidence
-  is [published with the release](https://github.com/fabianomag/agent-harnesses/releases/download/workspace-coordination-v0.1.0/manual-codex-evidence.json).
-
-The local runner does not execute manual evidence. Publishable results must
-come from a release manifest or evidence asset bound to the exact published
-package version and commit.
-
-## Version and immutable links
-
-Version `0.1.0` is published from the immutable
-`workspace-coordination-v0.1.0` release tag.
-
-- Immutable documentation URL: https://github.com/fabianomag/agent-harnesses/blob/workspace-coordination-v0.1.0/packages/workspace-coordination/README.md
-- Immutable install prompt: `Install this harness for me: https://github.com/fabianomag/agent-harnesses/releases/download/workspace-coordination-v0.1.0/workspace-coordination-0.1.0.zip`
-- Immutable source URL: https://github.com/fabianomag/agent-harnesses/tree/workspace-coordination-v0.1.0/packages/workspace-coordination
-- Release URL: https://github.com/fabianomag/agent-harnesses/releases/tag/workspace-coordination-v0.1.0
-- Installation report: https://github.com/fabianomag/agent-harnesses/issues/new?template=installation-report.yml
-
-Do not substitute a mutable branch URL for the version-bound fields.
-
-## Diagrams
-
-- Graph ID: `workspace-coordination-flow`
-- Source-tree spec: `graphs/workspace-coordination.graph.json`
-- Source-tree static asset: `assets/workspace-coordination.svg`
-- Interactive diagram: https://fabianomag.vercel.app/artifacts/agent-harnesses
-
-The static graph represents: workspace coordinator → child index → shared
-boundary/governance → child-local owner → reflection.
+The coordinator never discovers children or executes their work. Version
+`0.2.0` supports one mutating writer per coordinator root; serialize writers.
+State schema remains `1`. See the [advanced reference](docs/REFERENCE.md),
+[catalog](https://github.com/fabianomag/agent-harnesses/blob/v0.2.0/catalog/harnesses.json),
+and [graph](https://github.com/fabianomag/agent-harnesses/blob/v0.2.0/graphs/workspace-coordination.graph.json).

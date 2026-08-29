@@ -3,7 +3,7 @@
   "schemaVersion": 1,
   "id": "project-harness",
   "displayName": "Project Harness",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "license": "MIT",
   "status": "implemented",
   "readme": "README.md"

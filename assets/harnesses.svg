@@ -19,20 +19,20 @@
   <rect class="surface" x="430" y="20" width="620" height="100" rx="14"/>
   <text class="title" x="460" y="58">Project Harness</text>
   <text class="meta" x="460" y="90">project-harness</text>
-  <text class="meta" x="1020" y="90" text-anchor="end">0.1.0 · implemented · published</text>
+  <text class="meta" x="1020" y="90" text-anchor="end">0.2.0 · implemented · published</text>
   <rect class="surface" x="430" y="150" width="620" height="100" rx="14"/>
-  <text class="title" x="460" y="188">Workspace Coordination Harness</text>
+  <text class="title" x="460" y="188">Workspace Harness</text>
   <text class="meta" x="460" y="220">workspace-coordination</text>
-  <text class="meta" x="1020" y="220" text-anchor="end">0.1.0 · implemented · published</text>
+  <text class="meta" x="1020" y="220" text-anchor="end">0.2.0 · implemented · published</text>
   <rect class="surface" x="430" y="280" width="620" height="100" rx="14"/>
-  <text class="title" x="460" y="318">Cross-Project Harness</text>
+  <text class="title" x="460" y="318">Multi-Project Harness</text>
   <text class="meta" x="460" y="350">cross-project</text>
-  <text class="meta" x="1020" y="350" text-anchor="end">0.1.1 · implemented · published</text>
+  <text class="meta" x="1020" y="350" text-anchor="end">0.2.0 · implemented · published</text>
   <rect class="surface" x="430" y="410" width="620" height="100" rx="14"/>
-  <text class="title" x="460" y="448">Orchestration Harness</text>
+  <text class="title" x="460" y="448">Control Plane Harness</text>
   <text class="meta" x="460" y="480">orchestration</text>
-  <text class="meta" x="1020" y="480" text-anchor="end">0.1.0 · implemented · published</text>
-  <a href="https://fabianomag.vercel.app/artifacts/agent-harnesses" aria-label="Open the interactive Agent Harnesses diagram">
+  <text class="meta" x="1020" y="480" text-anchor="end">0.2.0 · implemented · published</text>
+  <a href="https://fabianomag.com/projects/agent-harnesses" aria-label="Open the interactive Agent Harnesses diagram">
     <text class="link" x="40" y="545">Interactive diagram</text>
   </a>
 </svg>
