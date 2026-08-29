@@ -6,13 +6,13 @@
     "minimumPython": "3.10",
     "repository": "https://github.com/fabianomag/agent-harnesses",
     "site": {
-      "en": "https://fabianomag.com/artifacts/agent-harnesses",
-      "ptBr": "https://fabianomag.com/pt-br/artefatos/agent-harnesses"
+      "en": "https://fabianomag.com/projects/agent-harnesses",
+      "ptBr": "https://fabianomag.com/pt-br/projetos/agent-harnesses"
     }
   },
   "promptInstructions": {
-    "en": "Before any write, confirm the explicit target and use a public Python 3.10+ executable; never use a private Codex runtime. Download the ZIP and its adjacent .sha256 sidecar into an isolated temporary directory, verify the checksum before extraction or execution, then extract it. Run installer.py doctor first. Stop without writes on a mismatch and only recommend a better fit; never silently substitute another harness. Run install with --dry-run and then --apply, follow the selected package README to initialize the target, and run verify. Report success only when verify returns ready=true. Clean up temporary files and report the receipt plus uninstall/rollback instructions. Do not edit unrelated documentation, PATH, or .gitignore, and do not install a global Skill.",
-    "ptBr": "Antes de qualquer escrita, confirme o diretório-alvo explícito e use um executável público do Python 3.10+; nunca use um runtime privado do Codex. Baixe o ZIP e o arquivo `.sha256` correspondente em um diretório temporário isolado, valide o checksum antes de extrair ou executar e só então extraia. Execute primeiro `installer.py doctor`. Em caso de incompatibilidade, pare sem escrever nada e apenas recomende a melhor adequação; nunca substitua silenciosamente por outro harness. Execute `install` com `--dry-run` e depois `--apply`, siga o README do package selecionado para inicializar o diretório-alvo e execute `verify`. Só reporte sucesso quando `verify` retornar `ready=true`. Limpe os arquivos temporários e informe o comprovante e as instruções de `uninstall`/rollback. Não edite documentação não relacionada, `PATH` ou `.gitignore` e não instale uma Skill global."
+    "en": "Before any write, confirm the explicit target and resolve exactly one Python 3.10+ executable available to the user or system as `<python>` (for example `python3`, `python`, or `py -3`); reuse only that executable and never use a private Codex runtime. Download the ZIP and its adjacent `.sha256` sidecar into an isolated temporary directory, verify the checksum before extraction or execution, then extract it. From the extracted bundle root run:\n`<python> -B installer.py doctor <selector> --target \"<target>\" --json`\nStop without writes on a mismatch and only recommend a better fit; never silently substitute another harness. Then run:\n`<python> -B installer.py install <selector> --target \"<target>\" --dry-run --json`\n`<python> -B installer.py install <selector> --target \"<target>\" --apply --json`\nFollow `package/README.md` inside the extracted bundle to initialize the target, then run from the bundle root:\n`<python> -B installer.py verify <selector> --target \"<target>\" --json`\nReport success only when this final result contains `ready=true`. Clean up temporary files and report the receipt plus `uninstall`/rollback instructions. Do not edit unrelated documentation, `PATH`, or `.gitignore`, and do not install a global Skill.",
+    "ptBr": "\n\n1. Antes de qualquer escrita, confirme o diretório-alvo explícito e escolha um único executável do Python 3.10+ disponível para o usuário ou para o sistema como `<python>` (por exemplo, `python3`, `python` ou `py -3`); reutilize somente esse executável e nunca use um runtime privado do Codex.\n2. Baixe o ZIP e o arquivo `.sha256` correspondente em um diretório temporário isolado e valide a soma SHA-256 antes de extrair ou executar qualquer arquivo.\n3. Extraia o pacote e, na raiz do pacote extraído, execute:\n`<python> -B installer.py doctor <selector> --target \"<target>\" --json`\n4. Em caso de incompatibilidade, pare sem escrever nada e apenas recomende a melhor opção; nunca substitua silenciosamente por outro harness.\n5. Execute:\n`<python> -B installer.py install <selector> --target \"<target>\" --dry-run --json`\n`<python> -B installer.py install <selector> --target \"<target>\" --apply --json`\n6. Siga `package/README.md` dentro do pacote extraído (ou `package/README.pt-BR.md` em português) para inicializar o diretório-alvo e, na raiz do pacote, execute:\n`<python> -B installer.py verify <selector> --target \"<target>\" --json`\nSó reporte sucesso quando esse resultado final contiver `ready=true`.\n7. Limpe os arquivos temporários e informe o recibo da instalação e as instruções de `uninstall`/rollback. Não edite documentação não relacionada, `PATH` ou `.gitignore` e não instale uma Skill global."
   },
   "ptBrEnglishTerms": [
     "harness",
@@ -48,7 +48,7 @@
       },
       "strengths": {
         "en": ["Checkpoints", "Close and resume", "Fast setup"],
-        "ptBr": ["Checkpoints", "Close e resume", "Setup rápido"]
+        "ptBr": ["Checkpoints", "Closeout e retomada", "Configuração rápida"]
       },
       "content": {
         "en": {
@@ -60,10 +60,10 @@
         },
         "ptBr": {
           "scenario": "Preciso que um único projeto preserve contexto entre sessões de trabalho.",
-          "summary": "Um pequeno ciclo local ao projeto para contexto durável e a próxima ação.",
+          "summary": "Um fluxo local ao projeto para preservar contexto e a próxima ação.",
           "bestFor": "Um projeto explícito que precisa de checkpoints, closeout e retomada confiável.",
           "notFor": "Coordenação entre projetos filhos de um workspace ou raízes de projetos independentes.",
-          "whatItChanges": "Cria um diretório limitado de estado e blocos gerenciados de contexto dentro do projeto selecionado."
+          "whatItChanges": "Cria um diretório próprio de estado e blocos controlados de contexto dentro do projeto selecionado."
         }
       }
     },
@@ -79,7 +79,7 @@
       },
       "strengths": {
         "en": ["Child index", "Ownership boundaries", "Shared workspace view"],
-        "ptBr": ["Índice de projetos filhos", "Limites de ownership", "Visão compartilhada do workspace"]
+        "ptBr": ["Índice dos projetos filhos", "Limites de responsabilidade", "Visão compartilhada do workspace"]
       },
       "content": {
         "en": {
@@ -90,11 +90,11 @@
           "whatItChanges": "Creates a workspace control directory and child-local coordination records."
         },
         "ptBr": {
-          "scenario": "Tenho pastas de projetos filhos autônomos dentro de um único workspace.",
-          "summary": "Um índice de coordenação que preserva o ownership local de cada projeto filho.",
-          "bestFor": "Projetos filhos contidos que compartilham o limite de um workspace e um pequeno índice compartilhado.",
+          "scenario": "Tenho projetos filhos autônomos dentro de um único workspace.",
+          "summary": "Um índice de coordenação que preserva a responsabilidade de cada projeto filho.",
+          "bestFor": "Projetos filhos no mesmo workspace que precisam de um pequeno índice compartilhado.",
           "notFor": "Repositórios independentes ou um único projeto sem coordenação de projetos filhos.",
-          "whatItChanges": "Cria um diretório de controle do workspace e registros locais de coordenação de cada projeto filho."
+          "whatItChanges": "Cria um diretório de controle do workspace e registros de coordenação próprios de cada projeto filho."
         }
       }
     },
@@ -122,10 +122,10 @@
         },
         "ptBr": {
           "scenario": "Preciso de handoffs e estado compartilhado entre projetos independentes que já existem.",
-          "summary": "Um manifest canônico entre projetos, com reflexão limitada e sincronização estrutural.",
-          "bestFor": "Raízes de projetos independentes existentes que precisam de handoffs explícitos e coordenação transversal.",
-          "notFor": "Um índice de projetos filhos contidos ou um registry novo e estrito com recovery por journal.",
-          "whatItChanges": "Cria um manifest canônico de coordenação e projeções gerenciadas na raiz, sem assumir o ownership dos detalhes locais de cada projeto."
+          "summary": "Um manifest canônico entre projetos, com sínteses controladas e sincronização estrutural.",
+          "bestFor": "Projetos independentes com raízes próprias que precisam de handoffs explícitos e coordenação transversal.",
+          "notFor": "Um índice de projetos filhos contidos ou um cadastro central novo e estrito com recuperação por histórico transacional.",
+          "whatItChanges": "Cria um manifest canônico de coordenação e sínteses controladas na raiz, sem assumir a responsabilidade pelos detalhes locais de cada projeto."
         }
       }
     },
@@ -141,7 +141,7 @@
       },
       "strengths": {
         "en": ["Strict registry", "Transactions", "Recovery"],
-        "ptBr": ["Registry estrito", "Transactions", "Recovery"]
+        "ptBr": ["Cadastro central com validação estrita", "Transações", "Recuperação"]
       },
       "content": {
         "en": {
@@ -152,11 +152,11 @@
           "whatItChanges": "Creates a strict Master registry and managed front structure through validated transactional mutations. It does not call models or dispatch agents."
         },
         "ptBr": {
-          "scenario": "Estou criando uma estrutura nova que precisa de registry estrito, transactions e recovery.",
-          "summary": "Um control plane local e transacional para uma estrutura Master deliberadamente nova.",
-          "bestFor": "Um control plane novo cujo registry e cujas alterações de ciclo de vida justificam transactions e recovery.",
-          "notFor": "Adotar um layout de projetos existente, despachar agents ou executar o trabalho dos projetos.",
-          "whatItChanges": "Cria um Master registry estrito e uma estrutura gerenciada de frentes por alterações transacionais validadas. Não chama models nem despacha agents."
+          "scenario": "Estou criando uma estrutura de coordenação nova que precisa de cadastro central estrito, transações e recuperação.",
+          "summary": "Um control plane transacional para uma estrutura central criada de forma deliberada.",
+          "bestFor": "Um control plane novo em que o cadastro central e as mudanças de ciclo de vida justificam transações e recuperação.",
+          "notFor": "Adotar uma estrutura de projetos existente, acionar coding agents ou executar o trabalho dos projetos.",
+          "whatItChanges": "Cria um cadastro central estrito e frentes gerenciadas por mudanças transacionais validadas. Não chama modelos nem aciona coding agents."
         }
       }
     }

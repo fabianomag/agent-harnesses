@@ -3,8 +3,8 @@
   "id": "orchestration-flow",
   "package": {
     "id": "orchestration",
-    "displayName": "Orchestration Harness",
-    "version": "0.1.0",
+    "displayName": "Control Plane Harness",
+    "version": "0.2.0",
     "artifactStatus": {
       "implementation": "implemented",
       "publication": "published"
@@ -14,9 +14,9 @@
     "catalog": "catalog/harnesses.json",
     "spec": "graphs/orchestration.graph.json",
     "staticAsset": "assets/orchestration.svg",
-    "interactiveDiagram": "https://fabianomag.vercel.app/artifacts/agent-harnesses"
+    "interactiveDiagram": "https://fabianomag.com/projects/agent-harnesses"
   },
-  "purpose": "Operate a transactional local control plane with a strict registry, explicit lifecycle records, recovery, and structural sync.",
+  "purpose": "A transactional local control plane for a deliberate new Master structure.",
   "meaning": "Package-specific conceptual flow. Edges show operating sequence, not package ranking or dependency.",
   "nodes": [
     {

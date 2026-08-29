@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Automated tests for Cross-Project Harness."""
+"""Automated tests for Multi-Project Harness."""
 
 from __future__ import annotations
 

@@ -15,7 +15,7 @@ import tempfile
 import urllib.request
 import uuid
 import zipfile
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 
 PRODUCT = json.loads(r'''{
@@ -44,8 +44,8 @@ PRODUCT = json.loads(r'''{
           "bestFor": "Um projeto explícito que precisa de checkpoints, closeout e retomada confiável.",
           "notFor": "Coordenação entre projetos filhos de um workspace ou raízes de projetos independentes.",
           "scenario": "Preciso que um único projeto preserve contexto entre sessões de trabalho.",
-          "summary": "Um pequeno ciclo local ao projeto para contexto durável e a próxima ação.",
-          "whatItChanges": "Cria um diretório limitado de estado e blocos gerenciados de contexto dentro do projeto selecionado."
+          "summary": "Um fluxo local ao projeto para preservar contexto e a próxima ação.",
+          "whatItChanges": "Cria um diretório próprio de estado e blocos controlados de contexto dentro do projeto selecionado."
         }
       },
       "displayName": "Project Harness",
@@ -58,8 +58,8 @@ PRODUCT = json.loads(r'''{
         ],
         "ptBr": [
           "Checkpoints",
-          "Close e resume",
-          "Setup rápido"
+          "Closeout e retomada",
+          "Configuração rápida"
         ]
       }
     },
@@ -84,11 +84,11 @@ PRODUCT = json.loads(r'''{
           "whatItChanges": "Creates a workspace control directory and child-local coordination records."
         },
         "ptBr": {
-          "bestFor": "Projetos filhos contidos que compartilham o limite de um workspace e um pequeno índice compartilhado.",
+          "bestFor": "Projetos filhos no mesmo workspace que precisam de um pequeno índice compartilhado.",
           "notFor": "Repositórios independentes ou um único projeto sem coordenação de projetos filhos.",
-          "scenario": "Tenho pastas de projetos filhos autônomos dentro de um único workspace.",
-          "summary": "Um índice de coordenação que preserva o ownership local de cada projeto filho.",
-          "whatItChanges": "Cria um diretório de controle do workspace e registros locais de coordenação de cada projeto filho."
+          "scenario": "Tenho projetos filhos autônomos dentro de um único workspace.",
+          "summary": "Um índice de coordenação que preserva a responsabilidade de cada projeto filho.",
+          "whatItChanges": "Cria um diretório de controle do workspace e registros de coordenação próprios de cada projeto filho."
         }
       },
       "displayName": "Workspace Harness",
@@ -100,8 +100,8 @@ PRODUCT = json.loads(r'''{
           "Shared workspace view"
         ],
         "ptBr": [
-          "Índice de projetos filhos",
-          "Limites de ownership",
+          "Índice dos projetos filhos",
+          "Limites de responsabilidade",
           "Visão compartilhada do workspace"
         ]
       }
@@ -127,11 +127,11 @@ PRODUCT = json.loads(r'''{
           "whatItChanges": "Creates a canonical coordination manifest and managed root projections without taking ownership of project-local details."
         },
         "ptBr": {
-          "bestFor": "Raízes de projetos independentes existentes que precisam de handoffs explícitos e coordenação transversal.",
-          "notFor": "Um índice de projetos filhos contidos ou um registry novo e estrito com recovery por journal.",
+          "bestFor": "Projetos independentes com raízes próprias que precisam de handoffs explícitos e coordenação transversal.",
+          "notFor": "Um índice de projetos filhos contidos ou um cadastro central novo e estrito com recuperação por histórico transacional.",
           "scenario": "Preciso de handoffs e estado compartilhado entre projetos independentes que já existem.",
-          "summary": "Um manifest canônico entre projetos, com reflexão limitada e sincronização estrutural.",
-          "whatItChanges": "Cria um manifest canônico de coordenação e projeções gerenciadas na raiz, sem assumir o ownership dos detalhes locais de cada projeto."
+          "summary": "Um manifest canônico entre projetos, com sínteses controladas e sincronização estrutural.",
+          "whatItChanges": "Cria um manifest canônico de coordenação e sínteses controladas na raiz, sem assumir a responsabilidade pelos detalhes locais de cada projeto."
         }
       },
       "displayName": "Multi-Project Harness",
@@ -170,11 +170,11 @@ PRODUCT = json.loads(r'''{
           "whatItChanges": "Creates a strict Master registry and managed front structure through validated transactional mutations. It does not call models or dispatch agents."
         },
         "ptBr": {
-          "bestFor": "Um control plane novo cujo registry e cujas alterações de ciclo de vida justificam transactions e recovery.",
-          "notFor": "Adotar um layout de projetos existente, despachar agents ou executar o trabalho dos projetos.",
-          "scenario": "Estou criando uma estrutura nova que precisa de registry estrito, transactions e recovery.",
-          "summary": "Um control plane local e transacional para uma estrutura Master deliberadamente nova.",
-          "whatItChanges": "Cria um Master registry estrito e uma estrutura gerenciada de frentes por alterações transacionais validadas. Não chama models nem despacha agents."
+          "bestFor": "Um control plane novo em que o cadastro central e as mudanças de ciclo de vida justificam transações e recuperação.",
+          "notFor": "Adotar uma estrutura de projetos existente, acionar coding agents ou executar o trabalho dos projetos.",
+          "scenario": "Estou criando uma estrutura de coordenação nova que precisa de cadastro central estrito, transações e recuperação.",
+          "summary": "Um control plane transacional para uma estrutura central criada de forma deliberada.",
+          "whatItChanges": "Cria um cadastro central estrito e frentes gerenciadas por mudanças transacionais validadas. Não chama modelos nem aciona coding agents."
         }
       },
       "displayName": "Control Plane Harness",
@@ -186,16 +186,16 @@ PRODUCT = json.loads(r'''{
           "Recovery"
         ],
         "ptBr": [
-          "Registry estrito",
-          "Transactions",
-          "Recovery"
+          "Cadastro central com validação estrita",
+          "Transações",
+          "Recuperação"
         ]
       }
     }
   ],
   "promptInstructions": {
-    "en": "Before any write, confirm the explicit target and use a public Python 3.10+ executable; never use a private Codex runtime. Download the ZIP and its adjacent .sha256 sidecar into an isolated temporary directory, verify the checksum before extraction or execution, then extract it. Run installer.py doctor first. Stop without writes on a mismatch and only recommend a better fit; never silently substitute another harness. Run install with --dry-run and then --apply, follow the selected package README to initialize the target, and run verify. Report success only when verify returns ready=true. Clean up temporary files and report the receipt plus uninstall/rollback instructions. Do not edit unrelated documentation, PATH, or .gitignore, and do not install a global Skill.",
-    "ptBr": "Antes de qualquer escrita, confirme o diretório-alvo explícito e use um executável público do Python 3.10+; nunca use um runtime privado do Codex. Baixe o ZIP e o arquivo `.sha256` correspondente em um diretório temporário isolado, valide o checksum antes de extrair ou executar e só então extraia. Execute primeiro `installer.py doctor`. Em caso de incompatibilidade, pare sem escrever nada e apenas recomende a melhor adequação; nunca substitua silenciosamente por outro harness. Execute `install` com `--dry-run` e depois `--apply`, siga o README do package selecionado para inicializar o diretório-alvo e execute `verify`. Só reporte sucesso quando `verify` retornar `ready=true`. Limpe os arquivos temporários e informe o comprovante e as instruções de `uninstall`/rollback. Não edite documentação não relacionada, `PATH` ou `.gitignore` e não instale uma Skill global."
+    "en": "Before any write, confirm the explicit target and resolve exactly one Python 3.10+ executable available to the user or system as `<python>` (for example `python3`, `python`, or `py -3`); reuse only that executable and never use a private Codex runtime. Download the ZIP and its adjacent `.sha256` sidecar into an isolated temporary directory, verify the checksum before extraction or execution, then extract it. From the extracted bundle root run:\n`<python> -B installer.py doctor <selector> --target \"<target>\" --json`\nStop without writes on a mismatch and only recommend a better fit; never silently substitute another harness. Then run:\n`<python> -B installer.py install <selector> --target \"<target>\" --dry-run --json`\n`<python> -B installer.py install <selector> --target \"<target>\" --apply --json`\nFollow `package/README.md` inside the extracted bundle to initialize the target, then run from the bundle root:\n`<python> -B installer.py verify <selector> --target \"<target>\" --json`\nReport success only when this final result contains `ready=true`. Clean up temporary files and report the receipt plus `uninstall`/rollback instructions. Do not edit unrelated documentation, `PATH`, or `.gitignore`, and do not install a global Skill.",
+    "ptBr": "\n\n1. Antes de qualquer escrita, confirme o diretório-alvo explícito e escolha um único executável do Python 3.10+ disponível para o usuário ou para o sistema como `<python>` (por exemplo, `python3`, `python` ou `py -3`); reutilize somente esse executável e nunca use um runtime privado do Codex.\n2. Baixe o ZIP e o arquivo `.sha256` correspondente em um diretório temporário isolado e valide a soma SHA-256 antes de extrair ou executar qualquer arquivo.\n3. Extraia o pacote e, na raiz do pacote extraído, execute:\n`<python> -B installer.py doctor <selector> --target \"<target>\" --json`\n4. Em caso de incompatibilidade, pare sem escrever nada e apenas recomende a melhor opção; nunca substitua silenciosamente por outro harness.\n5. Execute:\n`<python> -B installer.py install <selector> --target \"<target>\" --dry-run --json`\n`<python> -B installer.py install <selector> --target \"<target>\" --apply --json`\n6. Siga `package/README.md` dentro do pacote extraído (ou `package/README.pt-BR.md` em português) para inicializar o diretório-alvo e, na raiz do pacote, execute:\n`<python> -B installer.py verify <selector> --target \"<target>\" --json`\nSó reporte sucesso quando esse resultado final contiver `ready=true`.\n7. Limpe os arquivos temporários e informe o recibo da instalação e as instruções de `uninstall`/rollback. Não edite documentação não relacionada, `PATH` ou `.gitignore` e não instale uma Skill global."
   },
   "ptBrEnglishTerms": [
     "harness",
@@ -222,8 +222,8 @@ PRODUCT = json.loads(r'''{
     "minimumPython": "3.10",
     "repository": "https://github.com/fabianomag/agent-harnesses",
     "site": {
-      "en": "https://fabianomag.com/artifacts/agent-harnesses",
-      "ptBr": "https://fabianomag.com/pt-br/artefatos/agent-harnesses"
+      "en": "https://fabianomag.com/projects/agent-harnesses",
+      "ptBr": "https://fabianomag.com/pt-br/projetos/agent-harnesses"
     },
     "tag": "v0.2.0",
     "version": "0.2.0"
@@ -239,6 +239,39 @@ MARKERS = {
 }
 RUNTIME_RELATIVE = Path(".agent-harnesses/runtime")
 RECEIPT_NAME = ".agent-harness-receipt.json"
+MANAGED_PATH_SHAPES = {
+    "project-harness": {
+        ".project-harness": "directory",
+        "docs": "directory",
+        "generated": "directory",
+        "plans": "directory",
+        "references": "directory",
+        "AGENTS.md": "file",
+        "ARCHITECTURE.md": "file",
+        "docs/project-context.md": "file",
+        "docs/decisions.md": "file",
+        "docs/next-actions.md": "file",
+        "docs/session-log.md": "file",
+    },
+    "workspace-coordination": {
+        ".workspace-coordination": "directory",
+        "WORKSPACE_COORDINATION.md": "file",
+    },
+    "cross-project": {
+        "harness.config.json": "file",
+        "AGENTS.md": "file",
+        "FRONTS.md": "file",
+        "NEXT.md": "file",
+    },
+    "orchestration": {
+        ".orchestration": "directory",
+        "fronts": "directory",
+        "AGENTS.md": "file",
+        "ARCHITECTURE.md": "file",
+        "FRONTS.md": "file",
+        "NEXT.md": "file",
+    },
+}
 
 
 class InstallerFailure(RuntimeError):
@@ -269,7 +302,7 @@ def _is_link_like(path):
     except OSError as error:
         raise InstallerFailure(
             "E_TARGET_AMBIGUOUS",
-            "preflight",
+            "downloaded",
             "Path metadata cannot be read safely.",
             "Choose one existing real directory with no linked components.",
         ) from error
@@ -288,7 +321,7 @@ def _safe_existing_directory(value):
     if not value or not str(value).strip():
         raise InstallerFailure(
             "E_TARGET_AMBIGUOUS",
-            "preflight",
+            "downloaded",
             "The target must be explicit.",
             "Pass --target with one existing project or workspace directory.",
         )
@@ -300,7 +333,7 @@ def _safe_existing_directory(value):
         if _lexists(current) and _is_link_like(current):
             raise InstallerFailure(
                 "E_TARGET_AMBIGUOUS",
-                "preflight",
+                "downloaded",
                 "The target contains a linked path component.",
                 "Choose one existing real directory with no symlinks or reparse points.",
             )
@@ -309,14 +342,14 @@ def _safe_existing_directory(value):
     except OSError as error:
         raise InstallerFailure(
             "E_TARGET_AMBIGUOUS",
-            "preflight",
+            "downloaded",
             "The target does not resolve to an existing directory.",
             "Create or select the exact project or workspace directory first.",
         ) from error
     if not target.is_dir() or _is_link_like(target):
         raise InstallerFailure(
             "E_TARGET_AMBIGUOUS",
-            "preflight",
+            "downloaded",
             "The target is not a real directory.",
             "Choose one existing real project or workspace directory.",
         )
@@ -324,7 +357,7 @@ def _safe_existing_directory(value):
     if target in forbidden or target.name.casefold() == ".git" or ".git" in target.parts:
         raise InstallerFailure(
             "E_TARGET_AMBIGUOUS",
-            "preflight",
+            "downloaded",
             "The selected target is too broad or is Git metadata.",
             "Choose the exact project or workspace root, never a home, filesystem, or .git directory.",
         )
@@ -338,14 +371,77 @@ def _package_for_selector(selector):
             return package
     raise InstallerFailure(
         "E_HARNESS_MISMATCH",
-        "preflight",
+        "downloaded",
         "The selector does not identify one public harness.",
         "Use project-harness, workspace-coordination, cross-project, or orchestration.",
     )
 
 
 def _marker_ids(target):
-    return [package_id for package_id, relative in MARKERS.items() if _lexists(target / relative)]
+    observed = []
+    for package_id, relative in MARKERS.items():
+        current = target
+        parent_missing = False
+        for part in relative.parts[:-1]:
+            current = current / part
+            if not _lexists(current):
+                parent_missing = True
+                break
+            if _is_link_like(current) or not current.is_dir():
+                raise InstallerFailure(
+                    "E_INITIALIZATION_CONFLICT",
+                    "downloaded",
+                    "An existing harness marker boundary is not a real directory.",
+                    "Resolve the marker collision without following or overwriting it.",
+                )
+        if parent_missing:
+            continue
+        marker = target / relative
+        if not _lexists(marker):
+            continue
+        if _is_link_like(marker) or not marker.is_file():
+            raise InstallerFailure(
+                "E_INITIALIZATION_CONFLICT",
+                "downloaded",
+                "An existing harness marker is not a real file.",
+                "Resolve the marker collision without following or overwriting it.",
+            )
+        observed.append(package_id)
+    return observed
+
+
+def _validate_managed_shapes(package, target):
+    for relative_text, expected_kind in MANAGED_PATH_SHAPES[package["id"]].items():
+        relative = Path(relative_text)
+        current = target
+        for index, part in enumerate(relative.parts):
+            current = current / part
+            if not _lexists(current):
+                break
+            if _is_link_like(current):
+                raise InstallerFailure(
+                    "E_INITIALIZATION_CONFLICT",
+                    "downloaded",
+                    "A path managed by the selected harness contains a link.",
+                    "Resolve the collision without following or overwriting the linked path.",
+                )
+            final = index == len(relative.parts) - 1
+            if not final and not current.is_dir():
+                raise InstallerFailure(
+                    "E_INITIALIZATION_CONFLICT",
+                    "downloaded",
+                    "A parent of a managed path is not a directory.",
+                    "Resolve the conflicting path before installation.",
+                )
+            if final:
+                matches = current.is_dir() if expected_kind == "directory" else current.is_file()
+                if not matches:
+                    raise InstallerFailure(
+                        "E_INITIALIZATION_CONFLICT",
+                        "downloaded",
+                        "An existing managed path has an incompatible type.",
+                        "Keep it unchanged and choose another target or resolve the collision explicitly.",
+                    )
 
 
 def _recommend(package_id):
@@ -358,7 +454,7 @@ def _doctor(package, target):
     if len(marker_ids) > 1:
         raise InstallerFailure(
             "E_TARGET_AMBIGUOUS",
-            "preflight",
+            "downloaded",
             "The target contains markers for more than one harness.",
             "Resolve the existing harness ownership before installing another runtime.",
         )
@@ -366,18 +462,22 @@ def _doctor(package, target):
         observed = marker_ids[0]
         raise InstallerFailure(
             "E_HARNESS_MISMATCH",
-            "preflight",
+            "downloaded",
             "The target is already initialized for a different harness.",
             "Keep the target unchanged and use %s." % _recommend(observed),
         )
+    _validate_managed_shapes(package, target)
     runtime_root = target / ".agent-harnesses"
     if _lexists(runtime_root) and (_is_link_like(runtime_root) or not runtime_root.is_dir()):
         raise InstallerFailure(
             "E_INITIALIZATION_CONFLICT",
-            "preflight",
+            "downloaded",
             "The target-local runtime boundary is not a real directory.",
             "Resolve the .agent-harnesses collision without overwriting it.",
         )
+    destination = _runtime_destination(target, package["id"])
+    if _lexists(destination):
+        _verify_runtime_files(destination, package["id"])
     if package["id"] == "orchestration" and not marker_ids:
         master_like = any(
             _lexists(target / name)
@@ -390,8 +490,8 @@ def _doctor(package, target):
         ]
         if master_like or project_directories:
             raise InstallerFailure(
-                "E_INITIALIZATION_CONFLICT",
-                "preflight",
+                "E_HARNESS_MISMATCH",
+                "downloaded",
                 "Control Plane Harness cannot safely adopt this existing project structure.",
                 "Keep the target unchanged and evaluate %s for existing independent projects."
                 % _recommend("cross-project"),
@@ -400,7 +500,7 @@ def _doctor(package, target):
     message = "Preflight passed for the selected harness."
     if initialized:
         message = "Preflight passed; the target already has the selected harness marker."
-    return _result("OK", "initialized" if initialized else "preflight", message, ready=False)
+    return _result("OK", "downloaded", message, ready=False)
 
 
 def _sha256(path):
@@ -411,7 +511,12 @@ def _sha256(path):
     return digest.hexdigest()
 
 
-def _load_json(path):
+def _load_json(
+    path,
+    phase="downloaded",
+    message="The package manifest is unreadable or invalid.",
+    remediation="Discard the download and fetch the immutable release assets again.",
+):
     def reject_duplicate(pairs):
         value = {}
         for key, item in pairs:
@@ -425,10 +530,53 @@ def _load_json(path):
     except (OSError, UnicodeError, ValueError) as error:
         raise InstallerFailure(
             "E_CHECKSUM_MISMATCH",
-            "downloaded",
-            "The package manifest is unreadable or invalid.",
-            "Discard the download and fetch the immutable release assets again.",
+            phase,
+            message,
+            remediation,
         ) from error
+
+
+def _inventory_failure(phase, message):
+    remediation = "Discard the source and fetch it again."
+    if phase == "installed":
+        remediation = "Restore the exact receipt-owned runtime bytes before retrying."
+    raise InstallerFailure("E_CHECKSUM_MISMATCH", phase, message, remediation)
+
+
+def _portable_relative_path(value, phase):
+    if not isinstance(value, str) or not value or chr(92) in value or "\x00" in value:
+        _inventory_failure(phase, "The inventory contains an invalid portable path.")
+    relative = PurePosixPath(value)
+    if (
+        relative.is_absolute()
+        or not relative.parts
+        or relative.as_posix() != value
+        or any(part in {"", ".", ".."} or ":" in part for part in relative.parts)
+    ):
+        _inventory_failure(phase, "The inventory contains an unsafe or noncanonical path.")
+    return relative
+
+
+def _parse_inventory(inventory, phase):
+    if not isinstance(inventory, list) or not inventory:
+        _inventory_failure(phase, "The package inventory is missing or invalid.")
+    expected = {}
+    for entry in inventory:
+        if not isinstance(entry, dict) or set(entry) != {"path", "sha256"}:
+            _inventory_failure(phase, "The package inventory entry shape is invalid.")
+        relative = _portable_relative_path(entry["path"], phase)
+        digest_value = entry["sha256"]
+        if (
+            not isinstance(digest_value, str)
+            or len(digest_value) != 64
+            or any(character not in "0123456789abcdef" for character in digest_value)
+        ):
+            _inventory_failure(phase, "The package inventory contains an invalid digest.")
+        portable = relative.as_posix()
+        if portable in expected:
+            _inventory_failure(phase, "The package inventory contains a duplicate path.")
+        expected[portable] = digest_value
+    return expected
 
 
 def _source_from_bundle(root, expected_id):
@@ -437,7 +585,8 @@ def _source_from_bundle(root, expected_id):
     if not manifest_path.is_file() or not package_root.is_dir():
         return None
     manifest = _load_json(manifest_path)
-    if manifest.get("package", {}).get("id") != expected_id or manifest.get("package", {}).get("version") != VERSION:
+    package_identity = manifest.get("package") if isinstance(manifest, dict) else None
+    if not isinstance(package_identity, dict) or package_identity.get("id") != expected_id or package_identity.get("version") != VERSION:
         raise InstallerFailure(
             "E_HARNESS_MISMATCH",
             "downloaded",
@@ -465,21 +614,7 @@ def _source_from_repository(root, expected_id):
 
 
 def _validate_inventory(package_root, inventory):
-    if not isinstance(inventory, list) or not inventory:
-        raise InstallerFailure(
-            "E_CHECKSUM_MISMATCH",
-            "downloaded",
-            "The package inventory is missing.",
-            "Discard the source and fetch the immutable release assets again.",
-        )
-    expected = {}
-    for entry in inventory:
-        if not isinstance(entry, dict) or set(entry) != {"path", "sha256"}:
-            raise InstallerFailure("E_CHECKSUM_MISMATCH", "downloaded", "The package inventory is invalid.", "Discard the source and fetch it again.")
-        relative = Path(entry["path"])
-        if relative.is_absolute() or not relative.parts or any(part in {"", ".", ".."} for part in relative.parts):
-            raise InstallerFailure("E_CHECKSUM_MISMATCH", "downloaded", "The package inventory contains an unsafe path.", "Discard the source and fetch it again.")
-        expected[relative.as_posix()] = entry["sha256"]
+    expected = _parse_inventory(inventory, "downloaded")
     observed = {}
     for path in sorted(package_root.rglob("*")):
         if _is_link_like(path):
@@ -490,7 +625,7 @@ def _validate_inventory(package_root, inventory):
         raise InstallerFailure(
             "E_CHECKSUM_MISMATCH",
             "downloaded",
-            "The package bytes do not match the signed inventory.",
+            "The package bytes do not match the recorded inventory.",
             "Discard the source and fetch the immutable release assets again.",
         )
     return expected
@@ -502,11 +637,14 @@ def _safe_extract(archive, destination):
         if not members:
             raise InstallerFailure("E_CHECKSUM_MISMATCH", "downloaded", "The release archive is empty.", "Fetch the asset again.")
         for member in members:
-            relative = Path(member.filename)
+            filename = member.filename
+            directory_suffix = filename.endswith("/")
+            portable_name = filename[:-1] if directory_suffix else filename
+            relative = _portable_relative_path(portable_name, "downloaded")
             mode = member.external_attr >> 16
-            if relative.is_absolute() or any(part in {"", ".", ".."} for part in relative.parts) or stat.S_ISLNK(mode):
+            if member.is_dir() != directory_suffix or stat.S_ISLNK(mode):
                 raise InstallerFailure("E_CHECKSUM_MISMATCH", "downloaded", "The release archive contains an unsafe entry.", "Discard the archive.")
-            candidate = (destination / relative).resolve()
+            candidate = destination.joinpath(*relative.parts).resolve()
             if destination.resolve() not in candidate.parents and candidate != destination.resolve():
                 raise InstallerFailure("E_CHECKSUM_MISMATCH", "downloaded", "The release archive escapes its extraction boundary.", "Discard the archive.")
         bundle.extractall(destination)
@@ -584,20 +722,31 @@ def _verify_runtime_files(destination, package_id):
     if not destination.is_dir() or _is_link_like(destination):
         raise InstallerFailure("E_NOT_READY", "downloaded", "The selected runtime is not installed.", "Run install --dry-run and install --apply first.")
     receipt_path = destination / RECEIPT_NAME
-    receipt = _load_json(receipt_path)
-    if receipt.get("schemaVersion") != 1 or receipt.get("package") != {"id": package_id, "version": VERSION}:
+    if not _lexists(receipt_path) or _is_link_like(receipt_path) or not receipt_path.is_file():
+        raise InstallerFailure("E_CHECKSUM_MISMATCH", "installed", "The installation receipt is missing or not a real file.", "Restore the exact receipt-owned runtime bytes before retrying.")
+    receipt = _load_json(
+        receipt_path,
+        phase="installed",
+        message="The installation receipt is unreadable or invalid.",
+        remediation="Restore the exact receipt-owned runtime bytes before retrying.",
+    )
+    if (
+        not isinstance(receipt, dict)
+        or set(receipt) != {"schemaVersion", "package", "files"}
+        or type(receipt.get("schemaVersion")) is not int
+        or receipt.get("schemaVersion") != 1
+        or not isinstance(receipt.get("package"), dict)
+        or receipt["package"] != {"id": package_id, "version": VERSION}
+    ):
         raise InstallerFailure("E_CHECKSUM_MISMATCH", "installed", "The installation receipt is invalid.", "Do not overwrite it; use uninstall only after restoring receipt-owned bytes.")
-    inventory = receipt.get("files")
-    if not isinstance(inventory, list):
-        raise InstallerFailure("E_CHECKSUM_MISMATCH", "installed", "The installation receipt has no valid inventory.", "Restore the exact installed package before retrying.")
-    expected = {entry.get("path"): entry.get("sha256") for entry in inventory if isinstance(entry, dict)}
+    expected = _parse_inventory(receipt["files"], "installed")
     observed = {}
     for path in sorted(destination.rglob("*")):
         if _is_link_like(path):
             raise InstallerFailure("E_CHECKSUM_MISMATCH", "installed", "The installed runtime contains a linked entry.", "Inspect it without following links.")
-        if path.is_file() and path.name != RECEIPT_NAME:
+        if path.is_file() and path != receipt_path:
             observed[path.relative_to(destination).as_posix()] = _sha256(path)
-    if None in expected or observed != expected or receipt_path.read_bytes() != _canonical_bytes(receipt):
+    if observed != expected or receipt_path.read_bytes() != _canonical_bytes(receipt):
         raise InstallerFailure("E_CHECKSUM_MISMATCH", "installed", "Installed runtime bytes differ from the receipt.", "Do not overwrite or uninstall changed bytes; inspect the target-local runtime.")
     return receipt
 
@@ -640,25 +789,33 @@ def _copy_install(source_root, inventory, destination, package_id):
         return "unchanged"
     runtime_root = destination.parents[2]
     created = []
-    current = runtime_root
+    current = destination.parent
     missing = []
     while not _lexists(current):
         missing.append(current)
         current = current.parent
-    if _is_link_like(current):
-        raise InstallerFailure("E_INITIALIZATION_CONFLICT", "downloaded", "The runtime boundary contains a linked component.", "Resolve the collision without overwriting it.")
-    for path in reversed(missing):
-        path.mkdir()
-        created.append(path)
-    destination.parent.mkdir(parents=True, exist_ok=True)
-    for parent in (runtime_root, runtime_root / package_id, destination.parent):
-        if parent not in created and parent.exists() and _is_link_like(parent):
-            raise InstallerFailure("E_INITIALIZATION_CONFLICT", "downloaded", "The runtime boundary contains a linked component.", "Resolve the collision without overwriting it.")
+    if _is_link_like(current) or not current.is_dir():
+        raise InstallerFailure("E_INITIALIZATION_CONFLICT", "downloaded", "The runtime boundary contains an unsafe component.", "Resolve the collision without overwriting it.")
     stage = runtime_root / (".install-%s-%s" % (package_id, uuid.uuid4().hex))
+    stage_created = False
     try:
+        for path in reversed(missing):
+            try:
+                path.mkdir()
+            except FileExistsError:
+                if _is_link_like(path) or not path.is_dir():
+                    raise InstallerFailure(
+                        "E_INITIALIZATION_CONFLICT",
+                        "downloaded",
+                        "A concurrent runtime parent has an unsafe type.",
+                        "Keep it unchanged and retry only after resolving the collision.",
+                    )
+            else:
+                created.append(path)
         stage.mkdir()
+        stage_created = True
         for relative_text in sorted(expected):
-            relative = Path(relative_text)
+            relative = Path(*PurePosixPath(relative_text).parts)
             target = stage / relative
             target.parent.mkdir(parents=True, exist_ok=True)
             with (source_root / relative).open("rb") as source, target.open("xb") as output:
@@ -672,7 +829,7 @@ def _copy_install(source_root, inventory, destination, package_id):
             shutil.rmtree(stage)
             return "unchanged"
     except BaseException:
-        if stage.exists():
+        if stage_created and stage.exists() and not _is_link_like(stage):
             shutil.rmtree(stage, ignore_errors=True)
         for path in reversed(created):
             try:
@@ -726,7 +883,7 @@ def _uninstall(package, target, apply):
     if not apply:
         return _result("OK", "installed", "Uninstall dry-run passed; only receipt-owned unchanged runtime bytes would be removed.", ready=False)
     quarantine = destination.parent / (".remove-%s-%s" % (VERSION, uuid.uuid4().hex))
-    os.rename(destination, quarantine)
+    _publish_no_replace(destination, quarantine)
     try:
         shutil.rmtree(quarantine)
     except BaseException:
@@ -780,27 +937,37 @@ def main(argv=None):
     arguments_list = list(sys.argv[1:] if argv is None else argv)
     wants_json = "--json" in arguments_list
     if sys.version_info < (3, 10):
-        result = _result("E_PYTHON_UNSUPPORTED", "downloaded", "Python 3.10 or newer is required.", "Install a public Python 3.10+ executable; do not use a private Codex runtime.")
+        result = _result("E_PYTHON_UNSUPPORTED", "downloaded", "Python 3.10 or newer is required.", "Use a Python 3.10+ executable available to the user or system; do not use a private Codex runtime.")
         print(_render(result, wants_json))
         return 2
     arguments = _parser().parse_args(arguments_list)
     try:
         package = _package_for_selector(arguments.selector)
         target = _safe_existing_directory(arguments.target)
-        doctor = _doctor(package, target)
+        if arguments.command == "uninstall":
+            result = _uninstall(package, target, arguments.apply)
+        else:
+            doctor = _doctor(package, target)
         if arguments.command == "doctor":
             result = doctor
         elif arguments.command == "verify":
             result = _verify_ready(package, target)
         elif arguments.command == "uninstall":
-            result = _uninstall(package, target, arguments.apply)
+            pass
         elif not arguments.apply:
             destination = _runtime_destination(target, package["id"])
+            source = _local_source(package["id"])
+            if source is None:
+                with tempfile.TemporaryDirectory(prefix="agent-harnesses-") as directory:
+                    source = _download_source(package, Path(directory))
+                    _validate_inventory(source[0], source[1])
+            else:
+                _validate_inventory(source[0], source[1])
             if _lexists(destination):
                 _verify_runtime_files(destination, package["id"])
-                message = "Install dry-run passed; the exact runtime is already installed."
+                message = "Install dry-run passed; source inventory is verified and the exact runtime is already installed."
             else:
-                message = "Install dry-run passed; the selected runtime can be installed without initializing the target."
+                message = "Install dry-run passed; source inventory is verified and the selected runtime can be installed without initializing the target."
             result = _result("OK", "downloaded", message, ready=False)
         else:
             source = _local_source(package["id"])

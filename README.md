@@ -1,262 +1,129 @@
+<!-- BEGIN GENERATED:PRODUCT -->
 # Agent Harnesses
 
-Agent Harnesses is a clean-room, English-first, MIT-licensed collection of
-four local harness packages. It solves a practical continuity problem: agent
-work becomes fragile when project context, coordination boundaries, decisions,
-and next actions exist only in chat history.
+[Português do Brasil](README.pt-BR.md)
 
-Each package makes a different local boundary durable. They are sibling
-choices, not maturity levels and not a quality ranking.
+Four local harnesses for four different coordination boundaries. Choose the smallest boundary that matches your actual work; the packages are siblings, not levels in a maturity ladder.
 
-## Choose by boundary
+Interactive guide: https://fabianomag.com/projects/agent-harnesses
 
-Complexity describes the operational surface, not which package is better.
-`implemented` means a package runtime exists in this source tree. Publication
-does not by itself mean Codex-verified or proven on every platform.
+Requirements: Python 3.10 or newer, an explicit existing target directory, and one exact `v0.2.0` release asset. The runtimes use only the Python standard library. The installer does not change `PATH`, edit `.gitignore`, or install a global Skill.
 
-| Package | Problem | Complexity | Use when | Do not use when | Main difference | Version | Docs | Interactive |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Project Harness (`project-harness`) | One project loses durable context between work blocks | Low to intermediate | One explicit project needs context, checkpoints, closeout, and a durable next action | Coordination must cross project roots | Smallest executable project-local lifecycle | `0.1.0` | [README](packages/project-harness/README.md) | [Open](https://fabianomag.vercel.app/artifacts/agent-harnesses) |
-| Workspace Coordination Harness (`workspace-coordination`) | A containing workspace needs a small map without copying child-local state | Intermediate | Autonomous child folders share one coordinator and governance boundary | Projects are independent roots, or one project is the whole scope | Coordinator index plus child-local ownership; single writer in `0.1.0` | `0.1.0` | [README](packages/workspace-coordination/README.md) | [Open](https://fabianomag.vercel.app/artifacts/agent-harnesses) |
-| Cross-Project Harness (`cross-project`) | Named independent projects need deterministic transversal state and handoffs | High | One selected root coordinates named fronts while implementation remains local | A contained child index is enough, or journaled Master recovery is required | Canonical cross-project manifest, structural sync, and bounded reflection | `0.1.1` | [README](packages/cross-project/README.md) | [Open](https://fabianomag.vercel.app/artifacts/agent-harnesses) |
-| Orchestration Harness (`orchestration`) | A local control plane needs registry consistency, validated mutations, and recovery | Advanced | A strict Master registry, explicit lifecycle, transactions, and recovery are justified | The goal is to dispatch agents, execute projects, or manage one simple project | Transactional control plane with journaled recovery; it does not call a model or execute projects | `0.1.0` | [README](packages/orchestration/README.md) | [Open](https://fabianomag.vercel.app/artifacts/agent-harnesses) |
+## What do you need to coordinate?
 
-## Catalog, badges, and diagrams
+| Harness | Choose it when | Not for | Strengths | Complexity |
+| --- | --- | --- | --- | --- |
+| [Project Harness](packages/project-harness/README.md) (`project-harness`) | I need one project to remember context between work sessions. | Coordination across workspace children or independent project roots. | Checkpoints · Close and resume · Fast setup | Low |
+| [Workspace Harness](packages/workspace-coordination/README.md) (`workspace-coordination`) | I have autonomous child folders inside one containing workspace. | Independent repositories or a single project with no child coordination. | Child index · Ownership boundaries · Shared workspace view | Medium |
+| [Multi-Project Harness](packages/cross-project/README.md) (`cross-project`) | I need handoffs and shared state across existing independent projects. | A contained child index or a new strict registry with journaled recovery. | Independent projects · Handoffs · Structural sync | Medium |
+| [Control Plane Harness](packages/orchestration/README.md) (`orchestration`) | I am creating a new structure that needs a strict registry, transactions, and recovery. | Adopting an existing project layout, dispatching agents, or executing project work. | Strict registry · Transactions · Recovery | High |
 
-The deterministic [catalog](catalog/harnesses.json) contains purpose,
-complexity, non-ranking evolutionary position, intended audience, artifact
-status, limitations, evidence methods, exact payload hashes, and graph
-references for all four packages. Its public schema is
-[schemas/harness-catalog.schema.json](schemas/harness-catalog.schema.json).
+Control Plane Harness is a local control plane. It does not call models, dispatch agents, or execute projects, and it intentionally refuses to adopt an existing Master-like structure when ownership would be ambiguous.
 
-Badges are evidence dimensions:
+## Copy one install prompt
 
-- `Context`
-- `Skill`
-- `Harness`
-- `Loop`
-- `Guardrails`
-
-Their exact levels are `absent`, `basic`, `partial`, `strong`, and `verified`.
-Levels describe evidence strength for one dimension, not overall package
-quality. `verified` requires repeatable evaluations of the exact published
-version. No package claims that level before its public walkthrough evidence
-is attached to the immutable release.
-
-Each package has a distinct generated graph spec and static SVG:
-
-| Package | Graph ID | Spec | Static asset |
-| --- | --- | --- | --- |
-| Project Harness | `project-harness-flow` | [JSON](graphs/project-harness.graph.json) | [SVG](assets/project-harness.svg) |
-| Workspace Coordination Harness | `workspace-coordination-flow` | [JSON](graphs/workspace-coordination.graph.json) | [SVG](assets/workspace-coordination.svg) |
-| Cross-Project Harness | `cross-project-flow` | [JSON](graphs/cross-project.graph.json) | [SVG](assets/cross-project.svg) |
-| Orchestration Harness | `orchestration-flow` | [JSON](graphs/orchestration.graph.json) | [SVG](assets/orchestration.svg) |
-
-The optional [collection graph](graphs/harnesses.graph.json) and
-[collection SVG](assets/harnesses.svg) show membership only. They do not assert
-dependency, progression, or preference.
-
-The [interactive experience](https://fabianomag.vercel.app/artifacts/agent-harnesses)
-and every version-bound documentation, install, source, and release URL are
-published explicitly in the catalog. Release tags and assets are protected by
-GitHub Immutable Releases; the interactive URL is the stable collection page.
-
-## Install from one immutable URL
-
-Copy exactly one prompt. Each URL downloads a package-selected, self-contained
-release bundle with this source tree, the common installer/verifier, manifests,
-documentation, and the selected package's First use instructions.
-
-```text
-Install this harness for me: https://github.com/fabianomag/agent-harnesses/releases/download/project-harness-v0.1.0/project-harness-0.1.0.zip
-Install this harness for me: https://github.com/fabianomag/agent-harnesses/releases/download/workspace-coordination-v0.1.0/workspace-coordination-0.1.0.zip
-Install this harness for me: https://github.com/fabianomag/agent-harnesses/releases/download/cross-project-v0.1.1/cross-project-0.1.1.zip
-Install this harness for me: https://github.com/fabianomag/agent-harnesses/releases/download/orchestration-v0.1.0/orchestration-0.1.0.zip
-```
-
-The receiving agent must read [INSTALL_FROM_RELEASE.md](INSTALL_FROM_RELEASE.md),
-preview the exact no-overwrite installation, apply only after the preview,
-verify the installed bytes, and explain the selected package's First use.
-Release-page asset metadata and the adjacent `SHA256SUMS` asset carry the
-authoritative archive checksum; the checksum is deliberately outside the
-archive it authenticates.
-
-## Install one exact package from a source tree
-
-Python 3.10 or newer is required. Package implementations and common tools use
-only the Python standard library.
-
-Create one existing real directory as the installation boundary:
-
-```text
-python3 -B -c "from pathlib import Path; Path('local-harness-packages').mkdir(exist_ok=True)"
-```
-
-Preview, install, and verify one exact package ID and version:
-
-```text
-python3 -B tools/package_manager.py install --package project-harness --version 0.1.0 --root local-harness-packages --dry-run
-python3 -B tools/package_manager.py install --package project-harness --version 0.1.0 --root local-harness-packages --apply
-python3 -B tools/package_manager.py verify --package project-harness --version 0.1.0 --root local-harness-packages
-```
-
-Use these exact selections for the other packages:
-
-```text
-python3 -B tools/package_manager.py install --package workspace-coordination --version 0.1.0 --root local-harness-packages --dry-run
-python3 -B tools/package_manager.py install --package cross-project --version 0.1.1 --root local-harness-packages --dry-run
-python3 -B tools/package_manager.py install --package orchestration --version 0.1.0 --root local-harness-packages --dry-run
-```
-
-Repeat the selected command with `--apply`, then run `verify` with the same
-package ID, version, and root.
-
-The installer copies the cataloged package payload without invoking it. It is
-root-bound and inspects every existing lexical component of the installation
-root before canonicalizing it, rejecting link-like components. Dry-run writes
-nothing. When an apply still needs publication, it stages that attempt under a
-unique root-local name and exposes the complete payload with one
-platform-native no-clobber directory rename (`renamex_np` on macOS,
-`renameat2` on Linux, and non-replacing `os.rename` behavior on Windows). If
-that primitive is unavailable, apply fails closed. Concurrent identical
-attempts converge on the one verified destination. Repeating an exact
-installation is a no-op. A changed destination or extra entry is refused
-rather than overwritten.
-
-Successful publication moves its unique stage into place, so it leaves no
-stage from that successful attempt behind. Before publication, failed,
-interrupted, or losing concurrent attempts deliberately do not auto-delete
-their stage: portable pathname cleanup cannot be bound atomically to the
-original filesystem object, and deleting by name could erase a replacement
-created by another actor. Such a concurrent loser reports
-`unchanged-residual`, not a plain no-op. A later apply that reaches staging
-uses a fresh stage name; an apply that first sees a verified destination is an
-`unchanged` no-op. Neither path alters residual stages.
-
-There is no cleanup journal for process kill or power loss. A failed attempt
-can therefore leave an empty, partial, or complete visible stage, while
-interruption after publish can leave a complete destination; retry or `verify`
-determines whether the destination is valid. Inspect any residual stage before
-manual removal. POSIX symbolic-link rejection is exercised locally; no Windows
-reparse-point result is claimed by this local candidate.
-
-Installation includes the common MIT `LICENSE` with Fabiano Magalhães as the
-documented copyright holder.
-
-## First real use
-
-Read the selected package README first. Package CLIs intentionally keep their
-own argument and mutation contracts.
+Copy only the block for the harness you chose. Each block names one package, one version, and one ZIP.
 
 ### Project Harness
 
 ```text
-python3 -B -c "from pathlib import Path; Path('example-project').mkdir(exist_ok=True)"
-python3 -B local-harness-packages/project-harness-0.1.0/project_harness.py init --root example-project --dry-run
-python3 -B local-harness-packages/project-harness-0.1.0/project_harness.py init --root example-project
-python3 -B local-harness-packages/project-harness-0.1.0/project_harness.py verify --root example-project
-python3 -B local-harness-packages/project-harness-0.1.0/project_harness.py open --root example-project
+Install Project Harness (`project-harness`) v0.2.0 from https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.0/project-harness-0.2.0.zip. Before any write, confirm the explicit target and resolve exactly one Python 3.10+ executable available to the user or system as `<python>` (for example `python3`, `python`, or `py -3`); reuse only that executable and never use a private Codex runtime. Download the ZIP and its adjacent `.sha256` sidecar into an isolated temporary directory, verify the checksum before extraction or execution, then extract it. From the extracted bundle root run:
+`<python> -B installer.py doctor project-harness --target "<target>" --json`
+Stop without writes on a mismatch and only recommend a better fit; never silently substitute another harness. Then run:
+`<python> -B installer.py install project-harness --target "<target>" --dry-run --json`
+`<python> -B installer.py install project-harness --target "<target>" --apply --json`
+Follow `package/README.md` inside the extracted bundle to initialize the target, then run from the bundle root:
+`<python> -B installer.py verify project-harness --target "<target>" --json`
+Report success only when this final result contains `ready=true`. Clean up temporary files and report the receipt plus `uninstall`/rollback instructions. Do not edit unrelated documentation, `PATH`, or `.gitignore`, and do not install a global Skill.
 ```
 
-Continue with the documented `checkpoint` and `close` commands.
-
-### Workspace Coordination Harness
-
-Create the coordinator root, both child folders, and their declared owner files
-before registration:
+### Workspace Harness
 
 ```text
-python3 -B -c "from pathlib import Path; root=Path('example-workspace'); (root/'child-alpha').mkdir(parents=True, exist_ok=True); (root/'child-beta').mkdir(parents=True, exist_ok=True); (root/'child-alpha'/'AGENTS.md').write_text('# Alpha owner\n', encoding='utf-8'); (root/'child-beta'/'OWNER.md').write_text('# Beta owner\n', encoding='utf-8')"
-python3 -B local-harness-packages/workspace-coordination-0.1.0/workspace_coordination.py --root example-workspace init --dry-run
-python3 -B local-harness-packages/workspace-coordination-0.1.0/workspace_coordination.py --root example-workspace init --apply
-python3 -B local-harness-packages/workspace-coordination-0.1.0/workspace_coordination.py --root example-workspace verify
-python3 -B local-harness-packages/workspace-coordination-0.1.0/workspace_coordination.py --root example-workspace open
+Install Workspace Harness (`workspace-coordination`) v0.2.0 from https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.0/workspace-coordination-0.2.0.zip. Before any write, confirm the explicit target and resolve exactly one Python 3.10+ executable available to the user or system as `<python>` (for example `python3`, `python`, or `py -3`); reuse only that executable and never use a private Codex runtime. Download the ZIP and its adjacent `.sha256` sidecar into an isolated temporary directory, verify the checksum before extraction or execution, then extract it. From the extracted bundle root run:
+`<python> -B installer.py doctor workspace-coordination --target "<target>" --json`
+Stop without writes on a mismatch and only recommend a better fit; never silently substitute another harness. Then run:
+`<python> -B installer.py install workspace-coordination --target "<target>" --dry-run --json`
+`<python> -B installer.py install workspace-coordination --target "<target>" --apply --json`
+Follow `package/README.md` inside the extracted bundle to initialize the target, then run from the bundle root:
+`<python> -B installer.py verify workspace-coordination --target "<target>" --json`
+Report success only when this final result contains `ready=true`. Clean up temporary files and report the receipt plus `uninstall`/rollback instructions. Do not edit unrelated documentation, `PATH`, or `.gitignore`, and do not install a global Skill.
 ```
 
-The package README contains the complete two-child registration and reflection
-loop.
-
-### Cross-Project Harness
-
-Create `example-cross/projects/alpha` before registration:
+### Multi-Project Harness
 
 ```text
-python3 -B -c "from pathlib import Path; Path('example-cross/projects/alpha').mkdir(parents=True, exist_ok=True)"
-python3 -B local-harness-packages/cross-project-0.1.1/scripts/cross_project.py bom-dia --root example-cross
-python3 -B local-harness-packages/cross-project-0.1.1/scripts/cross_project.py hq-init --root example-cross --dry-run --front alpha --name "Alpha" --path projects/alpha --role "Produces one synthetic component" --next "Validate the first slice"
-python3 -B local-harness-packages/cross-project-0.1.1/scripts/cross_project.py hq-init --root example-cross --front alpha --name "Alpha" --path projects/alpha --role "Produces one synthetic component" --next "Validate the first slice"
-python3 -B local-harness-packages/cross-project-0.1.1/scripts/cross_project.py hq-sync --root example-cross
+Install Multi-Project Harness (`cross-project`) v0.2.0 from https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.0/cross-project-0.2.0.zip. Before any write, confirm the explicit target and resolve exactly one Python 3.10+ executable available to the user or system as `<python>` (for example `python3`, `python`, or `py -3`); reuse only that executable and never use a private Codex runtime. Download the ZIP and its adjacent `.sha256` sidecar into an isolated temporary directory, verify the checksum before extraction or execution, then extract it. From the extracted bundle root run:
+`<python> -B installer.py doctor cross-project --target "<target>" --json`
+Stop without writes on a mismatch and only recommend a better fit; never silently substitute another harness. Then run:
+`<python> -B installer.py install cross-project --target "<target>" --dry-run --json`
+`<python> -B installer.py install cross-project --target "<target>" --apply --json`
+Follow `package/README.md` inside the extracted bundle to initialize the target, then run from the bundle root:
+`<python> -B installer.py verify cross-project --target "<target>" --json`
+Report success only when this final result contains `ready=true`. Clean up temporary files and report the receipt plus `uninstall`/rollback instructions. Do not edit unrelated documentation, `PATH`, or `.gitignore`, and do not install a global Skill.
 ```
 
-Continue with the documented `digere`, `registra`, and `encerra` reflection
-cycle.
-
-### Orchestration Harness
+### Control Plane Harness
 
 ```text
-python3 -B -c "from pathlib import Path; Path('example-orchestration').mkdir(exist_ok=True)"
-python3 -B local-harness-packages/orchestration-0.1.0/hq.py --root example-orchestration --json bom-dia
-python3 -B local-harness-packages/orchestration-0.1.0/hq.py --root example-orchestration --json init --id alpha --name "Alpha" --path fronts/alpha --dry-run
-python3 -B local-harness-packages/orchestration-0.1.0/hq.py --root example-orchestration --json init --id alpha --name "Alpha" --path fronts/alpha --apply
-python3 -B local-harness-packages/orchestration-0.1.0/hq.py --root example-orchestration --json hq-sync
+Install Control Plane Harness (`orchestration`) v0.2.0 from https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.0/orchestration-0.2.0.zip. Before any write, confirm the explicit target and resolve exactly one Python 3.10+ executable available to the user or system as `<python>` (for example `python3`, `python`, or `py -3`); reuse only that executable and never use a private Codex runtime. Download the ZIP and its adjacent `.sha256` sidecar into an isolated temporary directory, verify the checksum before extraction or execution, then extract it. From the extracted bundle root run:
+`<python> -B installer.py doctor orchestration --target "<target>" --json`
+Stop without writes on a mismatch and only recommend a better fit; never silently substitute another harness. Then run:
+`<python> -B installer.py install orchestration --target "<target>" --dry-run --json`
+`<python> -B installer.py install orchestration --target "<target>" --apply --json`
+Follow `package/README.md` inside the extracted bundle to initialize the target, then run from the bundle root:
+`<python> -B installer.py verify orchestration --target "<target>" --json`
+Report success only when this final result contains `ready=true`. Clean up temporary files and report the receipt plus `uninstall`/rollback instructions. Do not edit unrelated documentation, `PATH`, or `.gitignore`, and do not install a global Skill.
 ```
+<!-- END GENERATED:PRODUCT -->
 
-Continue with the documented focus, digest, record, and closeout commands.
+## Manual install
 
-## Agent compatibility
+Download one ZIP and its matching `<asset>.sha256` file. Verify that individual
+sidecar before extraction; there is no collection-wide `SHA256SUMS` file.
 
-Codex is compatible with the packaged Skill and CLI contracts. Fresh manual
-walkthrough evidence is bound to each exact release bundle and candidate commit
-in that release's immutable `manual-codex-evidence.json` asset.
-
-Other agent environments are compatible at the explicit CLI and Markdown
-contract boundary, but their agent-specific integrations are unverified. The
-Codex verification claim does not extend to those other environments.
-
-## Local verification
-
-Run the complete automated and structural integration suite:
+After extraction, run from the bundle root. Keep that root until the final
+`verify`; `installer.py` is not copied into the installed runtime. Resolve one
+user- or system-available Python 3.10+ executable as `<python>` (for example
+`python3`, `python`, or `py -3`) and reuse it for every command:
 
 ```text
-python3 -B tools/run_checks.py
+<python> -B installer.py doctor <selector> --target "<target>" --json
+<python> -B installer.py install <selector> --target "<target>" --dry-run --json
+<python> -B installer.py install <selector> --target "<target>" --apply --json
 ```
 
-The runner does not execute manual Codex evidence and does not claim a final
-candidate. Publishable manual evidence must come from a release manifest or
-evidence asset bound to the exact published package version and commit.
-
-To add private deny patterns, provide only an external literal pattern file:
+Then follow `package/README.md` in the extracted bundle and finish with:
 
 ```text
-python3 -B tools/validate.py --private-pattern-file OUTSIDE_REPOSITORY
+<python> -B installer.py verify <selector> --target "<target>" --json
 ```
 
-The validator reports generic codes and locations. It never prints the
-external patterns, matching content, source excerpts, or external input path.
+The selected runtime lives at
+`<target>/.agent-harnesses/runtime/<id>/0.2.0`.
 
-## Optional installation report
+The state is explicit: `downloaded → installed → initialized → verified →
+ready`. Installing package bytes is not operational success. Only a successful
+`verify` result with `"ready": true` means the initialized target is ready.
 
-**Problems installing? Report it.** Start with a private, reviewable draft;
-nothing is created or submitted automatically.
-
-First, copy this prompt into your local agent session. It asks for a draft only:
+To remove only unchanged, receipt-owned runtime bytes while leaving initialized
+project files untouched:
 
 ```text
-Draft a short installation report for my review. Do not create or submit an issue.
-Package ID: <one exact catalog ID>
-Package version: <exact version>
-Phase: <dry-run | install | verify | first-use>
-Result: <succeeded | failed safely | unclear>
-OS family: <Linux | macOS | Windows | other or undisclosed>
-Python: <major.minor>
-Synthetic summary: <one bounded sentence>
-Exclude secrets, credentials, tokens, private identifiers, private or absolute local paths, full logs, and sensitive attachments.
+<python> -B installer.py uninstall <selector> --target "<target>" --dry-run --json
+<python> -B installer.py uninstall <selector> --target "<target>" --apply --json
 ```
 
-Review and edit the draft yourself. No repository tool opens, transmits,
-creates, or submits a report. If you then choose to share it, use the
-[Installation Report Issue Form](.github/ISSUE_TEMPLATE/installation-report.yml)
-as a fallback. It is not a security channel. Report vulnerabilities only
-through the private route described in [SECURITY.md](SECURITY.md).
+## Technical evidence and advanced detail
 
-Copyright is held by Fabiano Magalhães. See [LICENSE](LICENSE).
+The five evidence dimensions (`Context`, `Skill`, `Harness`, `Loop`, and
+`Guardrails`) remain technical evidence, not comparison badges or a package
+ranking. See the generated [catalog](catalog/harnesses.json),
+[graphs](graphs/), and the [advanced reference](docs/REFERENCE.md).
+
+Release `v0.2.0` contains four deterministic package-only ZIPs, one checksum
+sidecar per asset, the standalone installer, the release manifest, the site
+snapshot, and the changelog. Historical `0.1.x` tags remain immutable and are
+superseded rather than rewritten.
+
+Copyright Fabiano Magalhães. [MIT License](LICENSE).

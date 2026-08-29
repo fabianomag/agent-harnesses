@@ -92,6 +92,11 @@ CHECKS = (
     ),
     Check(
         "structural",
+        "product-derived installer and documentation",
+        _python("tools/build_product.py", "--check"),
+    ),
+    Check(
+        "structural",
         "repository contracts and public safety",
         _python("tools/validate.py"),
     ),

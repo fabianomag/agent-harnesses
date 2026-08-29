@@ -12,6 +12,11 @@ import stat
 from pathlib import Path
 from typing import Any, Iterable
 
+try:
+    from tools import product
+except ModuleNotFoundError:
+    import product  # type: ignore[no-redef]
+
 
 PACKAGE_ORDER = (
     "project-harness",
@@ -22,9 +27,9 @@ PACKAGE_ORDER = (
 
 EXPECTED_PACKAGES = {
     "project-harness": "Project Harness",
-    "workspace-coordination": "Workspace Coordination Harness",
-    "cross-project": "Cross-Project Harness",
-    "orchestration": "Orchestration Harness",
+    "workspace-coordination": "Workspace Harness",
+    "cross-project": "Multi-Project Harness",
+    "orchestration": "Control Plane Harness",
 }
 
 CATALOG_PATH = Path("catalog/harnesses.json")
@@ -34,9 +39,6 @@ CATALOG_SCHEMA_REFERENCE = "../schemas/harness-catalog.schema.json"
 RECEIPT_NAME = ".harness-package-receipt.json"
 COMMON_LICENSE_NAME = "LICENSE"
 PUBLIC_REPOSITORY_URL = "https://github.com/fabianomag/agent-harnesses"
-INTERACTIVE_DIAGRAM_URL = (
-    "https://fabianomag.vercel.app/artifacts/agent-harnesses"
-)
 BADGE_NAMES = ("Context", "Skill", "Harness", "Loop", "Guardrails")
 BADGE_LEVELS = ("absent", "basic", "partial", "strong", "verified")
 SKILL_PATHS = {
@@ -248,7 +250,8 @@ PACKAGE_PROFILES: dict[str, dict[str, Any]] = {
                         "claim": (
                             "Packages a Codex Skill with validated name and "
                             "description frontmatter; manual Codex evidence "
-                            "is published with the exact release."
+                            "must be bound to the exact release before any "
+                            "verified claim."
                         ),
                     }
                 ],
@@ -370,7 +373,7 @@ PACKAGE_PROFILES: dict[str, dict[str, Any]] = {
                 "dispatch agents, or execute child work."
             ),
             (
-                "Version 0.1.0 supports one mutating writer per coordinator "
+                "Version 0.2.0 supports one mutating writer per coordinator "
                 "root."
             ),
         ],
@@ -400,7 +403,8 @@ PACKAGE_PROFILES: dict[str, dict[str, Any]] = {
                         "claim": (
                             "Packages a Codex Skill with validated name and "
                             "description frontmatter; manual Codex evidence "
-                            "is published with the exact release."
+                            "must be bound to the exact release before any "
+                            "verified claim."
                         ),
                     }
                 ],
@@ -555,7 +559,8 @@ PACKAGE_PROFILES: dict[str, dict[str, Any]] = {
                         "claim": (
                             "Packages a Codex Skill with validated name and "
                             "description frontmatter; manual Codex evidence "
-                            "is published with the exact release."
+                            "must be bound to the exact release before any "
+                            "verified claim."
                         ),
                     }
                 ],
@@ -709,7 +714,8 @@ PACKAGE_PROFILES: dict[str, dict[str, Any]] = {
                         "claim": (
                             "Packages a Codex Skill with validated name and "
                             "description frontmatter; manual Codex evidence "
-                            "is published with the exact release."
+                            "must be bound to the exact release before any "
+                            "verified claim."
                         ),
                     }
                 ],
@@ -1042,12 +1048,14 @@ def _graph_descriptor(package_id: str) -> dict[str, Any]:
 
 
 def _release_tag(package_id: str, version: str) -> str:
-    return f"{package_id}-v{version}"
+    del package_id
+    return f"v{version}"
 
 
 def _published_immutable_links(
     package_id: str,
     version: str,
+    interactive_url: str,
 ) -> dict[str, dict[str, str]]:
     tag = _release_tag(package_id, version)
     release_url = f"{PUBLIC_REPOSITORY_URL}/releases/tag/{tag}"
@@ -1076,33 +1084,14 @@ def _published_immutable_links(
         "release": {"status": "published", "url": release_url},
         "interactiveDiagram": {
             "status": "published",
-            "url": INTERACTIVE_DIAGRAM_URL,
+            "url": interactive_url,
         },
     }
 
 
-def _published_manual_evidence(
-    package_id: str,
-    version: str,
-    evidence: dict[str, Any],
-) -> dict[str, Any]:
-    published = copy.deepcopy(evidence)
-    tag = _release_tag(package_id, version)
-    manual = published["manualCodex"]
-    manual["status"] = "verified"
-    manual["description"] = (
-        "A fresh Codex walkthrough passed against the exact release bundle; "
-        "the immutable evidence asset binds the candidate commit, archive "
-        "digest, installation cycle, and First use result."
-    )
-    manual["publication"] = {
-        "status": "published",
-        "url": (
-            f"{PUBLIC_REPOSITORY_URL}/releases/download/{tag}/"
-            "manual-codex-evidence.json"
-        ),
-    }
-    return published
+def _release_evidence(evidence: dict[str, Any]) -> dict[str, Any]:
+    """Keep candidate-bound manual evidence pending until it actually exists."""
+    return copy.deepcopy(evidence)
 
 
 def _agent_compatibility() -> dict[str, Any]:
@@ -1113,12 +1102,12 @@ def _agent_compatibility() -> dict[str, Any]:
         ),
         "codex": {
             "status": "compatible",
-            "verification": "verified",
-            "verifiedEligible": True,
+            "verification": "pending",
+            "verifiedEligible": False,
             "scope": (
                 "Packaged Codex Skills plus explicit CLI and Markdown "
-                "contracts; fresh walkthrough evidence is bound to every "
-                "exact immutable release bundle."
+                "contracts; a fresh walkthrough of the exact v0.2.0 release "
+                "assets is still pending."
             ),
         },
         "otherAgents": {
@@ -1176,6 +1165,11 @@ def _validate_manifest_identity(
 def expected_catalog(repository_root: Path) -> dict[str, Any]:
     """Derive the public catalog from package contracts and exact payload bytes."""
 
+    product_value = product.load_product(repository_root)
+    definitions = product.package_map(product_value)
+    release = product_value["release"]
+    interactive_url = release["site"]["en"]
+
     license_path = repository_root / COMMON_LICENSE_NAME
     try:
         license_bytes = license_path.read_bytes()
@@ -1189,7 +1183,10 @@ def expected_catalog(repository_root: Path) -> dict[str, Any]:
 
     packages: list[dict[str, Any]] = []
     for package_id in PACKAGE_ORDER:
-        display_name = EXPECTED_PACKAGES[package_id]
+        definition = definitions[package_id]
+        display_name = definition["displayName"]
+        if display_name != EXPECTED_PACKAGES[package_id]:
+            raise CommonContractError("product display name is invalid")
         package_root = repository_root / "packages" / package_id
         manifest_path = package_root / "harness.package.json"
         manifest = _validate_manifest_identity(
@@ -1197,6 +1194,8 @@ def expected_catalog(repository_root: Path) -> dict[str, Any]:
             package_id=package_id,
             display_name=display_name,
         )
+        if manifest["version"] != release["version"]:
+            raise CommonContractError("package version differs from collection release")
         skill_path = package_root / SKILL_PATHS[package_id]
         try:
             skill_text = skill_path.read_text(encoding="utf-8")
@@ -1217,22 +1216,28 @@ def expected_catalog(repository_root: Path) -> dict[str, Any]:
                     "publication": "published",
                 },
                 "manifest": manifest_path.relative_to(repository_root).as_posix(),
-                "purpose": profile["purpose"],
-                "complexity": profile["complexity"],
+                "purpose": definition["content"]["en"]["summary"],
+                "complexity": {
+                    "level": definition["complexity"]["level"],
+                    "description": definition["content"]["en"]["bestFor"],
+                },
                 "evolutionaryPosition": profile["evolutionaryPosition"],
-                "audience": profile["audience"],
+                "audience": {
+                    "primary": profile["audience"]["primary"],
+                    "description": definition["content"]["en"]["bestFor"],
+                },
                 "badges": profile["badges"],
-                "limitations": profile["limitations"],
+                "limitations": [
+                    definition["content"]["en"]["notFor"],
+                    *profile["limitations"],
+                ],
                 "graph": _graph_descriptor(package_id),
                 "immutableLinks": _published_immutable_links(
                     package_id,
                     manifest["version"],
+                    interactive_url,
                 ),
-                "evidence": _published_manual_evidence(
-                    package_id,
-                    manifest["version"],
-                    profile["evidence"],
-                ),
+                "evidence": _release_evidence(profile["evidence"]),
                 "files": _file_inventory(package_root),
             }
         )
@@ -1295,7 +1300,9 @@ def expected_graph_spec(catalog_value: dict[str, Any]) -> dict[str, Any]:
     return {
         "schemaVersion": 1,
         "source": CATALOG_PATH.as_posix(),
-        "interactiveDiagram": INTERACTIVE_DIAGRAM_URL,
+        "interactiveDiagram": catalog_value["packages"][0]["immutableLinks"][
+            "interactiveDiagram"
+        ]["url"],
         "meaning": "Collection membership only; no dependency or ranking.",
         "nodes": [
             {
@@ -1406,7 +1413,14 @@ def expected_graph_svg(catalog_value: dict[str, Any]) -> bytes:
             )
         )
 
-    interactive_url = html.escape(INTERACTIVE_DIAGRAM_URL, quote=True)
+    interactive_url = html.escape(
+        str(
+            catalog_value["packages"][0]["immutableLinks"][
+                "interactiveDiagram"
+            ]["url"]
+        ),
+        quote=True,
+    )
     lines.extend(
         (
             f'  <a href="{interactive_url}" aria-label="Open the interactive '

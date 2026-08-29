@@ -87,11 +87,27 @@ def load_product(repository_root: Path) -> dict[str, Any]:
         raise ProductContractError("repository URL is outside the public contract")
     sites = _localized(release["site"], "release.site")
     if sites != {
-        "en": "https://fabianomag.com/artifacts/agent-harnesses",
-        "ptBr": "https://fabianomag.com/pt-br/artefatos/agent-harnesses",
+        "en": "https://fabianomag.com/projects/agent-harnesses",
+        "ptBr": "https://fabianomag.com/pt-br/projetos/agent-harnesses",
     }:
         raise ProductContractError("site URLs are outside the public contract")
-    _localized(value["promptInstructions"], "promptInstructions")
+    prompt_instructions = _localized(
+        value["promptInstructions"], "promptInstructions"
+    )
+    if any(
+        instructions.count("<selector>") != 4
+        for instructions in prompt_instructions.values()
+    ):
+        raise ProductContractError(
+            "each prompt locale must contain four selector command tokens"
+        )
+    if any(
+        instructions.count("<python> -B installer.py") != 4
+        for instructions in prompt_instructions.values()
+    ):
+        raise ProductContractError(
+            "each prompt locale must contain four public Python command tokens"
+        )
 
     terms = value["ptBrEnglishTerms"]
     if not isinstance(terms, list) or len(terms) != len(set(terms)) or any(
@@ -193,7 +209,153 @@ def install_prompt(value: dict[str, Any], package: dict[str, Any], language: str
             f"Instale {package['displayName']} (`{package['id']}`) "
             f"v{release['version']} a partir de {asset_url(value, package)}."
         )
-    return opening + " " + value["promptInstructions"][language]
+    instructions = value["promptInstructions"][language].replace(
+        "<selector>", package["id"]
+    )
+    separator = "" if instructions.startswith("\n") else " "
+    return opening + separator + instructions
+
+
+def root_readme_block(value: dict[str, Any], language: str) -> str:
+    """Render the product-owned root README block for one locale."""
+    if language not in {"en", "ptBr"}:
+        raise ProductContractError("README language is invalid")
+    release = value["release"]
+    if language == "en":
+        lines = [
+            "# Agent Harnesses",
+            "",
+            "[Português do Brasil](README.pt-BR.md)",
+            "",
+            "Four local harnesses for four different coordination boundaries. Choose the smallest boundary that matches your actual work; the packages are siblings, not levels in a maturity ladder.",
+            "",
+            f"Interactive guide: {release['site']['en']}",
+            "",
+            f"Requirements: Python {release['minimumPython']} or newer, an explicit existing target directory, and one exact `{release['tag']}` release asset. The runtimes use only the Python standard library. The installer does not change `PATH`, edit `.gitignore`, or install a global Skill.",
+            "",
+            "## What do you need to coordinate?",
+            "",
+            "| Harness | Choose it when | Not for | Strengths | Complexity |",
+            "| --- | --- | --- | --- | --- |",
+        ]
+    else:
+        lines = [
+            "# Agent Harnesses",
+            "",
+            "[English](README.md)",
+            "",
+            "Quatro harnesses locais para quatro limites de coordenação diferentes. Escolha o menor limite que corresponda ao trabalho real; os pacotes são alternativas paralelas, não degraus de maturidade.",
+            "",
+            f"Guia interativo: {release['site']['ptBr']}",
+            "",
+            f"Requisitos: Python {release['minimumPython']} ou mais recente, um diretório-alvo existente e explícito e um único arquivo da release `{release['tag']}`. Os runtimes usam apenas a biblioteca padrão do Python. O instalador não altera `PATH`, não edita `.gitignore` e não instala uma Skill global.",
+            "",
+            "## O que você precisa coordenar?",
+            "",
+            "| Harness | Escolha quando | Não serve para | Pontos fortes | Complexidade |",
+            "| --- | --- | --- | --- | --- |",
+        ]
+    for item in value["packages"]:
+        content = item["content"][language]
+        strengths = " · ".join(item["strengths"][language])
+        readme = "README.md" if language == "en" else "README.pt-BR.md"
+        lines.append(
+            f"| [{item['displayName']}](packages/{item['id']}/{readme}) (`{item['id']}`) "
+            f"| {content['scenario']} | {content['notFor']} | {strengths} | "
+            f"{item['complexity'][language]} |"
+        )
+    if language == "en":
+        lines.extend(
+            [
+                "",
+                "Control Plane Harness is a local control plane. It does not call models, dispatch agents, or execute projects, and it intentionally refuses to adopt an existing Master-like structure when ownership would be ambiguous.",
+                "",
+                "## Copy one install prompt",
+                "",
+                "Copy only the block for the harness you chose. Each block names one package, one version, and one ZIP.",
+            ]
+        )
+    else:
+        lines.extend(
+            [
+                "",
+                "Control Plane Harness é um control plane local. Ele não chama modelos, não aciona coding agents e não executa projetos. Por segurança, também se recusa a adotar automaticamente uma estrutura de coordenação existente cuja responsabilidade seja ambígua.",
+                "",
+                "## Copie um único prompt de instalação",
+                "",
+                "Cada bloco abaixo contém somente um harness, uma versão e um ZIP. Copie apenas o bloco escolhido.",
+            ]
+        )
+    for item in value["packages"]:
+        lines.extend(
+            [
+                "",
+                f"### {item['displayName']}",
+                "",
+                "```text",
+                install_prompt(value, item, language),
+                "```",
+            ]
+        )
+    return "\n".join(lines)
+
+
+def package_readme_block(
+    value: dict[str, Any], package: dict[str, Any], language: str
+) -> str:
+    """Render the product-owned package decision and installation block."""
+    if language not in {"en", "ptBr"}:
+        raise ProductContractError("README language is invalid")
+    release = value["release"]
+    content = package["content"][language]
+    strengths = " · ".join(package["strengths"][language])
+    if language == "en":
+        labels = {
+            "language": "[Português do Brasil](README.pt-BR.md)",
+            "version": "Version",
+            "best": "Best for",
+            "not": "Not for",
+            "changes": "What it changes",
+            "strengths": "Strengths",
+            "complexity": "Complexity",
+            "installation": "Installation",
+            "copy": "Copy only this prompt:",
+        }
+    else:
+        labels = {
+            "language": "[English](README.md)",
+            "version": "Versão",
+            "best": "Melhor opção para",
+            "not": "Não serve para",
+            "changes": "O que muda",
+            "strengths": "Pontos fortes",
+            "complexity": "Complexidade",
+            "installation": "Instalação",
+            "copy": "Copie somente este prompt:",
+        }
+    return "\n".join(
+        [
+            f"# {package['displayName']}",
+            "",
+            f"{labels['language']} · {labels['version']} `{release['version']}`",
+            "",
+            f"**{labels['best']}:** {content['bestFor']}",
+            "",
+            f"**{labels['not']}:** {content['notFor']}",
+            "",
+            f"**{labels['changes']}:** {content['whatItChanges']}",
+            "",
+            f"{labels['strengths']}: **{strengths}**. {labels['complexity']}: {package['complexity'][language].lower()}.",
+            "",
+            f"## {labels['installation']}",
+            "",
+            labels["copy"],
+            "",
+            "```text",
+            install_prompt(value, package, language),
+            "```",
+        ]
+    )
 
 
 def site_snapshot(value: dict[str, Any]) -> dict[str, Any]:
@@ -223,6 +385,16 @@ def site_snapshot(value: dict[str, Any]) -> dict[str, Any]:
     return {
         "schemaVersion": 1,
         "release": release,
+        "releaseManifest": {
+            "url": (
+                f"{release['repository']}/releases/download/{release['tag']}/"
+                "release-manifest.json"
+            ),
+            "checksumUrl": (
+                f"{release['repository']}/releases/download/{release['tag']}/"
+                "release-manifest.json.sha256"
+            ),
+        },
         "ptBrEnglishTerms": value["ptBrEnglishTerms"],
         "packages": packages,
     }

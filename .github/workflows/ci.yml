@@ -37,6 +37,8 @@ jobs:
           python-version: "3.10"
       - name: Check deterministic common artifacts
         run: python -B tools/build_common.py --check
+      - name: Check product-derived installer and documentation
+        run: python -B tools/build_product.py --check
       - name: Validate public repository contracts
         run: python -B tools/validate.py
       - name: Run common unit and integration tests

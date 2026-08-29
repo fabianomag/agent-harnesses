@@ -1,4 +1,4 @@
-"""Generate or check product-derived installer bytes."""
+"""Generate or check all product-owned installer and README blocks."""
 
 from __future__ import annotations
 
@@ -19,6 +19,57 @@ REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 TEMPLATE_PATH = Path("tools/installer.py.in")
 INSTALLER_PATH = Path("installer.py")
 TOKEN = "__EMBEDDED_PRODUCT_JSON__"
+BEGIN_MARKER = "<!-- BEGIN GENERATED:PRODUCT -->"
+END_MARKER = "<!-- END GENERATED:PRODUCT -->"
+
+
+def _read_markdown(path: Path) -> str:
+    try:
+        return path.read_text(encoding="utf-8")
+    except (OSError, UnicodeError) as error:
+        raise product.ProductContractError(
+            f"generated README scaffold is unreadable: {path}"
+        ) from error
+
+
+def _replace_generated_block(path: Path, block: str) -> bytes:
+    raw = _read_markdown(path)
+    if raw.count(BEGIN_MARKER) != 1 or raw.count(END_MARKER) != 1:
+        raise product.ProductContractError(
+            f"README needs exactly one generated product block: {path}"
+        )
+    prefix, tail = raw.split(BEGIN_MARKER, 1)
+    _old, suffix = tail.split(END_MARKER, 1)
+    rendered = (
+        prefix
+        + BEGIN_MARKER
+        + "\n"
+        + block.rstrip()
+        + "\n"
+        + END_MARKER
+        + suffix
+    )
+    return rendered.encode("utf-8")
+
+
+def expected_readmes(
+    repository_root: Path, value: dict
+) -> dict[Path, bytes]:
+    expected: dict[Path, bytes] = {}
+    root_locales = (("en", Path("README.md")), ("ptBr", Path("README.pt-BR.md")))
+    for language, relative in root_locales:
+        expected[relative] = _replace_generated_block(
+            repository_root / relative,
+            product.root_readme_block(value, language),
+        )
+    for definition in value["packages"]:
+        for language, name in (("en", "README.md"), ("ptBr", "README.pt-BR.md")):
+            relative = Path("packages") / definition["id"] / name
+            expected[relative] = _replace_generated_block(
+                repository_root / relative,
+                product.package_readme_block(value, definition, language),
+            )
+    return expected
 
 
 def expected_installer(repository_root: Path = REPOSITORY_ROOT) -> bytes:
@@ -34,33 +85,56 @@ def expected_installer(repository_root: Path = REPOSITORY_ROOT) -> bytes:
 
 
 def check(repository_root: Path = REPOSITORY_ROOT) -> list[str]:
-    expected = expected_installer(repository_root)
-    try:
-        actual = (repository_root / INSTALLER_PATH).read_bytes()
-    except OSError:
-        actual = None
-    return [] if actual == expected else [INSTALLER_PATH.as_posix()]
+    value = product.load_product(repository_root)
+    expected = {
+        INSTALLER_PATH: expected_installer(repository_root),
+        product.SITE_SNAPSHOT_PATH: product.canonical_json_bytes(
+            product.site_snapshot(value)
+        ),
+    }
+    expected.update(expected_readmes(repository_root, value))
+    drift: list[str] = []
+    for relative, content in expected.items():
+        try:
+            actual = (repository_root / relative).read_bytes()
+        except OSError:
+            actual = None
+        if actual != content:
+            drift.append(relative.as_posix())
+    return sorted(set(drift))
 
 
 def write(repository_root: Path = REPOSITORY_ROOT) -> list[str]:
-    destination = repository_root / INSTALLER_PATH
-    content = expected_installer(repository_root)
-    descriptor, temporary_name = tempfile.mkstemp(prefix=".installer.", suffix=".tmp", dir=repository_root)
-    temporary = Path(temporary_name)
-    try:
-        with os.fdopen(descriptor, "wb") as handle:
-            handle.write(content)
-            handle.flush()
-            os.fsync(handle.fileno())
-        os.chmod(temporary, 0o755)
-        os.replace(temporary, destination)
-    except BaseException:
+    value = product.load_product(repository_root)
+    expected = {
+        INSTALLER_PATH: expected_installer(repository_root),
+        product.SITE_SNAPSHOT_PATH: product.canonical_json_bytes(
+            product.site_snapshot(value)
+        ),
+    }
+    expected.update(expected_readmes(repository_root, value))
+    written: list[str] = []
+    for relative, content in expected.items():
+        destination = repository_root / relative
+        descriptor, temporary_name = tempfile.mkstemp(
+            prefix=f".{destination.name}.", suffix=".tmp", dir=destination.parent
+        )
+        temporary = Path(temporary_name)
         try:
-            temporary.unlink()
-        except FileNotFoundError:
-            pass
-        raise
-    return [INSTALLER_PATH.as_posix()]
+            with os.fdopen(descriptor, "wb") as handle:
+                handle.write(content)
+                handle.flush()
+                os.fsync(handle.fileno())
+            os.chmod(temporary, 0o755 if relative == INSTALLER_PATH else 0o644)
+            os.replace(temporary, destination)
+        except BaseException:
+            try:
+                temporary.unlink()
+            except FileNotFoundError:
+                pass
+            raise
+        written.append(relative.as_posix())
+    return sorted(written)
 
 
 def _parse_args(argv: Sequence[str]) -> argparse.Namespace:
@@ -83,9 +157,10 @@ def main(argv: Sequence[str] | None = None) -> int:
         print("FAIL: canonical product source violates its contract")
         return 1
     if drift:
-        print("ERROR [GENERATED_DRIFT] installer.py: regenerate product artifacts")
+        for path in drift:
+            print(f"ERROR [PRODUCT_DRIFT] {path}: align with product/harnesses.json")
         return 1
-    print("PASS: product-derived installer matches")
+    print("PASS: product-derived installer and README blocks match")
     return 0
 
 

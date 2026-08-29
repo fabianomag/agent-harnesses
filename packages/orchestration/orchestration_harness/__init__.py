@@ -1,4 +1,4 @@
-"""Public API for the clean-room Orchestration Harness."""
+"""Public API for the clean-room Control Plane Harness."""
 
 from .errors import (
     CollisionError,
@@ -24,4 +24,4 @@ __all__ = [
     "ValidationError",
 ]
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"

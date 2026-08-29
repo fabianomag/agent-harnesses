@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="1610" height="350" viewBox="0 0 1610 350" role="img" aria-labelledby="title description" data-graph-id="orchestration-flow" data-package-id="orchestration">
-  <title id="title">Orchestration Harness conceptual flow</title>
+  <title id="title">Control Plane Harness conceptual flow</title>
   <desc id="description">Strategic opening then Registry validation then Dry-run then Transactional apply / rollback then Pending reflection then Verified sync. This is an operating sequence, not a ranking.</desc>
   <defs>
     <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
@@ -15,7 +15,7 @@
     .meta { fill: #475569; font: 13px ui-monospace, SFMono-Regular, monospace; }
     .link { fill: #1d4ed8; font: 600 13px ui-sans-serif, system-ui, sans-serif; text-decoration: underline; }
   </style>
-  <text class="heading" x="40" y="38">Orchestration Harness conceptual flow</text>
+  <text class="heading" x="40" y="38">Control Plane Harness conceptual flow</text>
   <text class="meta" x="40" y="66">orchestration · graph orchestration-flow</text>
   <path class="edge" d="M 270 190 L 292 190"/>
   <path class="edge" d="M 530 190 L 552 190"/>
@@ -65,8 +65,8 @@
       <tspan x="1360" dy="0">Verified sync</tspan>
     </text>
   </g>
-  <text class="meta" x="40" y="320">0.1.0 · implemented · published</text>
-  <a href="https://fabianomag.vercel.app/artifacts/agent-harnesses" aria-label="Open the interactive Orchestration Harness diagram">
+  <text class="meta" x="40" y="320">0.2.0 · implemented · published</text>
+  <a href="https://fabianomag.com/projects/agent-harnesses" aria-label="Open the interactive Control Plane Harness diagram">
     <text class="link" x="40" y="345">Interactive diagram</text>
   </a>
 </svg>

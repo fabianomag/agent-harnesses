@@ -1,4 +1,4 @@
-"""Behavior tests for the Workspace Coordination Harness."""
+"""Behavior tests for the Workspace Harness."""
 
 from __future__ import annotations
 

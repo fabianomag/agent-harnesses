@@ -12,11 +12,11 @@ reflect a small shared boundary delta.
 Do not use it merely because several repositories are mentioned:
 
 - Use Project Harness for work and continuity inside one project.
-- Use Workspace Coordination Harness for children contained by one coordinator
+- Use Workspace Harness for children contained by one coordinator
   root.
-- Use Cross-Project Harness for handoffs between independent projects or
+- Use Multi-Project Harness for handoffs between independent projects or
   workspaces.
-- Use Orchestration Harness for a transactional local control plane with a
+- Use Control Plane Harness for a transactional local control plane with a
   strict registry, explicit lifecycle records, structural sync, and recovery.
   It does not dispatch agents or execute processes.
 

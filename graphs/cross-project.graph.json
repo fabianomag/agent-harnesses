@@ -3,8 +3,8 @@
   "id": "cross-project-flow",
   "package": {
     "id": "cross-project",
-    "displayName": "Cross-Project Harness",
-    "version": "0.1.1",
+    "displayName": "Multi-Project Harness",
+    "version": "0.2.0",
     "artifactStatus": {
       "implementation": "implemented",
       "publication": "published"
@@ -14,9 +14,9 @@
     "catalog": "catalog/harnesses.json",
     "spec": "graphs/cross-project.graph.json",
     "staticAsset": "assets/cross-project.svg",
-    "interactiveDiagram": "https://fabianomag.vercel.app/artifacts/agent-harnesses"
+    "interactiveDiagram": "https://fabianomag.com/projects/agent-harnesses"
   },
-  "purpose": "Coordinate explicit named projects through canonical transversal state, structural sync, and bounded reflection.",
+  "purpose": "A canonical cross-project manifest with bounded reflection and structural sync.",
   "meaning": "Package-specific conceptual flow. Edges show operating sequence, not package ranking or dependency.",
   "nodes": [
     {

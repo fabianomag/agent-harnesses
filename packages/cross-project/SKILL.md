@@ -3,7 +3,7 @@ name: cross-project
 description: Coordinate several real child projects from one local root with named targets, read-only orientation and sync, bounded digestion, and rollback-protected registration or reflection. Use when a workspace needs a small cross-project control surface without scanning outside its root.
 ---
 
-# Cross-Project Harness
+# Multi-Project Harness
 
 Keep project-local detail in each child. Store only role, coordination state,
 next action, blocker, reflection summary, and reflection trigger in the root.

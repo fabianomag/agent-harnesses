@@ -1,4 +1,4 @@
-"""Run the Orchestration Harness without installation."""
+"""Run the Control Plane Harness without installation."""
 
 from orchestration_harness.cli import main
 
