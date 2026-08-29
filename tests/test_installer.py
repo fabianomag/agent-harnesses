@@ -556,17 +556,27 @@ class InstallerSafetyTests(unittest.TestCase):
                 self.assertEqual("E_CHECKSUM_MISMATCH", context.exception.result["code"])
 
     def test_archive_paths_are_portable_and_rejected_before_extraction(self) -> None:
-        for name in (
+        for index, name in enumerate((
             "nested" + chr(92) + "payload.txt",
             "../escape.txt",
             "/".join(("", "absolute.txt")),
-        ):
+        )):
             with self.subTest(name=name):
-                archive = self.target / "synthetic.zip"
-                extraction = self.target / "extracted"
+                archive = self.target / f"synthetic-{index}.zip"
+                extraction = self.target / f"extracted-{index}"
                 extraction.mkdir()
                 with zipfile.ZipFile(archive, "w") as bundle:
-                    bundle.writestr(name, b"synthetic")
+                    # ZipInfo normalizes the host OS separator in its
+                    # constructor. Set the stored name afterwards so this
+                    # test exercises the exact malicious archive bytes on
+                    # Windows as well as POSIX hosts.
+                    member = zipfile.ZipInfo("portable-placeholder.txt")
+                    member.filename = name
+                    member.orig_filename = name
+                    bundle.writestr(member, b"synthetic")
+
+                with zipfile.ZipFile(archive) as bundle:
+                    self.assertEqual([name], bundle.namelist())
 
                 with self.assertRaises(installer.InstallerFailure) as context:
                     installer._safe_extract(archive, extraction)
