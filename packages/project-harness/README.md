@@ -1,7 +1,7 @@
 <!-- BEGIN GENERATED:PRODUCT -->
 # Project Harness
 
-[Português do Brasil](README.pt-BR.md) · Version `0.2.1`
+[Português do Brasil](README.pt-BR.md) · Version `0.2.2`
 
 **Best for:** One explicit project that needs checkpoints, closeout, and reliable resumption.
 
@@ -24,7 +24,7 @@ Strengths: **Checkpoints · Close and resume · Fast setup**. Complexity: low.
 Copy only this prompt:
 
 ```text
-Install Project Harness (`project-harness`) v0.2.1 from https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.1/project-harness-0.2.1.zip.
+Install Project Harness (`project-harness`) v0.2.2 from https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.2/project-harness-0.2.2.zip.
 
 Before proposing execution, confirm every selected-harness readiness fact:
 - The explicit target is the root of one real project.
@@ -59,7 +59,7 @@ extraction, then run `installer.py doctor`, `install --dry-run`, and `install
 Use the same public Python 3.10+ executable resolved by the install prompt as
 `<python>`. From the installed runtime directory:
 
-`<project-root>/.agent-harnesses/runtime/project-harness/0.2.1`
+`<project-root>/.agent-harnesses/runtime/project-harness/0.2.2`
 
 ```text
 <python> -B project_harness.py init --root "<project-root>" --dry-run
@@ -75,7 +75,7 @@ From the still-extracted bundle root, finish the guided install with
 
 ## State compatibility
 
-Package version and state schema are independent. Runtime `0.2.1` creates
+Package version and state schema are independent. Runtime `0.2.2` creates
 schema `1` state and reads/verifies Project Harness `0.1.0` state without
 rewriting its `harnessVersion`. No implicit migration occurs.
 
@@ -88,5 +88,5 @@ receipt-owned runtime bytes and leaves initialized project files intact.
 
 Technical implementation, collision, rollback, evidence, and diagram details
 are in the [operator guide](OPERATOR_GUIDE.md), [advanced reference](docs/REFERENCE.md),
-immutable [catalog](https://github.com/fabianomag/agent-harnesses/blob/v0.2.1/catalog/harnesses.json),
-and [graph](https://github.com/fabianomag/agent-harnesses/blob/v0.2.1/graphs/project-harness.graph.json).
+immutable [catalog](https://github.com/fabianomag/agent-harnesses/blob/v0.2.2/catalog/harnesses.json),
+and [graph](https://github.com/fabianomag/agent-harnesses/blob/v0.2.2/graphs/project-harness.graph.json).

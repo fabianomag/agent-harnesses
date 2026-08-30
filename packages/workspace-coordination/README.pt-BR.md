@@ -1,7 +1,7 @@
 <!-- BEGIN GENERATED:PRODUCT -->
 # Workspace Harness
 
-[English](README.md) · Versão `0.2.1`
+[English](README.md) · Versão `0.2.2`
 
 **Melhor opção para:** Projetos filhos no mesmo workspace que precisam de um pequeno índice compartilhado.
 
@@ -24,7 +24,7 @@ Pontos fortes: **Índice dos projetos filhos · Limites de responsabilidade · V
 Copie somente este prompt:
 
 ```text
-Instale Workspace Harness (`workspace-coordination`) v0.2.1 a partir de https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.1/workspace-coordination-0.2.1.zip.
+Instale Workspace Harness (`workspace-coordination`) v0.2.2 a partir de https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.2/workspace-coordination-0.2.2.zip.
 
 Antes de propor a execução, confirme cada fato de readiness do harness selecionado:
 - O target explícito é o workspace contêiner, não um de seus projetos filhos.
@@ -56,7 +56,7 @@ Use somente paths de projetos filhos e owner files já confirmados pelo usuário
 não crie um workspace de exemplo nem infira projetos filhos. Use como
 `<python>` o mesmo executável público do Python 3.10+ escolhido no prompt de
 instalação. Use o runtime em
-`<raiz-coordenadora>/.agent-harnesses/runtime/workspace-coordination/0.2.1`:
+`<raiz-coordenadora>/.agent-harnesses/runtime/workspace-coordination/0.2.2`:
 
 ```text
 <python> -B workspace_coordination.py --root "<raiz-coordenadora>" init --dry-run
@@ -68,13 +68,13 @@ instalação. Use o runtime em
 ```
 
 O coordenador não descobre projetos filhos nem executa o trabalho deles. A
-versão `0.2.1` exige um único writer de mutações (`single writer`) por raiz
+versão `0.2.2` exige um único writer de mutações (`single writer`) por raiz
 coordenadora; serialize os writers. O state schema permanece `1`. O
 [guia operacional](OPERATOR_GUIDE.pt-BR.md) ensina o ciclo completo; a
 [referência avançada](docs/REFERENCE.md) preserva os contratos de single
 writer, recuperação e evidência. Consulte também o
-[catálogo imutável](https://github.com/fabianomag/agent-harnesses/blob/v0.2.1/catalog/harnesses.json)
-e o [diagrama](https://github.com/fabianomag/agent-harnesses/blob/v0.2.1/graphs/workspace-coordination.graph.json).
+[catálogo imutável](https://github.com/fabianomag/agent-harnesses/blob/v0.2.2/catalog/harnesses.json)
+e o [diagrama](https://github.com/fabianomag/agent-harnesses/blob/v0.2.2/graphs/workspace-coordination.graph.json).
 Execute `<python> -B installer.py verify workspace-coordination --target
 "<raiz-coordenadora>" --json` na raiz do pacote ainda extraído;
 `installer.py` não é copiado para o runtime.

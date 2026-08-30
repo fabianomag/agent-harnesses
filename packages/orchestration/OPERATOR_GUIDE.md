@@ -3,7 +3,7 @@
 This is the complete, agent-agnostic operating contract for the installed runtime. It does not require a formal Skill or an agent-specific API. Use one public Python 3.10+ executable and the target-local entrypoint shown below.
 
 - Entrypoint: `hq.py`
-- Package: `orchestration` v`0.2.1`
+- Package: `orchestration` v`0.2.2`
 
 ## Operational memory
 
@@ -34,11 +34,11 @@ Inspect read-only, state the intended command, inputs, paths, and effects, then 
 | `foco` | `write` | Transactionally select one explicit registered front. | `<workspace>`, `<front-selector>` | Updates the active-front selection in the strict registry and deterministic views. |
 | `init` | `write` | Preview or transactionally initialize the control plane and register one new front. | `<workspace>`, `<front-id>`, `<front-name>`, `<front-path>`, `<alias?>`, `--dry-run&#124;--apply` | Dry-run writes nothing; apply creates the strict registry and declared Master/front lifecycle files through a journaled transaction. |
 | `hq-sync` | `read` | Strictly validate registry, front boundaries, generated files, locks, and recovery state. | `<workspace>` | Reports clean state or bounded issues without repair. |
-| `digere` | `write` | Persist one explicit reflection and pending action for a selected front. | `<workspace>`, `<front-selector?>`, `<summary>`, `<pending-action>` | Transactionally records only the supplied reflection and moves the front to digested state. |
+| `digere` | `write` | Persist one explicit reflection and pending action for a selected front. | `<workspace>`, `<front-selector?>`, `<summary>`, `<pending-action>` | Transactionally records the supplied reflection and pending action, refreshes deterministic views and counters, and moves the front to digested state. |
 | `registra` | `write` | Promote the current explicit digest to a durable record. | `<workspace>`, `<front-selector?>`, `<note?>` | Transactionally records the current digest and moves the selected front to recorded state. |
 | `encerra` | `write` | Close a recorded work block with an explicit summary and next action. | `<workspace>`, `<front-selector?>`, `<summary>`, `<next-action>` | Transactionally persists closeout and the next resumption point, then moves the front to closed state. |
 | `repair-panel` | `repair` | Preview or repair only a derivable generated pending-panel mismatch. | `<workspace>`, `--dry-run&#124;--apply` | Repairs only the generated panel after every registry and boundary check passes; it never repoints or merges fronts. |
-| `recover` | `repair` | Inspect or apply verified recovery for a durable transaction journal. | `<workspace>`, `--dry-run&#124;--apply`, `--break-stale-lock?` | Rolls back a recognized pre-commit transaction or completes verified cleanup after a durable commit; unknown bytes stop recovery. |
+| `recover` | `repair` | Inspect or apply verified recovery for a durable transaction journal. | `<workspace>`, `--dry-run&#124;--apply`, `--break-stale-lock?` | Rolls back a recognized pre-commit transaction or completes verified cleanup after a durable commit; unknown managed-target bytes stop recovery. |
 
 ## Placeholder examples
 
@@ -124,8 +124,8 @@ Use hq-sync for diagnosis, inspect recovery before apply when a journal exists, 
 
 ## Installation receipt, rollback, update, and uninstall
 
-- Receipt: target-relative `.agent-harnesses/runtime/orchestration/0.2.1/.agent-harness-receipt.json`.
-- From a checksum-verified `0.2.1` bundle, preview package removal with `<python> -B installer.py uninstall orchestration --target "<target>" --dry-run --json`; after review, apply it with `<python> -B installer.py uninstall orchestration --target "<target>" --apply --json`.
+- Receipt: target-relative `.agent-harnesses/runtime/orchestration/0.2.2/.agent-harness-receipt.json`.
+- From a checksum-verified `0.2.2` bundle, preview package removal with `<python> -B installer.py uninstall orchestration --target "<target>" --dry-run --json`; after review, apply it with `<python> -B installer.py uninstall orchestration --target "<target>" --apply --json`.
 - Uninstall removes only the receipt-owned runtime and installer-managed onboarding block. It never removes initialized operational state.
 - If a step fails after package apply, first run this package's verify-or-recover workflow. If the target still is not ready, preview and then apply uninstall to roll back the package. Preserve and report any residual initialized state; never delete it automatically.
 - To update, download the new version's ZIP and matching checksum sidecar, verify the checksum, read its migration notes, then run the new bundle's doctor, install --dry-run, and install --apply. Do not edit a versioned runtime in place; keep the old version until the new one reaches ready=true.

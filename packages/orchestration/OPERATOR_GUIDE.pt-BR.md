@@ -3,7 +3,7 @@
 Este é o contrato operacional completo e agent-agnostic do runtime instalado. Ele não exige uma Skill formal nem uma API específica de agente. Use um único executável público do Python 3.10+ e o entrypoint local ao target indicado abaixo.
 
 - Entrypoint: `hq.py`
-- Package: `orchestration` v`0.2.1`
+- Package: `orchestration` v`0.2.2`
 
 ## Memória operacional
 
@@ -34,11 +34,11 @@ Inspecione em modo read-only, informe o comando pretendido, os inputs, os paths 
 | `foco` | `write` | Selecionar transacionalmente uma frente registrada e explícita. | `<workspace>`, `<front-selector>` | Atualiza a seleção da frente ativa no registry estrito e nas views determinísticas. |
 | `init` | `write` | Fazer preview ou inicializar transacionalmente o control plane e registrar uma nova frente. | `<workspace>`, `<front-id>`, `<front-name>`, `<front-path>`, `<alias?>`, `--dry-run&#124;--apply` | O dry-run não escreve; o apply cria o registry estrito e os arquivos declarados de ciclo de vida do Master e da frente por uma transação com journal. |
 | `hq-sync` | `read` | Validar estritamente o registry, os limites das frentes, os arquivos gerados, locks e o estado de recovery. | `<workspace>` | Informa estado limpo ou issues delimitadas sem repair. |
-| `digere` | `write` | Persistir uma reflexão explícita e uma ação pendente para a frente selecionada. | `<workspace>`, `<front-selector?>`, `<summary>`, `<pending-action>` | Registra transacionalmente somente a reflexão fornecida e move a frente para o estado digested. |
+| `digere` | `write` | Persistir uma reflexão explícita e uma ação pendente para a frente selecionada. | `<workspace>`, `<front-selector?>`, `<summary>`, `<pending-action>` | Registra transacionalmente a reflexão e a ação pendente fornecidas, atualiza views e counters determinísticos e move a frente para o estado digested. |
 | `registra` | `write` | Promover o digest explícito atual para um registro durável. | `<workspace>`, `<front-selector?>`, `<note?>` | Registra transacionalmente o digest atual e move a frente selecionada para o estado recorded. |
 | `encerra` | `write` | Encerrar um bloco de trabalho registrado com summary e próxima ação explícitos. | `<workspace>`, `<front-selector?>`, `<summary>`, `<next-action>` | Persiste transacionalmente o closeout e o próximo ponto de retomada e move a frente para o estado closed. |
 | `repair-panel` | `repair` | Fazer preview ou repair somente de uma divergência derivável no painel gerado de pendências. | `<workspace>`, `--dry-run&#124;--apply` | Faz repair somente do painel gerado depois que todas as verificações de registry e limites passam; nunca redireciona nem mescla frentes. |
-| `recover` | `repair` | Inspecionar ou aplicar recovery verificado para um journal durável de transação. | `<workspace>`, `--dry-run&#124;--apply`, `--break-stale-lock?` | Executa rollback de uma transação pre-commit reconhecida ou conclui cleanup verificado após commit durável; bytes desconhecidos interrompem recovery. |
+| `recover` | `repair` | Inspecionar ou aplicar recovery verificado para um journal durável de transação. | `<workspace>`, `--dry-run&#124;--apply`, `--break-stale-lock?` | Executa rollback de uma transação pre-commit reconhecida ou conclui cleanup verificado após commit durável; bytes desconhecidos nos targets gerenciados interrompem recovery. |
 
 ## Exemplos com placeholders
 
@@ -124,8 +124,8 @@ Usar hq-sync para diagnóstico, inspecionar recovery antes do apply quando houve
 
 ## Receipt de instalação, rollback, update e uninstall
 
-- Receipt: path relativo ao target `.agent-harnesses/runtime/orchestration/0.2.1/.agent-harness-receipt.json`.
-- A partir de um bundle `0.2.1` com checksum verificado, antecipe a remoção do package com `<python> -B installer.py uninstall orchestration --target "<target>" --dry-run --json`; após a revisão, aplique-a com `<python> -B installer.py uninstall orchestration --target "<target>" --apply --json`.
+- Receipt: path relativo ao target `.agent-harnesses/runtime/orchestration/0.2.2/.agent-harness-receipt.json`.
+- A partir de um bundle `0.2.2` com checksum verificado, antecipe a remoção do package com `<python> -B installer.py uninstall orchestration --target "<target>" --dry-run --json`; após a revisão, aplique-a com `<python> -B installer.py uninstall orchestration --target "<target>" --apply --json`.
 - Uninstall remove somente o runtime pertencente ao receipt e o bloco de onboarding gerenciado pelo installer. Ele nunca remove o estado operacional inicializado.
 - Se uma etapa falhar após o apply do package, primeiro execute o workflow de verify ou recovery deste package. Se o target ainda não estiver ready, antecipe e depois aplique o uninstall para executar rollback do package. Preserve e informe qualquer estado inicializado residual; nunca o apague automaticamente.
 - Para update, baixe o ZIP e o checksum sidecar correspondentes à nova versão, verifique o checksum, leia as migration notes e então execute doctor, install --dry-run e install --apply com o novo bundle. Não edite um runtime versionado in-place; mantenha a versão anterior até a nova chegar a ready=true.

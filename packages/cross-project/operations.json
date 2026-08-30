@@ -166,7 +166,7 @@
     "displayName": "Multi-Project Harness",
     "entrypoint": "scripts/cross_project.py",
     "id": "cross-project",
-    "version": "0.2.1"
+    "version": "0.2.2"
   },
   "readiness": {
     "en": "The coordination manifest has at least one explicit existing project registration, every managed projection matches it, and hq-sync reports consistent state.",

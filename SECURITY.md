@@ -2,9 +2,9 @@
 
 ## Supported versions
 
-The supported public line is the unified Agent Harnesses `v0.2.1` release.
+The supported public line is the unified Agent Harnesses `v0.2.2` release.
 Historical `0.1.x` tags and `v0.2.0` remain immutable but are superseded.
-Package version and state schema are independent; Project Harness `0.2.1` reads and verifies
+Package version and state schema are independent; Project Harness `0.2.2` reads and verifies
 its `0.1.0` state without silently rewriting it.
 
 ## Local safety boundary

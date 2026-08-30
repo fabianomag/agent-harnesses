@@ -1,7 +1,7 @@
 <!-- BEGIN GENERATED:PRODUCT -->
 # Control Plane Harness
 
-[Português do Brasil](README.pt-BR.md) · Version `0.2.1`
+[Português do Brasil](README.pt-BR.md) · Version `0.2.2`
 
 **Best for:** A new control plane whose registry and lifecycle mutations justify transactions and recovery.
 
@@ -24,7 +24,7 @@ Strengths: **Strict registry · Transactions · Recovery**. Complexity: high.
 Copy only this prompt:
 
 ```text
-Install Control Plane Harness (`orchestration`) v0.2.1 from https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.1/orchestration-0.2.1.zip.
+Install Control Plane Harness (`orchestration`) v0.2.2 from https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.2/orchestration-0.2.2.zip.
 
 Before proposing execution, confirm every selected-harness readiness fact:
 - The explicit target is a deliberate new Master or control-plane root, not an existing coordination structure to adopt.
@@ -60,7 +60,7 @@ adopt an existing structure or create sample fronts. Use the same public Python
 3.10+ executable resolved by the install prompt as `<python>`. From the
 installed runtime directory:
 
-`<workspace>/.agent-harnesses/runtime/orchestration/0.2.1`
+`<workspace>/.agent-harnesses/runtime/orchestration/0.2.2`
 
 ```text
 <python> -B hq.py --root "<workspace>" --json bom-dia
@@ -79,5 +79,5 @@ Schema `1` remains supported. Mutations use a journal and explicit recovery,
 but the harness never executes registered projects. See the
 [advanced reference](docs/REFERENCE.md),
 [operator guide](OPERATOR_GUIDE.md),
-[catalog](https://github.com/fabianomag/agent-harnesses/blob/v0.2.1/catalog/harnesses.json),
-and [graph](https://github.com/fabianomag/agent-harnesses/blob/v0.2.1/graphs/orchestration.graph.json).
+[catalog](https://github.com/fabianomag/agent-harnesses/blob/v0.2.2/catalog/harnesses.json),
+and [graph](https://github.com/fabianomag/agent-harnesses/blob/v0.2.2/graphs/orchestration.graph.json).

@@ -3,7 +3,7 @@
 Este é o contrato operacional completo e agent-agnostic do runtime instalado. Ele não exige uma Skill formal nem uma API específica de agente. Use um único executável público do Python 3.10+ e o entrypoint local ao target indicado abaixo.
 
 - Entrypoint: `workspace_coordination.py`
-- Package: `workspace-coordination` v`0.2.1`
+- Package: `workspace-coordination` v`0.2.2`
 
 ## Memória operacional
 
@@ -31,14 +31,14 @@ Inspecione em modo read-only, informe o comando pretendido, os inputs, os paths 
 | Comando | Categoria | Finalidade | Inputs | Efeitos |
 | --- | --- | --- | --- | --- |
 | `init` | `write` | Fazer preview ou inicializar o limite do coordenador do workspace. | `<coordinator-root>`, `--dry-run&#124;--apply` | O dry-run não escreve; o apply cria somente os arquivos canônicos e gerados do coordenador. |
-| `add` | `write` | Registrar um projeto filho contido e existente com seu owner file explícito. | `<coordinator-root>`, `<child-id>`, `<child-path>`, `<owner-file>`, `--dry-run&#124;--apply` | Atualiza somente o índice do coordenador e o registro local de coordenação do projeto filho selecionado. |
+| `add` | `write` | Registrar um projeto filho contido e existente com seu owner file explícito. | `<coordinator-root>`, `<child-id>`, `<child-path>`, `<owner-file>`, `--dry-run&#124;--apply` | Atualiza somente o manifest do coordenador e o index gerado; valida o owner file e qualquer estado local existente do projeto filho selecionado sem alterar o projeto filho. |
 | `remove` | `write` | Remover um registro de projeto filho sem excluir nem editar o projeto filho. | `<coordinator-root>`, `<child-id>`, `--dry-run&#124;--apply` | Remove somente o estado de registro pertencente ao coordenador e preserva o projeto filho. |
 | `open` | `read` | Abrir o contexto delimitado de retomada do coordenador ou de um projeto filho registrado. | `<coordinator-root>`, `<child-id?>` | Lê registros do coordenador e do projeto filho selecionado sem writes. |
 | `digest` | `read` | Ler o contexto delimitado de ownership e continuidade de um projeto filho. | `<coordinator-root>`, `<child-id>` | Retorna o contexto local explícito do projeto filho sem descobrir nem copiar outros dados de projeto. |
 | `record` | `write` | Acrescentar um registro explícito de continuidade local do projeto filho. | `<coordinator-root>`, `<child-id>`, `<record-key>`, `<record-kind>`, `<summary>`, `<next-action>`, `--dry-run&#124;--apply` | Escreve o registro confirmado somente no estado local pertencente ao harness do projeto filho selecionado. |
 | `reflect` | `write` | Refletir um delta compartilhado, conciso e confirmado no coordenador. | `<coordinator-root>`, `<child-id>`, `<reflection-key>`, `<summary>`, `--dry-run&#124;--apply` | Adiciona um delta compartilhado delimitado sem absorver o estado detalhado do projeto filho. |
 | `verify` | `read` | Validar o estado do coordenador, os registros, o ownership dos projetos filhos e as views geradas. | `<coordinator-root>` | Informa issues estruturais sem repair. |
-| `recover` | `repair` | Fazer preview ou regenerar somente o estado gerenciado recuperável do workspace. | `<coordinator-root>`, `--dry-run&#124;--apply` | Faz repair do estado derivável e gerenciado pelo coordenador sem reconstruir fatos ausentes pertencentes aos projetos filhos. |
+| `recover` | `repair` | Fazer preview ou regenerar somente o estado gerenciado recuperável do workspace. | `<coordinator-root>`, `--dry-run&#124;--apply` | Faz repair dos arquivos deriváveis do coordenador e canonicaliza o estado local existente dos projetos filhos pertencente ao harness; nunca cria registros locais ausentes nem reconstrói fatos. |
 
 ## Exemplos com placeholders
 
@@ -124,8 +124,8 @@ Executar verify primeiro; fazer preview de recover somente para drift gerenciado
 
 ## Receipt de instalação, rollback, update e uninstall
 
-- Receipt: path relativo ao target `.agent-harnesses/runtime/workspace-coordination/0.2.1/.agent-harness-receipt.json`.
-- A partir de um bundle `0.2.1` com checksum verificado, antecipe a remoção do package com `<python> -B installer.py uninstall workspace-coordination --target "<target>" --dry-run --json`; após a revisão, aplique-a com `<python> -B installer.py uninstall workspace-coordination --target "<target>" --apply --json`.
+- Receipt: path relativo ao target `.agent-harnesses/runtime/workspace-coordination/0.2.2/.agent-harness-receipt.json`.
+- A partir de um bundle `0.2.2` com checksum verificado, antecipe a remoção do package com `<python> -B installer.py uninstall workspace-coordination --target "<target>" --dry-run --json`; após a revisão, aplique-a com `<python> -B installer.py uninstall workspace-coordination --target "<target>" --apply --json`.
 - Uninstall remove somente o runtime pertencente ao receipt e o bloco de onboarding gerenciado pelo installer. Ele nunca remove o estado operacional inicializado.
 - Se uma etapa falhar após o apply do package, primeiro execute o workflow de verify ou recovery deste package. Se o target ainda não estiver ready, antecipe e depois aplique o uninstall para executar rollback do package. Preserve e informe qualquer estado inicializado residual; nunca o apague automaticamente.
 - Para update, baixe o ZIP e o checksum sidecar correspondentes à nova versão, verifique o checksum, leia as migration notes e então execute doctor, install --dry-run e install --apply com o novo bundle. Não edite um runtime versionado in-place; mantenha a versão anterior até a nova chegar a ready=true.

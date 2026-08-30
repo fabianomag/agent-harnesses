@@ -7,7 +7,7 @@ Four local harnesses for four different coordination boundaries. Choose the smal
 
 Interactive guide: https://fabianomag.com/projects/agent-harnesses
 
-Requirements: Python 3.10 or newer, an explicit existing target directory, and one exact `v0.2.1` ZIP with its matching checksum sidecar. Each ZIP installs the complete Python-standard-library runtime, command inventory, and agent-agnostic operator guide for one harness. It does not change `PATH`, edit `.gitignore`, or require a global Skill.
+Requirements: Python 3.10 or newer, an explicit existing target directory, and one exact `v0.2.2` ZIP with its matching checksum sidecar. Each ZIP installs the complete Python-standard-library runtime, command inventory, and agent-agnostic operator guide for one harness. It does not change `PATH`, edit `.gitignore`, or require a global Skill.
 
 ## What do you need to coordinate?
 
@@ -27,7 +27,7 @@ Copy only the block for the harness you chose. Each block names one package, one
 ### Project Harness
 
 ```text
-Install Project Harness (`project-harness`) v0.2.1 from https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.1/project-harness-0.2.1.zip.
+Install Project Harness (`project-harness`) v0.2.2 from https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.2/project-harness-0.2.2.zip.
 
 Before proposing execution, confirm every selected-harness readiness fact:
 - The explicit target is the root of one real project.
@@ -53,7 +53,7 @@ Deliver the tutorial in the user's language and in the conversation without crea
 ### Workspace Harness
 
 ```text
-Install Workspace Harness (`workspace-coordination`) v0.2.1 from https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.1/workspace-coordination-0.2.1.zip.
+Install Workspace Harness (`workspace-coordination`) v0.2.2 from https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.2/workspace-coordination-0.2.2.zip.
 
 Before proposing execution, confirm every selected-harness readiness fact:
 - The explicit target is the container workspace, not one of its child projects.
@@ -79,7 +79,7 @@ Deliver the tutorial in the user's language and in the conversation without crea
 ### Multi-Project Harness
 
 ```text
-Install Multi-Project Harness (`cross-project`) v0.2.1 from https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.1/cross-project-0.2.1.zip.
+Install Multi-Project Harness (`cross-project`) v0.2.2 from https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.2/cross-project-0.2.2.zip.
 
 Before proposing execution, confirm every selected-harness readiness fact:
 - The coordination root and the independent existing project roots are explicit.
@@ -105,7 +105,7 @@ Deliver the tutorial in the user's language and in the conversation without crea
 ### Control Plane Harness
 
 ```text
-Install Control Plane Harness (`orchestration`) v0.2.1 from https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.1/orchestration-0.2.1.zip.
+Install Control Plane Harness (`orchestration`) v0.2.2 from https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.2/orchestration-0.2.2.zip.
 
 Before proposing execution, confirm every selected-harness readiness fact:
 - The explicit target is a deliberate new Master or control-plane root, not an existing coordination structure to adopt.
@@ -160,7 +160,7 @@ Then follow `package/README.md` in the extracted bundle and finish with:
 ```
 
 The selected runtime lives at
-`<target>/.agent-harnesses/runtime/<id>/0.2.1`.
+`<target>/.agent-harnesses/runtime/<id>/0.2.2`.
 
 The state is explicit: `downloaded → installed → initialized → verified →
 ready`. Installing package bytes is not operational success. Only a successful
@@ -186,7 +186,7 @@ ranking. See the generated [catalog](catalog/harnesses.json),
 Optional platform-native integrations live under [`adapters/`](adapters/) and
 are never part of the four core ZIPs or the default installation.
 
-Release `v0.2.1` contains four deterministic package-only ZIPs, one checksum
+Release `v0.2.2` contains four deterministic package-only ZIPs, one checksum
 sidecar per asset, the standalone installer, the release manifest, the site
 snapshot, and the changelog. Historical `0.1.x` tags and immutable `v0.2.0`
 remain available and are superseded rather than rewritten.

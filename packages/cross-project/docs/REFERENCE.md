@@ -1,7 +1,7 @@
 # Multi-Project Harness — advanced reference
 
 - Package ID: `cross-project`
-- Version: `0.2.1`
+- Version: `0.2.2`
 - Artifact status: implemented, published
 - Runtime: Python 3.10 or newer, standard library only
 
@@ -25,9 +25,13 @@ governance, or for a journaled transactional Master control plane.
   `python`, or `py -3`), never a private application runtime.
 - An existing real installation root for the common package manager.
 - An existing real coordination root for runtime commands.
-- Every registered child directory must already exist below that root.
-- The selected root and child paths must not be filesystem root, home, Git
-  metadata, symbolic links, or metadata-reported Windows reparse points.
+- Every registered project root must already exist. New registrations may use a
+  normalized native absolute path, including a sibling of the coordination
+  root. Root-relative POSIX paths remain supported for existing v0.1/v0.2.1
+  manifests whose projects are contained by the coordination root.
+- The selected coordination root and project roots must not be filesystem
+  root, home, Git metadata, symbolic links, or metadata-reported Windows
+  reparse points.
 - Every existing lexical component of the selected root is inspected without
   following links before the root is resolved.
 - A source checkout is required only for repository-level installation,
@@ -46,8 +50,9 @@ NEXT.md
 
 `harness.config.json` is the machine authority. Its exact top-level fields are
 `schemaVersion`, `harness`, `master`, and `fronts`. A named front stores only
-its public name, root-relative path, role, state, next action, blocker,
-coordination-pending state, last reflection, and reflection trigger.
+its public name, normalized absolute root (or a legacy contained relative
+path), role, state, next action, blocker, coordination-pending state, last
+reflection, and reflection trigger.
 
 The Markdown files contain bounded managed sections. Dense implementation state
 remains with each local project owner.
@@ -57,12 +62,12 @@ remains with each local project owner.
 From the source repository root:
 
 ```text
-<python> -B tools/package_manager.py install --package cross-project --version 0.2.1 --root "<install-root>" --dry-run
-<python> -B tools/package_manager.py install --package cross-project --version 0.2.1 --root "<install-root>" --apply
-<python> -B tools/package_manager.py verify --package cross-project --version 0.2.1 --root "<install-root>"
+<python> -B tools/package_manager.py install --package cross-project --version 0.2.2 --root "<install-root>" --dry-run
+<python> -B tools/package_manager.py install --package cross-project --version 0.2.2 --root "<install-root>" --apply
+<python> -B tools/package_manager.py verify --package cross-project --version 0.2.2 --root "<install-root>"
 ```
 
-The installed copy is `<install-root>/cross-project-0.2.1/`. The common
+The installed copy is `<install-root>/cross-project-0.2.2/`. The common
 package manager does not create a global command or invoke the runtime.
 
 ## Preflight
@@ -81,9 +86,11 @@ Preview the exact registration before applying it:
 
 The preview writes nothing. Read-only, preview, and applying commands reject a
 selected root whose final path or any intermediate parent is link-like. They
-also reject absolute or escaping child paths, Git metadata, duplicate
-identities, one directory registered under two IDs, and any root-wide or
-external scan.
+also reject non-normalized absolute paths, escaping relative paths, missing or
+non-directory roots, filesystem root, home, Git metadata, duplicate identities,
+and one physical directory registered under two IDs. Validation touches only
+the explicitly supplied coordination and project roots; it never discovers or
+scans for other projects.
 
 ## Verify
 
@@ -97,7 +104,7 @@ root:
 Verify installed package bytes from the source repository root:
 
 ```text
-<python> -B tools/package_manager.py verify --package cross-project --version 0.2.1 --root "<install-root>"
+<python> -B tools/package_manager.py verify --package cross-project --version 0.2.2 --root "<install-root>"
 ```
 
 Run package-local automated checks from the installed package root:
@@ -108,11 +115,12 @@ Run package-local automated checks from the installed package root:
 
 ## First use
 
-Confirm `<coordination-root>/<project-path>` as a regular existing directory
-before running this installed-copy sequence; do not create a sample project.
-Pass the physical, link-free
-`<coordination-root>` path; a lexically different path through a symlink is
-rejected even when it names the same directory:
+Confirm `<project-path>` as the normalized absolute root of a real independent
+project before running this installed-copy sequence; do not create a sample
+project. A contained relative path is accepted only as the compatibility form
+for an existing v0.1/v0.2.1 layout. Pass physical, link-free paths; a lexically
+different path through a symlink is rejected even when it names the same
+directory:
 
 ```text
 <python> -B scripts/cross_project.py bom-dia --root "<coordination-root>"
@@ -157,16 +165,18 @@ The package intentionally has no automatic crash-recovery command.
 - Adversarial replacement of the selected root inode remains a residual risk.
 - Windows reparse-point behavior is metadata-aware but has not been validated
   locally on Windows; no Windows/reparse portability result is claimed.
-- The package does not scan parents, home, siblings, Git remotes, or external
-  services.
+- The package does not discover or scan parents, home, unregistered siblings,
+  Git remotes, or external services. It validates metadata only for each exact
+  project root that the user explicitly supplies.
 - Remote operations and publication are outside the package.
 
 ## Evidence
 
 - **Automated — defined:** `tests/test_cross_project.py` contains repeatable
-  tests for previews, idempotence, preservation, bounded reads, locking,
-  rollback, intermediate-root link rejection with physical zero-write
-  snapshots, physical-path acceptance, and the reflection lifecycle.
+tests for previews, idempotence, preservation, bounded reads, locking,
+rollback, link rejection with physical zero-write snapshots, independent
+sibling project roots, legacy contained paths, project-root byte preservation,
+and the reflection lifecycle.
 - **Structural — defined:** common installed-copy and repository validation
   procedures are present; this README does not self-attest a result.
 - **Manual Codex — pending:** a fresh Multi-Project Harness walkthrough must
@@ -178,13 +188,13 @@ package version and commit.
 
 ## Version and immutable links
 
-Version `0.2.1` is bound to the immutable `v0.2.1` release tag and supersedes
+Version `0.2.2` is bound to the immutable `v0.2.2` release tag and supersedes
 the immutable `v0.2.0` collection release without rewriting it.
 
-- Immutable documentation URL: https://github.com/fabianomag/agent-harnesses/blob/v0.2.1/packages/cross-project/README.md
-- Immutable install prompt: `Install this harness for me: https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.1/cross-project-0.2.1.zip`
-- Immutable source URL: https://github.com/fabianomag/agent-harnesses/tree/v0.2.1/packages/cross-project
-- Release URL: https://github.com/fabianomag/agent-harnesses/releases/tag/v0.2.1
+- Immutable documentation URL: https://github.com/fabianomag/agent-harnesses/blob/v0.2.2/packages/cross-project/README.md
+- Immutable install prompt: `Install this harness for me: https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.2/cross-project-0.2.2.zip`
+- Immutable source URL: https://github.com/fabianomag/agent-harnesses/tree/v0.2.2/packages/cross-project
+- Release URL: https://github.com/fabianomag/agent-harnesses/releases/tag/v0.2.2
 - Installation report: https://github.com/fabianomag/agent-harnesses/issues/new?template=installation-report.yml
 
 Do not substitute a mutable branch URL for the version-bound fields.
@@ -192,7 +202,7 @@ Do not substitute a mutable branch URL for the version-bound fields.
 ## Diagrams
 
 - Graph ID: `cross-project-flow`
-- Immutable spec: https://github.com/fabianomag/agent-harnesses/blob/v0.2.1/graphs/cross-project.graph.json
+- Immutable spec: https://github.com/fabianomag/agent-harnesses/blob/v0.2.2/graphs/cross-project.graph.json
 - Source-tree static asset: `assets/cross-project.svg`
 - Interactive diagram: https://fabianomag.com/projects/agent-harnesses
 

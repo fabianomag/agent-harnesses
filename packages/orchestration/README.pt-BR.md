@@ -1,7 +1,7 @@
 <!-- BEGIN GENERATED:PRODUCT -->
 # Control Plane Harness
 
-[English](README.md) · Versão `0.2.1`
+[English](README.md) · Versão `0.2.2`
 
 **Melhor opção para:** Um control plane novo em que o cadastro central e as mudanças de ciclo de vida justificam transações e recuperação.
 
@@ -24,7 +24,7 @@ Pontos fortes: **Cadastro central com validação estrita · Transações · Rec
 Copie somente este prompt:
 
 ```text
-Instale Control Plane Harness (`orchestration`) v0.2.1 a partir de https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.1/orchestration-0.2.1.zip.
+Instale Control Plane Harness (`orchestration`) v0.2.2 a partir de https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.2/orchestration-0.2.2.zip.
 
 Antes de propor a execução, confirme cada fato de readiness do harness selecionado:
 - O target explícito é uma nova raiz Master ou de control plane deliberada, não uma estrutura de coordenação existente a ser adotada.
@@ -60,7 +60,7 @@ Use uma nova raiz deliberada de control plane e somente valores confirmados das
 frentes. Não adote uma estrutura existente nem crie frentes de exemplo. Use
 como `<python>` o mesmo executável público do Python 3.10+ escolhido no prompt
 de instalação. Use o runtime em
-`<workspace>/.agent-harnesses/runtime/orchestration/0.2.1`:
+`<workspace>/.agent-harnesses/runtime/orchestration/0.2.2`:
 
 ```text
 <python> -B hq.py --root "<workspace>" --json bom-dia
@@ -74,8 +74,8 @@ explícito, mas o harness nunca executa os projetos cadastrados. A
 [referência avançada](docs/REFERENCE.md) preserva os contratos de transações,
 bloqueio, recuperação e evidência; o
 [guia operacional](OPERATOR_GUIDE.pt-BR.md) ensina o ciclo completo. Consulte também o
-[catálogo imutável](https://github.com/fabianomag/agent-harnesses/blob/v0.2.1/catalog/harnesses.json)
-e o [diagrama](https://github.com/fabianomag/agent-harnesses/blob/v0.2.1/graphs/orchestration.graph.json).
+[catálogo imutável](https://github.com/fabianomag/agent-harnesses/blob/v0.2.2/catalog/harnesses.json)
+e o [diagrama](https://github.com/fabianomag/agent-harnesses/blob/v0.2.2/graphs/orchestration.graph.json).
 Execute `<python> -B installer.py verify orchestration --target "<workspace>"
 --json` na raiz do pacote ainda extraído; `installer.py` não é copiado para o
 runtime.

@@ -1,4 +1,4 @@
-# Agent Harnesses v0.2.1 — advanced reference
+# Agent Harnesses v0.2.2 — advanced reference
 
 The root [README](../README.md) owns the public choice and installation path.
 This reference keeps implementation and evidence detail out of that first
@@ -47,18 +47,18 @@ failures include `E_PYTHON_UNSUPPORTED`, `E_TARGET_AMBIGUOUS`,
 individual archive sidecar before extraction, verifies the recorded package
 inventory, rejects linked/colliding target paths, and never silently changes
 the selected harness. Runtime bytes live at
-`<target>/.agent-harnesses/runtime/<id>/0.2.1`. A receipt records exactly those
+`<target>/.agent-harnesses/runtime/<id>/0.2.2`. A receipt records exactly those
 bytes together with the bounded onboarding block digest and whether the
 installer created `AGENTS.md`. Uninstall refuses changed bytes and leaves
 initialized state untouched.
 
 The repository's older `tools/package_manager.py` remains a contributor-side
-payload verifier. It is not the public `v0.2.1` installation interface.
+payload verifier. It is not the public `v0.2.2` installation interface.
 
 ## Package version and state schema
 
-Package version is not state schema version. Release `0.2.1` keeps the existing
-schema `1` contracts. Project Harness `0.2.1` explicitly reads and verifies
+Package version is not state schema version. Release `0.2.2` keeps the existing
+schema `1` contracts. Project Harness `0.2.2` explicitly reads and verifies
 state created by Project Harness `0.1.0` while preserving the recorded
 `harnessVersion`; it never rewrites that state as an implicit migration. Any
 future migration must expose its own `dry-run` and `apply` operation.
@@ -80,7 +80,7 @@ future migration must expose its own `dry-run` and `apply` operation.
 
 ## Immutable release shape
 
-Release `v0.2.1` contains four deterministic package-only ZIPs. Each ZIP
+Release `v0.2.2` contains four deterministic package-only ZIPs. Each ZIP
 contains only the selected package, necessary common files, license, localized
 README files, `operations.json`, localized operator guides, installer, and a
 recorded inventory. Platform-specific adapters remain repository-only and are

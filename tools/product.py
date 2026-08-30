@@ -9,7 +9,7 @@ from typing import Any
 
 
 PRODUCT_PATH = Path("product/harnesses.json")
-SITE_SNAPSHOT_PATH = Path("catalog/site-harnesses.v0.2.1.json")
+SITE_SNAPSHOT_PATH = Path("catalog/site-harnesses.v0.2.2.json")
 PACKAGE_IDS = (
     "project-harness",
     "workspace-coordination",
@@ -152,7 +152,7 @@ def load_product(repository_root: Path) -> dict[str, Any]:
         raise ProductContractError("release fields do not match the contract")
     version = _nonempty(release["version"], "release.version")
     if (
-        version != "0.2.1"
+        version != "0.2.2"
         or SEMVER.fullmatch(version) is None
         or release["tag"] != f"v{version}"
     ):

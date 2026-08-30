@@ -65,8 +65,8 @@
     {
       "command": "add",
       "effects": {
-        "en": "Updates only the coordinator index and the selected child's local coordination record.",
-        "ptBr": "Atualiza somente o índice do coordenador e o registro local de coordenação do projeto filho selecionado."
+        "en": "Updates only the coordinator manifest and generated index; validates the selected child's owner file and any existing local state without changing the child.",
+        "ptBr": "Atualiza somente o manifest do coordenador e o index gerado; valida o owner file e qualquer estado local existente do projeto filho selecionado sem alterar o projeto filho."
       },
       "example": "<python> -B workspace_coordination.py --root \"<coordinator-root>\" add --id \"<child-id>\" --path \"<child-path>\" --owner \"<owner-file>\" --dry-run",
       "inputs": [
@@ -195,8 +195,8 @@
     {
       "command": "recover",
       "effects": {
-        "en": "Repairs derivable coordinator-managed state and never reconstructs missing child-owned facts.",
-        "ptBr": "Faz repair do estado derivável e gerenciado pelo coordenador sem reconstruir fatos ausentes pertencentes aos projetos filhos."
+        "en": "Repairs derivable coordinator files and canonicalizes existing harness-owned child-local state; it never creates missing child records or reconstructs facts.",
+        "ptBr": "Faz repair dos arquivos deriváveis do coordenador e canonicaliza o estado local existente dos projetos filhos pertencente ao harness; nunca cria registros locais ausentes nem reconstrói fatos."
       },
       "example": "<python> -B workspace_coordination.py --root \"<coordinator-root>\" recover --dry-run",
       "inputs": [
@@ -214,7 +214,7 @@
     "displayName": "Workspace Harness",
     "entrypoint": "workspace_coordination.py",
     "id": "workspace-coordination",
-    "version": "0.2.1"
+    "version": "0.2.2"
   },
   "readiness": {
     "en": "The coordinator is initialized, every registered child and owner path is explicit and valid, and canonical plus generated workspace state verifies cleanly.",
