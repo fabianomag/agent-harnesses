@@ -520,6 +520,15 @@ class ReleaseWorkflowTests(unittest.TestCase):
         self.assertLess(download, final_verify)
         self.assertIn("--draft", self.workflow[create:download])
 
+    def test_tag_push_rebuilds_without_recreating_the_release(self) -> None:
+        release_job = self.workflow.index("  release:")
+        release_guard = self.workflow.index(
+            "if: github.event_name == 'workflow_dispatch'",
+            release_job,
+        )
+        release_needs = self.workflow.index("needs: build", release_job)
+        self.assertLess(release_guard, release_needs)
+
     def test_run_blocks_do_not_interpolate_dispatch_inputs_directly(self) -> None:
         in_run = False
         for line in self.workflow.splitlines():

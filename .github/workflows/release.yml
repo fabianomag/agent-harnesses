@@ -75,6 +75,7 @@ jobs:
 
   release:
     name: Create and re-verify draft release
+    if: github.event_name == 'workflow_dispatch'
     needs: build
     runs-on: ubuntu-latest
     timeout-minutes: 20
