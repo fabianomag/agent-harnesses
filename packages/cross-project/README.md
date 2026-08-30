@@ -1,7 +1,7 @@
 <!-- BEGIN GENERATED:PRODUCT -->
 # Multi-Project Harness
 
-[Português do Brasil](README.pt-BR.md) · Version `0.2.1`
+[Português do Brasil](README.pt-BR.md) · Version `0.2.2`
 
 **Best for:** Existing independent project roots that need explicit handoffs and transversal coordination.
 
@@ -24,7 +24,7 @@ Strengths: **Independent projects · Handoffs · Structural sync**. Complexity: 
 Copy only this prompt:
 
 ```text
-Install Multi-Project Harness (`cross-project`) v0.2.1 from https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.1/cross-project-0.2.1.zip.
+Install Multi-Project Harness (`cross-project`) v0.2.2 from https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.2/cross-project-0.2.2.zip.
 
 Before proposing execution, confirm every selected-harness readiness fact:
 - The coordination root and the independent existing project roots are explicit.
@@ -57,7 +57,7 @@ by the user; do not create sample projects or discover repositories. Use the
 same public Python 3.10+ executable resolved by the install prompt as
 `<python>`. From the installed runtime directory:
 
-`<coordination-root>/.agent-harnesses/runtime/cross-project/0.2.1`
+`<coordination-root>/.agent-harnesses/runtime/cross-project/0.2.2`
 
 ```text
 <python> -B scripts/cross_project.py bom-dia --root "<coordination-root>"
@@ -77,5 +77,5 @@ Schema `1` remains supported. Rollback covers catchable cooperative failures,
 not power loss or adversarial root replacement. See the
 [advanced reference](docs/REFERENCE.md),
 [operator guide](OPERATOR_GUIDE.md),
-[catalog](https://github.com/fabianomag/agent-harnesses/blob/v0.2.1/catalog/harnesses.json),
-and [graph](https://github.com/fabianomag/agent-harnesses/blob/v0.2.1/graphs/cross-project.graph.json).
+[catalog](https://github.com/fabianomag/agent-harnesses/blob/v0.2.2/catalog/harnesses.json),
+and [graph](https://github.com/fabianomag/agent-harnesses/blob/v0.2.2/graphs/cross-project.graph.json).

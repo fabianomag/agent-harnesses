@@ -120,8 +120,8 @@
     {
       "command": "digere",
       "effects": {
-        "en": "Transactionally records only the supplied reflection and moves the front to digested state.",
-        "ptBr": "Registra transacionalmente somente a reflexão fornecida e move a frente para o estado digested."
+        "en": "Transactionally records the supplied reflection and pending action, refreshes deterministic views and counters, and moves the front to digested state.",
+        "ptBr": "Registra transacionalmente a reflexão e a ação pendente fornecidas, atualiza views e counters determinísticos e move a frente para o estado digested."
       },
       "example": "<python> -B hq.py --root \"<workspace>\" --json digere --front \"<front-selector>\" --summary \"<summary>\" --pending \"<pending-action>\"",
       "inputs": [
@@ -193,8 +193,8 @@
     {
       "command": "recover",
       "effects": {
-        "en": "Rolls back a recognized pre-commit transaction or completes verified cleanup after a durable commit; unknown bytes stop recovery.",
-        "ptBr": "Executa rollback de uma transação pre-commit reconhecida ou conclui cleanup verificado após commit durável; bytes desconhecidos interrompem recovery."
+        "en": "Rolls back a recognized pre-commit transaction or completes verified cleanup after a durable commit; unknown managed-target bytes stop recovery.",
+        "ptBr": "Executa rollback de uma transação pre-commit reconhecida ou conclui cleanup verificado após commit durável; bytes desconhecidos nos targets gerenciados interrompem recovery."
       },
       "example": "<python> -B hq.py --root \"<workspace>\" --json recover --dry-run",
       "inputs": [
@@ -213,7 +213,7 @@
     "displayName": "Control Plane Harness",
     "entrypoint": "hq.py",
     "id": "orchestration",
-    "version": "0.2.1"
+    "version": "0.2.2"
   },
   "readiness": {
     "en": "A new control plane has at least one explicit registered front, the registry and generated lifecycle files are coherent, no recovery is pending, and hq-sync reports clean state.",

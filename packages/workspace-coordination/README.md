@@ -1,7 +1,7 @@
 <!-- BEGIN GENERATED:PRODUCT -->
 # Workspace Harness
 
-[Português do Brasil](README.pt-BR.md) · Version `0.2.1`
+[Português do Brasil](README.pt-BR.md) · Version `0.2.2`
 
 **Best for:** Contained child projects that share one workspace boundary and a small shared index.
 
@@ -24,7 +24,7 @@ Strengths: **Child index · Ownership boundaries · Shared workspace view**. Com
 Copy only this prompt:
 
 ```text
-Install Workspace Harness (`workspace-coordination`) v0.2.1 from https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.1/workspace-coordination-0.2.1.zip.
+Install Workspace Harness (`workspace-coordination`) v0.2.2 from https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.2/workspace-coordination-0.2.2.zip.
 
 Before proposing execution, confirm every selected-harness readiness fact:
 - The explicit target is the container workspace, not one of its child projects.
@@ -57,7 +57,7 @@ create a sample workspace or infer children. Use the same public Python 3.10+
 executable resolved by the install prompt as `<python>`. From the installed
 runtime directory:
 
-`<coordinator-root>/.agent-harnesses/runtime/workspace-coordination/0.2.1`
+`<coordinator-root>/.agent-harnesses/runtime/workspace-coordination/0.2.2`
 
 ```text
 <python> -B workspace_coordination.py --root "<coordinator-root>" init --dry-run
@@ -75,8 +75,8 @@ true` is success. `installer.py` is not copied into the runtime.
 ## Recovery and limitations
 
 The coordinator never discovers children or executes their work. Version
-`0.2.1` supports one mutating writer per coordinator root; serialize writers.
+`0.2.2` supports one mutating writer per coordinator root; serialize writers.
 State schema remains `1`. See the [operator guide](OPERATOR_GUIDE.md),
 [advanced reference](docs/REFERENCE.md),
-[catalog](https://github.com/fabianomag/agent-harnesses/blob/v0.2.1/catalog/harnesses.json),
-and [graph](https://github.com/fabianomag/agent-harnesses/blob/v0.2.1/graphs/workspace-coordination.graph.json).
+[catalog](https://github.com/fabianomag/agent-harnesses/blob/v0.2.2/catalog/harnesses.json),
+and [graph](https://github.com/fabianomag/agent-harnesses/blob/v0.2.2/graphs/workspace-coordination.graph.json).

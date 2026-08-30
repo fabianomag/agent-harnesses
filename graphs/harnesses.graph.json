@@ -13,7 +13,7 @@
       "id": "project-harness",
       "kind": "package",
       "label": "Project Harness",
-      "version": "0.2.1",
+      "version": "0.2.2",
       "artifactStatus": {
         "implementation": "implemented",
         "publication": "published"
@@ -23,7 +23,7 @@
       "id": "workspace-coordination",
       "kind": "package",
       "label": "Workspace Harness",
-      "version": "0.2.1",
+      "version": "0.2.2",
       "artifactStatus": {
         "implementation": "implemented",
         "publication": "published"
@@ -33,7 +33,7 @@
       "id": "cross-project",
       "kind": "package",
       "label": "Multi-Project Harness",
-      "version": "0.2.1",
+      "version": "0.2.2",
       "artifactStatus": {
         "implementation": "implemented",
         "publication": "published"
@@ -43,7 +43,7 @@
       "id": "orchestration",
       "kind": "package",
       "label": "Control Plane Harness",
-      "version": "0.2.1",
+      "version": "0.2.2",
       "artifactStatus": {
         "implementation": "implemented",
         "publication": "published"

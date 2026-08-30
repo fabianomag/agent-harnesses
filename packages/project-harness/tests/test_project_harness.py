@@ -114,20 +114,25 @@ class InitializationTests(TemporaryProjectTestCase):
         self.assertEqual(harness.HARNESS_VERSION, state["harnessVersion"])
         self.assertEqual([], state["records"])
 
-    def test_v010_state_is_read_and_verified_without_implicit_rewrite(self) -> None:
+    def test_prior_state_versions_are_read_without_implicit_rewrite(self) -> None:
         harness.initialize(self.root)
         state_path = self.root / harness.STATE_PATH
         state = json.loads(state_path.read_text(encoding="utf-8"))
-        state["harnessVersion"] = "0.1.0"
-        state_path.write_bytes(harness._state_bytes(state))
-        before = _tree_snapshot(self.root)
+        for prior_version in ("0.1.0", "0.2.0", "0.2.1"):
+            with self.subTest(prior_version=prior_version):
+                state["harnessVersion"] = prior_version
+                state_path.write_bytes(harness._state_bytes(state))
+                before = _tree_snapshot(self.root)
 
-        self.assertEqual([], harness.verify_root(self.root))
-        self.assertEqual("0.2.1", harness.status_snapshot(self.root)["harnessVersion"])
-        _root, plan = harness.plan_init(self.root)
+                self.assertEqual([], harness.verify_root(self.root))
+                self.assertEqual(
+                    "0.2.2",
+                    harness.status_snapshot(self.root)["harnessVersion"],
+                )
+                _root, plan = harness.plan_init(self.root)
 
-        self.assertTrue(plan.is_noop)
-        self.assertEqual(before, _tree_snapshot(self.root))
+                self.assertTrue(plan.is_noop)
+                self.assertEqual(before, _tree_snapshot(self.root))
 
     def test_preexisting_utf8_content_is_preserved_outside_managed_block(self) -> None:
         existing = b"# Existing\r\n\r\nSynthetic owner text\r\n"

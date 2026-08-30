@@ -1,8 +1,8 @@
 {
   "schemaVersion": 2,
   "release": {
-    "version": "0.2.1",
-    "tag": "v0.2.1",
+    "version": "0.2.2",
+    "tag": "v0.2.2",
     "minimumPython": "3.10",
     "repository": "https://github.com/fabianomag/agent-harnesses",
     "site": {
@@ -117,7 +117,7 @@
       "id": "project-harness",
       "displayName": "Project Harness",
       "aliases": ["project", "single-project", "project-harness"],
-      "asset": "project-harness-0.2.1.zip",
+      "asset": "project-harness-0.2.2.zip",
       "complexity": {
         "level": "low",
         "en": "Low",
@@ -239,7 +239,7 @@
       "id": "workspace-coordination",
       "displayName": "Workspace Harness",
       "aliases": ["workspace", "workspace-harness", "workspace-coordination"],
-      "asset": "workspace-coordination-0.2.1.zip",
+      "asset": "workspace-coordination-0.2.2.zip",
       "complexity": {
         "level": "medium",
         "en": "Medium",
@@ -305,7 +305,7 @@
             "kind": "write",
             "purpose": {"en": "Register one existing contained child with its explicit owner file.", "ptBr": "Registrar um projeto filho contido e existente com seu owner file explícito."},
             "inputs": ["<coordinator-root>", "<child-id>", "<child-path>", "<owner-file>", "--dry-run|--apply"],
-            "effects": {"en": "Updates only the coordinator index and the selected child's local coordination record.", "ptBr": "Atualiza somente o índice do coordenador e o registro local de coordenação do projeto filho selecionado."},
+            "effects": {"en": "Updates only the coordinator manifest and generated index; validates the selected child's owner file and any existing local state without changing the child.", "ptBr": "Atualiza somente o manifest do coordenador e o index gerado; valida o owner file e qualquer estado local existente do projeto filho selecionado sem alterar o projeto filho."},
             "example": "<python> -B workspace_coordination.py --root \"<coordinator-root>\" add --id \"<child-id>\" --path \"<child-path>\" --owner \"<owner-file>\" --dry-run"
           },
           {
@@ -361,7 +361,7 @@
             "kind": "repair",
             "purpose": {"en": "Preview or regenerate only recoverable managed workspace state.", "ptBr": "Fazer preview ou regenerar somente o estado gerenciado recuperável do workspace."},
             "inputs": ["<coordinator-root>", "--dry-run|--apply"],
-            "effects": {"en": "Repairs derivable coordinator-managed state and never reconstructs missing child-owned facts.", "ptBr": "Faz repair do estado derivável e gerenciado pelo coordenador sem reconstruir fatos ausentes pertencentes aos projetos filhos."},
+            "effects": {"en": "Repairs derivable coordinator files and canonicalizes existing harness-owned child-local state; it never creates missing child records or reconstructs facts.", "ptBr": "Faz repair dos arquivos deriváveis do coordenador e canonicaliza o estado local existente dos projetos filhos pertencente ao harness; nunca cria registros locais ausentes nem reconstrói fatos."},
             "example": "<python> -B workspace_coordination.py --root \"<coordinator-root>\" recover --dry-run"
           }
         ],
@@ -377,7 +377,7 @@
       "id": "cross-project",
       "displayName": "Multi-Project Harness",
       "aliases": ["multi-project", "cross-project", "cross"],
-      "asset": "cross-project-0.2.1.zip",
+      "asset": "cross-project-0.2.2.zip",
       "complexity": {
         "level": "medium",
         "en": "Medium",
@@ -491,7 +491,7 @@
       "id": "orchestration",
       "displayName": "Control Plane Harness",
       "aliases": ["control-plane", "control-plane-harness", "orchestration"],
-      "asset": "orchestration-0.2.1.zip",
+      "asset": "orchestration-0.2.2.zip",
       "complexity": {
         "level": "high",
         "en": "High",
@@ -581,7 +581,7 @@
             "kind": "write",
             "purpose": {"en": "Persist one explicit reflection and pending action for a selected front.", "ptBr": "Persistir uma reflexão explícita e uma ação pendente para a frente selecionada."},
             "inputs": ["<workspace>", "<front-selector?>", "<summary>", "<pending-action>"],
-            "effects": {"en": "Transactionally records only the supplied reflection and moves the front to digested state.", "ptBr": "Registra transacionalmente somente a reflexão fornecida e move a frente para o estado digested."},
+            "effects": {"en": "Transactionally records the supplied reflection and pending action, refreshes deterministic views and counters, and moves the front to digested state.", "ptBr": "Registra transacionalmente a reflexão e a ação pendente fornecidas, atualiza views e counters determinísticos e move a frente para o estado digested."},
             "example": "<python> -B hq.py --root \"<workspace>\" --json digere --front \"<front-selector>\" --summary \"<summary>\" --pending \"<pending-action>\""
           },
           {
@@ -613,7 +613,7 @@
             "kind": "repair",
             "purpose": {"en": "Inspect or apply verified recovery for a durable transaction journal.", "ptBr": "Inspecionar ou aplicar recovery verificado para um journal durável de transação."},
             "inputs": ["<workspace>", "--dry-run|--apply", "--break-stale-lock?"],
-            "effects": {"en": "Rolls back a recognized pre-commit transaction or completes verified cleanup after a durable commit; unknown bytes stop recovery.", "ptBr": "Executa rollback de uma transação pre-commit reconhecida ou conclui cleanup verificado após commit durável; bytes desconhecidos interrompem recovery."},
+            "effects": {"en": "Rolls back a recognized pre-commit transaction or completes verified cleanup after a durable commit; unknown managed-target bytes stop recovery.", "ptBr": "Executa rollback de uma transação pre-commit reconhecida ou conclui cleanup verificado após commit durável; bytes desconhecidos nos targets gerenciados interrompem recovery."},
             "example": "<python> -B hq.py --root \"<workspace>\" --json recover --dry-run"
           }
         ],

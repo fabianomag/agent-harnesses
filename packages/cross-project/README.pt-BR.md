@@ -1,7 +1,7 @@
 <!-- BEGIN GENERATED:PRODUCT -->
 # Multi-Project Harness
 
-[English](README.md) · Versão `0.2.1`
+[English](README.md) · Versão `0.2.2`
 
 **Melhor opção para:** Projetos independentes com raízes próprias que precisam de handoffs explícitos e coordenação transversal.
 
@@ -24,7 +24,7 @@ Pontos fortes: **Projetos independentes · Handoffs · Sincronização estrutura
 Copie somente este prompt:
 
 ```text
-Instale Multi-Project Harness (`cross-project`) v0.2.1 a partir de https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.1/cross-project-0.2.1.zip.
+Instale Multi-Project Harness (`cross-project`) v0.2.2 a partir de https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.2/cross-project-0.2.2.zip.
 
 Antes de propor a execução, confirme cada fato de readiness do harness selecionado:
 - A coordination root e as raízes independentes dos projetos existentes estão explícitas.
@@ -56,7 +56,7 @@ Use somente paths, papéis e próximas ações de projetos independentes já
 confirmados pelo usuário; não crie projetos de exemplo nem descubra
 repositórios. Use como `<python>` o mesmo executável público do Python 3.10+
 escolhido no prompt de instalação. No diretório do runtime em
-`<raiz-coordenadora>/.agent-harnesses/runtime/cross-project/0.2.1`:
+`<raiz-coordenadora>/.agent-harnesses/runtime/cross-project/0.2.2`:
 
 ```text
 <python> -B scripts/cross_project.py bom-dia --root "<raiz-coordenadora>"
@@ -71,8 +71,8 @@ não power loss nem substituição adversarial da raiz. A
 [referência avançada](docs/REFERENCE.md) preserva os contratos de bloqueio,
 rollback, recuperação e evidência; o
 [guia operacional](OPERATOR_GUIDE.pt-BR.md) ensina o ciclo completo. Consulte também o
-[catálogo imutável](https://github.com/fabianomag/agent-harnesses/blob/v0.2.1/catalog/harnesses.json)
-e o [diagrama](https://github.com/fabianomag/agent-harnesses/blob/v0.2.1/graphs/cross-project.graph.json).
+[catálogo imutável](https://github.com/fabianomag/agent-harnesses/blob/v0.2.2/catalog/harnesses.json)
+e o [diagrama](https://github.com/fabianomag/agent-harnesses/blob/v0.2.2/graphs/cross-project.graph.json).
 Execute `<python> -B installer.py verify cross-project --target
 "<raiz-coordenadora>" --json` na raiz do pacote ainda extraído; `installer.py`
 não é copiado para o runtime.

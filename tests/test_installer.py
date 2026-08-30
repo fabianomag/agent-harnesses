@@ -1,4 +1,4 @@
-"""Black-box and safety tests for the standalone v0.2.1 installer."""
+"""Black-box and safety tests for the standalone v0.2.2 installer."""
 
 from __future__ import annotations
 
@@ -7,6 +7,7 @@ import hashlib
 import io
 import json
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -48,6 +49,69 @@ def _run(target: Path, *arguments: str) -> tuple[subprocess.CompletedProcess[str
         text=True,
     )
     return process, json.loads(process.stdout)
+
+
+def _install_receipted_021_runtime(
+    target: Path,
+    package_id: str,
+    *,
+    external_agents: bytes | None,
+) -> tuple[Path, dict[str, object]]:
+    package = installer._package_for_selector(package_id)
+    source = installer._local_source(package["id"])
+    if source is None:
+        raise AssertionError("checked-in package source is unavailable")
+    inventory = installer._validate_inventory(source[0], source[1])
+    destination = installer._runtime_destination(
+        target,
+        package["id"],
+        installer.UPGRADE_FROM_VERSION,
+    )
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copytree(source[0], destination)
+    agents_created = external_agents is None
+    attachment_start = len(external_agents or b"")
+    agents = target / installer.AGENTS_RELATIVE
+    agents.write_bytes(
+        (external_agents or b"")
+        + (b"" if agents_created else installer.ONBOARDING_SEPARATOR)
+        + installer._onboarding_block(
+            package["id"],
+            installer.UPGRADE_FROM_VERSION,
+        )
+    )
+    receipt: dict[str, object] = {
+        "schemaVersion": 2,
+        "package": {
+            "id": package["id"],
+            "version": installer.UPGRADE_FROM_VERSION,
+        },
+        "files": [
+            {"path": path, "sha256": inventory[path]}
+            for path in sorted(inventory)
+        ],
+        "onboarding": installer._onboarding_receipt(
+            package["id"],
+            agents_created,
+            attachment_start,
+            installer.UPGRADE_FROM_VERSION,
+        ),
+    }
+    (destination / installer.RECEIPT_NAME).write_bytes(
+        installer._canonical_bytes(receipt)
+    )
+    installer._verify_runtime_files(
+        destination,
+        package["id"],
+        installer.UPGRADE_FROM_VERSION,
+    )
+    installer._verify_onboarding(
+        target,
+        package["id"],
+        receipt,
+        installer.UPGRADE_FROM_VERSION,
+    )
+    return destination, receipt
 
 
 class ProductContractTests(unittest.TestCase):
@@ -407,7 +471,8 @@ class InstallerSafetyTests(unittest.TestCase):
         )
         destination = installer._runtime_destination(self.target, "project-harness")
         receipt = json.loads((destination / installer.RECEIPT_NAME).read_bytes())
-        self.assertEqual(2, receipt["schemaVersion"])
+        self.assertEqual(3, receipt["schemaVersion"])
+        self.assertIsNone(receipt["upgrade"])
         self.assertTrue(receipt["onboarding"]["agentsCreated"])
         self.assertEqual(result["operationsContract"], receipt["onboarding"]["operationsContract"])
         self.assertEqual(result["operatorGuides"], receipt["onboarding"]["operatorGuides"])
@@ -509,7 +574,7 @@ class InstallerSafetyTests(unittest.TestCase):
         self.assertIn("unchanged", second_result["message"])
         self.assertEqual(before, _snapshot(self.target))
 
-    def test_021_install_and_uninstall_preserve_existing_020_runtime_and_state(self) -> None:
+    def test_022_install_and_uninstall_preserve_existing_020_runtime_and_state(self) -> None:
         old_runtime = (
             self.target
             / ".agent-harnesses"
@@ -550,6 +615,194 @@ class InstallerSafetyTests(unittest.TestCase):
         self.assertEqual(old_before, _snapshot(old_runtime))
         self.assertEqual(marker_before, marker.read_bytes())
         self.assertEqual(old_agents, agents.read_bytes())
+
+    def test_receipted_021_upgrade_is_read_only_until_apply_and_reversible(self) -> None:
+        external = b"# Existing owner\r\nPRIVATE-EXTERNAL-CONTENT"
+        old_runtime, old_receipt = _install_receipted_021_runtime(
+            self.target,
+            "project-harness",
+            external_agents=external,
+        )
+        agents = self.target / "AGENTS.md"
+        agents.chmod(0o600)
+        original_mode = agents.stat().st_mode & 0o777
+        marker = self.target / ".project-harness" / "state.json"
+        marker.parent.mkdir()
+        marker.write_bytes(b'{"harnessVersion":"0.2.1","state":"synthetic"}\n')
+        old_runtime_before = _snapshot(old_runtime)
+        marker_before = marker.read_bytes()
+        before = _snapshot(self.target)
+
+        checked, checked_result = _run(self.target, "doctor", "project")
+        self.assertEqual(0, checked.returncode)
+        self.assertIn("v0.2.1", checked_result["message"])
+        self.assertEqual(before, _snapshot(self.target))
+
+        previewed, preview_result = _run(
+            self.target,
+            "install",
+            "project",
+            "--dry-run",
+        )
+        self.assertEqual(0, previewed.returncode)
+        self.assertEqual("OK", preview_result["code"])
+        self.assertEqual(before, _snapshot(self.target))
+
+        applied, applied_result = _run(
+            self.target,
+            "install",
+            "project",
+            "--apply",
+        )
+        self.assertEqual(0, applied.returncode)
+        self.assertEqual("installed", applied_result["phase"])
+        self.assertEqual(old_runtime_before, _snapshot(old_runtime))
+        self.assertEqual(marker_before, marker.read_bytes())
+        self.assertEqual(
+            external
+            + installer.ONBOARDING_SEPARATOR
+            + installer._onboarding_block("project-harness"),
+            agents.read_bytes(),
+        )
+        self.assertEqual(original_mode, agents.stat().st_mode & 0o777)
+        current_runtime = installer._runtime_destination(
+            self.target,
+            "project-harness",
+        )
+        current_receipt = json.loads(
+            (current_runtime / installer.RECEIPT_NAME).read_bytes()
+        )
+        self.assertEqual(3, current_receipt["schemaVersion"])
+        self.assertEqual(
+            {
+                "fromVersion": "0.2.1",
+                "receiptSha256": hashlib.sha256(
+                    installer._canonical_bytes(old_receipt)
+                ).hexdigest(),
+            },
+            current_receipt["upgrade"],
+        )
+        self.assertNotIn("PRIVATE-EXTERNAL-CONTENT", json.dumps(current_receipt))
+
+        installed_snapshot = _snapshot(self.target)
+        repeated, repeated_result = _run(
+            self.target,
+            "install",
+            "project",
+            "--apply",
+        )
+        self.assertEqual(0, repeated.returncode)
+        self.assertIn("unchanged", repeated_result["message"])
+        self.assertEqual(installed_snapshot, _snapshot(self.target))
+
+        uninstall_before = _snapshot(self.target)
+        removal_preview, removal_preview_result = _run(
+            self.target,
+            "uninstall",
+            "project",
+            "--dry-run",
+        )
+        self.assertEqual(0, removal_preview.returncode)
+        self.assertEqual("OK", removal_preview_result["code"])
+        self.assertEqual(uninstall_before, _snapshot(self.target))
+
+        removed, removed_result = _run(
+            self.target,
+            "uninstall",
+            "project",
+            "--apply",
+        )
+        self.assertEqual(0, removed.returncode)
+        self.assertEqual("OK", removed_result["code"])
+        self.assertFalse(current_runtime.exists())
+        self.assertEqual(old_runtime_before, _snapshot(old_runtime))
+        self.assertEqual(marker_before, marker.read_bytes())
+        self.assertEqual(
+            external
+            + installer.ONBOARDING_SEPARATOR
+            + installer._onboarding_block(
+                "project-harness",
+                installer.UPGRADE_FROM_VERSION,
+            ),
+            agents.read_bytes(),
+        )
+        self.assertEqual(original_mode, agents.stat().st_mode & 0o777)
+
+    def test_unreceipted_021_block_is_a_zero_write_conflict(self) -> None:
+        agents = self.target / "AGENTS.md"
+        agents.write_bytes(
+            installer._onboarding_block(
+                "project-harness",
+                installer.UPGRADE_FROM_VERSION,
+            )
+        )
+        before = _snapshot(self.target)
+
+        for command in (
+            ("doctor", "project"),
+            ("install", "project", "--dry-run"),
+            ("install", "project", "--apply"),
+        ):
+            with self.subTest(command=command):
+                process, result = _run(self.target, *command)
+                self.assertEqual(2, process.returncode)
+                self.assertEqual("E_INITIALIZATION_CONFLICT", result["code"])
+                self.assertEqual(before, _snapshot(self.target))
+
+    def test_failed_021_upgrade_restores_exact_old_bytes_and_mode(self) -> None:
+        external = b"# Existing owner\n"
+        old_runtime, _old_receipt = _install_receipted_021_runtime(
+            self.target,
+            "project-harness",
+            external_agents=external,
+        )
+        agents = self.target / "AGENTS.md"
+        agents.chmod(0o640)
+        before_files = tuple(
+            (
+                path.relative_to(self.target).as_posix(),
+                hashlib.sha256(path.read_bytes()).hexdigest(),
+            )
+            for path in sorted(self.target.rglob("*"))
+            if path.is_file()
+        )
+        old_mode = agents.stat().st_mode & 0o777
+        old_runtime_before = _snapshot(old_runtime)
+        package = installer._package_for_selector("project")
+        source = installer._local_source(package["id"])
+        self.assertIsNotNone(source)
+
+        with mock.patch.object(
+            installer,
+            "_publish_no_replace",
+            side_effect=OSError("synthetic v0.2.2 publish failure"),
+        ):
+            with self.assertRaises(OSError):
+                installer._copy_install(
+                    source[0],
+                    source[1],
+                    installer._runtime_destination(self.target, package["id"]),
+                    package["id"],
+                )
+
+        after_files = tuple(
+            (
+                path.relative_to(self.target).as_posix(),
+                hashlib.sha256(path.read_bytes()).hexdigest(),
+            )
+            for path in sorted(self.target.rglob("*"))
+            if path.is_file()
+        )
+        self.assertEqual(before_files, after_files)
+        self.assertEqual(old_mode, agents.stat().st_mode & 0o777)
+        self.assertEqual(old_runtime_before, _snapshot(old_runtime))
+        self.assertFalse(
+            installer._runtime_destination(self.target, package["id"]).exists()
+        )
+        self.assertEqual(
+            [],
+            list(old_runtime.parent.glob(".install-*")),
+        )
 
     def test_concurrent_exact_installs_converge_without_residue(self) -> None:
         environment = os.environ.copy()
@@ -926,6 +1179,19 @@ class InstallerSafetyTests(unittest.TestCase):
         invalid_block_digest = json.loads(canonical)
         invalid_block_digest["onboarding"]["blockSha256"] = "0" * 64
         mutations.append(("invalid-block-digest", invalid_block_digest, False))
+        invalid_upgrade_version = json.loads(canonical)
+        invalid_upgrade_version["upgrade"] = {
+            "fromVersion": "0.2.0",
+            "receiptSha256": "0" * 64,
+        }
+        mutations.append(("invalid-upgrade-version", invalid_upgrade_version, False))
+        invalid_upgrade_shape = json.loads(canonical)
+        invalid_upgrade_shape["upgrade"] = {
+            "fromVersion": "0.2.1",
+            "receiptSha256": "0" * 64,
+            "externalBytes": "must-not-be-accepted",
+        }
+        mutations.append(("invalid-upgrade-shape", invalid_upgrade_shape, False))
         noncanonical = json.loads(canonical)
         mutations.append(("noncanonical-json", noncanonical, True))
 

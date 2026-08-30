@@ -3,6 +3,19 @@
 All notable public changes to Agent Harnesses are recorded here. Historical
 `0.1.x` package tags remain immutable; collection releases begin at `v0.2.0`.
 
+## [0.2.2] - 2026-08-29
+
+- Allow Multi-Project Harness to coordinate confirmed independent project
+  roots outside the coordination directory while preserving fail-closed path
+  validation and zero writes to those projects.
+- Correct the generated operator contracts for Workspace `add`/`recover` and
+  Control Plane `digere`/`recover` so their persistent effects match the
+  runtimes exactly.
+- Preserve direct, non-mutating reads of Project Harness state created by
+  `0.1.0`, `0.2.0`, and `0.2.1` during the `0.2.2` update.
+- Supersede immutable `v0.2.1` after public copied-prompt smoke testing exposed
+  the Multi-Project external-root defect.
+
 ## [0.2.1] - 2026-08-29
 
 - Make the core packages explicitly agent-agnostic: each package ships its

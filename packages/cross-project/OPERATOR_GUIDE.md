@@ -3,7 +3,7 @@
 This is the complete, agent-agnostic operating contract for the installed runtime. It does not require a formal Skill or an agent-specific API. Use one public Python 3.10+ executable and the target-local entrypoint shown below.
 
 - Entrypoint: `scripts/cross_project.py`
-- Package: `cross-project` v`0.2.1`
+- Package: `cross-project` v`0.2.2`
 
 ## Operational memory
 
@@ -103,8 +103,8 @@ Use hq-sync as read-only diagnosis; on inconsistency, stop for explicit manual r
 
 ## Installation receipt, rollback, update, and uninstall
 
-- Receipt: target-relative `.agent-harnesses/runtime/cross-project/0.2.1/.agent-harness-receipt.json`.
-- From a checksum-verified `0.2.1` bundle, preview package removal with `<python> -B installer.py uninstall cross-project --target "<target>" --dry-run --json`; after review, apply it with `<python> -B installer.py uninstall cross-project --target "<target>" --apply --json`.
+- Receipt: target-relative `.agent-harnesses/runtime/cross-project/0.2.2/.agent-harness-receipt.json`.
+- From a checksum-verified `0.2.2` bundle, preview package removal with `<python> -B installer.py uninstall cross-project --target "<target>" --dry-run --json`; after review, apply it with `<python> -B installer.py uninstall cross-project --target "<target>" --apply --json`.
 - Uninstall removes only the receipt-owned runtime and installer-managed onboarding block. It never removes initialized operational state.
 - If a step fails after package apply, first run this package's verify-or-recover workflow. If the target still is not ready, preview and then apply uninstall to roll back the package. Preserve and report any residual initialized state; never delete it automatically.
 - To update, download the new version's ZIP and matching checksum sidecar, verify the checksum, read its migration notes, then run the new bundle's doctor, install --dry-run, and install --apply. Do not edit a versioned runtime in place; keep the old version until the new one reaches ready=true.

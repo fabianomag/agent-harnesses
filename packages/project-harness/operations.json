@@ -172,7 +172,7 @@
     "displayName": "Project Harness",
     "entrypoint": "project_harness.py",
     "id": "project-harness",
-    "version": "0.2.1"
+    "version": "0.2.2"
   },
   "readiness": {
     "en": "The exact runtime inventory is installed, project state is initialized, managed projections verify, and the project can be opened from its persisted next step.",

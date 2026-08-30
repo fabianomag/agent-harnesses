@@ -178,25 +178,79 @@ def _child_parts(value: str) -> tuple[str, ...]:
     return pure.parts
 
 
-def _child_path(root: Path, value: str) -> tuple[str, Path]:
-    parts = _child_parts(value)
-    candidate = root.joinpath(*parts)
-    _assert_plain_target(candidate, root)
-    resolved = candidate.resolve(strict=True)
+def _project_path_syntax(value: str) -> Path | None:
+    """Validate one stored project-root spelling without touching the filesystem.
+
+    Relative POSIX paths are the v0.1/v0.2.1 compatibility form and remain
+    contained by the coordination root. New independent project roots may use
+    normalized native absolute paths.
+    """
+
+    candidate = Path(value)
+    if candidate.drive and not candidate.is_absolute():
+        raise HarnessError("project root must not use a drive-relative path")
+    if not candidate.is_absolute():
+        _child_parts(value)
+        return None
+
+    native = os.fspath(candidate)
+    if (
+        value != native
+        or any(part in {".", ".."} for part in candidate.parts)
+        or (os.name != "nt" and value.startswith("//"))
+    ):
+        raise HarnessError("absolute project root must be normalized")
+    if any(part.casefold() == ".git" for part in candidate.parts):
+        raise HarnessError("Git metadata must not be a project root")
+    return candidate
+
+
+def _project_path(root: Path, value: str) -> tuple[str, Path]:
+    candidate = _project_path_syntax(value)
+    if candidate is None:
+        parts = _child_parts(value)
+        contained = root.joinpath(*parts)
+        _assert_plain_target(contained, root)
+        resolved = contained.resolve(strict=True)
+        try:
+            resolved.relative_to(root)
+        except ValueError as exc:
+            raise HarnessError(
+                "relative project root resolves outside the coordination root"
+            ) from exc
+        if not resolved.is_dir():
+            raise HarnessError("project root must be an existing directory")
+        return resolved.relative_to(root).as_posix(), resolved
+
+    _assert_link_free_existing_root(candidate)
     try:
-        resolved.relative_to(root)
-    except ValueError as exc:
-        raise HarnessError("child path resolves outside the selected root") from exc
+        resolved = candidate.resolve(strict=True)
+    except (OSError, RuntimeError) as exc:
+        raise HarnessError("project root must be an existing directory") from exc
     if not resolved.is_dir():
-        raise HarnessError("child path must resolve to a directory")
-    return resolved.relative_to(root).as_posix(), resolved
+        raise HarnessError("project root must be an existing directory")
+    if resolved.parent == resolved:
+        raise HarnessError("filesystem root must not be a project root")
+    try:
+        home = Path.home().resolve(strict=True)
+    except OSError:
+        home = None
+    if home is not None and _same_path(resolved, home):
+        raise HarnessError("home directory must not be a project root")
+    if any(part.casefold() == ".git" for part in resolved.parts):
+        raise HarnessError("Git metadata must not be a project root")
+    if _same_path(resolved, root):
+        raise HarnessError(
+            "project root must be distinct from the coordination root"
+        )
+    return os.fspath(resolved), resolved
 
 
 def _same_path(first: Path, second: Path) -> bool:
     try:
         return first.samefile(second)
     except OSError as exc:
-        raise HarnessError("child path changed during validation; retry") from exc
+        raise HarnessError("project root changed during validation; retry") from exc
 
 
 def _read_text(path: Path) -> str:
@@ -260,7 +314,7 @@ def _validate_front(front_id: str, front: Any) -> None:
                 "lastReflection",
                 "reflectWhen",
             })
-    _child_parts(front["path"])
+    _project_path_syntax(front["path"])
     if front["coordinationPending"]:
         if front["lastReflection"] or front["reflectWhen"]:
             raise HarnessError("pending front must not contain a completed reflection")
@@ -363,8 +417,9 @@ def _agents_body() -> str:
     return """# Cross-project protocol
 
 Use `harness.config.json` as machine authority and `FRONTS.md` as the compact
-human panel. Keep dense implementation history in each child. Run `hq-sync`
-after a registration or reflection. Never repair a divergence silently."""
+human panel. Keep dense implementation history in each registered project.
+Run `hq-sync` after a registration or reflection. Never repair a divergence
+silently."""
 
 
 def _fronts_body(state: Mapping[str, Any]) -> str:
@@ -618,7 +673,7 @@ def _require_front(state: Mapping[str, Any], front_id: str) -> dict[str, Any]:
 def _assert_registered_paths(root: Path, state: Mapping[str, Any]) -> None:
     seen: list[tuple[str, Path]] = []
     for front_id, front in state["fronts"].items():
-        _, path = _child_path(root, front["path"])
+        _, path = _project_path(root, front["path"])
         for other_id, other_path in seen:
             if _same_path(path, other_path):
                 raise HarnessError(f"front path aliases {other_id}")
@@ -637,7 +692,7 @@ def command_bom_dia(args: argparse.Namespace) -> int:
             }
         elif args.front:
             front = _require_front(state, args.front)
-            _child_path(root, front["path"])
+            _project_path(root, front["path"])
             payload = {
                 "command": "bom-dia",
                 "front": args.front,
@@ -674,7 +729,7 @@ def command_hq_init(args: argparse.Namespace) -> int:
     read_snapshot = _snapshot(root)
     if not ID_PATTERN.fullmatch(args.front):
         raise HarnessError("front id has an invalid format")
-    relative, resolved = _child_path(root, args.path)
+    stored_path, resolved = _project_path(root, args.path)
     captured = _capture_managed(root)
     state = _state_from_capture(captured, root, required=False) or {
         "schemaVersion": SCHEMA_VERSION,
@@ -685,7 +740,7 @@ def command_hq_init(args: argparse.Namespace) -> int:
     existing = state["fronts"].get(args.front)
     proposed = {
         "name": args.name,
-        "path": relative,
+        "path": stored_path,
         "role": args.role,
         "state": "registered",
         "next": args.next,
@@ -699,7 +754,7 @@ def command_hq_init(args: argparse.Namespace) -> int:
     for other_id, other in state["fronts"].items():
         if other_id == args.front:
             continue
-        _, other_path = _child_path(root, other["path"])
+        _, other_path = _project_path(root, other["path"])
         if _same_path(other_path, resolved):
             raise HarnessError("another front id already owns this path")
     state["fronts"][args.front] = proposed
@@ -727,9 +782,9 @@ def command_hq_sync(args: argparse.Namespace) -> int:
         seen: list[tuple[str, Path]] = []
         for front_id, front in state["fronts"].items():
             try:
-                _, path = _child_path(root, front["path"])
-            except HarnessError:
-                issues.append(f"{front_id}: invalid or missing child path")
+                _, path = _project_path(root, front["path"])
+            except HarnessError as exc:
+                issues.append(f"{front_id}: {exc}")
                 continue
             for other_id, other_path in seen:
                 if _same_path(path, other_path):
@@ -753,9 +808,9 @@ def command_digere(args: argparse.Namespace) -> int:
     with _stable_read(root):
         state = _load(root)
         front = _require_front(state, args.front)
-        relative, _ = _child_path(root, front["path"])
+        stored_path, _ = _project_path(root, front["path"])
         if args.scope == "local":
-            owner = relative
+            owner = stored_path
             durable = True
         elif args.scope == "coordination":
             owner = CONFIG_NAME
@@ -843,7 +898,7 @@ def parser() -> argparse.ArgumentParser:
     bom.add_argument("--front")
     bom.set_defaults(handler=command_bom_dia)
 
-    init = commands.add_parser("hq-init", help="preview or register a child")
+    init = commands.add_parser("hq-init", help="preview or register a project")
     init.add_argument("--root", required=True)
     init.add_argument("--master-name", default="Cross-project root")
     init.add_argument("--front", required=True)

@@ -166,6 +166,137 @@ class CrossProjectTests(unittest.TestCase):
             self.run_cli("hq-sync", "--root", str(self.root))["consistent"]
         )
 
+    def test_legacy_contained_relative_project_root_remains_supported(self) -> None:
+        self.run_cli(*self.init_arguments())
+        state = json.loads(
+            (self.root / MODULE.CONFIG_NAME).read_text(encoding="utf-8")
+        )
+        self.assertEqual(state["fronts"]["alpha"]["path"], "projects/alpha")
+        self.assertTrue(
+            self.run_cli("hq-sync", "--root", str(self.root))["consistent"]
+        )
+
+    def test_independent_sibling_project_roots_sync_without_project_writes(self) -> None:
+        portfolio = self.root / "portfolio"
+        coordination = portfolio / "coordination"
+        alpha = portfolio / "alpha-service"
+        beta = portfolio / "beta-client"
+        for project, marker in ((alpha, b"alpha\n"), (beta, b"beta\n")):
+            project.mkdir(parents=True)
+            (project / "README.md").write_bytes(marker)
+        coordination.mkdir()
+
+        project_snapshots = {
+            alpha: self.physical_snapshot(alpha),
+            beta: self.physical_snapshot(beta),
+        }
+        coordination_before = self.physical_snapshot(coordination)
+        alpha_arguments = (
+            "hq-init",
+            "--root",
+            str(coordination),
+            "--front",
+            "alpha",
+            "--name",
+            "Alpha service",
+            "--path",
+            str(alpha),
+            "--role",
+            "Produces the service API",
+            "--next",
+            "Publish the confirmed contract",
+        )
+        beta_arguments = (
+            "hq-init",
+            "--root",
+            str(coordination),
+            "--front",
+            "beta",
+            "--name",
+            "Beta client",
+            "--path",
+            str(beta),
+            "--role",
+            "Consumes the service API",
+            "--next",
+            "Validate the handoff",
+        )
+
+        preview = self.run_cli(*alpha_arguments, "--dry-run")
+        self.assertTrue(preview["dryRun"])
+        self.assertEqual(
+            coordination_before,
+            self.physical_snapshot(coordination),
+        )
+        self.run_cli(*alpha_arguments)
+        self.run_cli(*beta_arguments)
+        self.assertTrue(
+            self.run_cli("hq-sync", "--root", str(coordination))["consistent"]
+        )
+
+        state = json.loads(
+            (coordination / MODULE.CONFIG_NAME).read_text(encoding="utf-8")
+        )
+        self.assertEqual(state["fronts"]["alpha"]["path"], str(alpha))
+        self.assertEqual(state["fronts"]["beta"]["path"], str(beta))
+        for project, before in project_snapshots.items():
+            self.assertEqual(before, self.physical_snapshot(project))
+
+        coordination_after = self.physical_snapshot(coordination)
+        repeated = self.run_cli(*alpha_arguments, "--dry-run")
+        self.assertEqual(repeated["changed"], [])
+        self.assertEqual(
+            coordination_after,
+            self.physical_snapshot(coordination),
+        )
+        for project, before in project_snapshots.items():
+            self.assertEqual(before, self.physical_snapshot(project))
+
+    def test_absolute_project_root_cannot_be_owned_by_two_front_ids(self) -> None:
+        portfolio = self.root / "absolute-alias"
+        coordination = portfolio / "coordination"
+        project = portfolio / "project"
+        project.mkdir(parents=True)
+        coordination.mkdir()
+        first = (
+            "hq-init",
+            "--root",
+            str(coordination),
+            "--front",
+            "first",
+            "--name",
+            "First",
+            "--path",
+            str(project),
+            "--role",
+            "Owns the project",
+            "--next",
+            "Continue",
+        )
+        self.run_cli(*first)
+        coordination_before = self.physical_snapshot(coordination)
+        project_before = self.physical_snapshot(project)
+        second = (
+            "hq-init",
+            "--root",
+            str(coordination),
+            "--front",
+            "second",
+            "--name",
+            "Second",
+            "--path",
+            str(project),
+            "--role",
+            "Must not alias the project",
+            "--next",
+            "Stop",
+        )
+        result = self.run_process(*second)
+        self.assertEqual(result.returncode, 2, result.stderr)
+        self.assertIn("already owns this path", result.stderr)
+        self.assertEqual(coordination_before, self.physical_snapshot(coordination))
+        self.assertEqual(project_before, self.physical_snapshot(project))
+
     def test_preview_and_read_only_commands_do_not_write(self) -> None:
         before = self.digest()
         self.run_cli(*self.init_arguments(), "--dry-run")
@@ -254,10 +385,9 @@ class CrossProjectTests(unittest.TestCase):
         second[second.index("projects/alpha")] = "projects/casetarget"
         self.run_cli(*second, expected=2)
 
-    def test_traversal_absolute_and_symlink_paths_are_rejected(self) -> None:
+    def test_traversal_and_relative_symlink_paths_are_rejected(self) -> None:
         for child in (
             "../outside",
-            str(self.root / "projects" / "alpha"),
             "projects//alpha",
             "projects/./alpha",
             "projects/alpha/",
@@ -273,6 +403,145 @@ class CrossProjectTests(unittest.TestCase):
         arguments = list(self.init_arguments())
         arguments[arguments.index("projects/alpha")] = "projects/linked"
         self.run_cli(*arguments, expected=2)
+
+    def test_unsafe_absolute_project_roots_fail_without_coordination_writes(self) -> None:
+        portfolio = self.root / "unsafe-absolute"
+        coordination = portfolio / "coordination"
+        project = portfolio / "project"
+        project.mkdir(parents=True)
+        coordination.mkdir()
+        regular_file = portfolio / "not-a-directory.txt"
+        regular_file.write_text("not a root\n", encoding="utf-8")
+        git_metadata = portfolio / ".git"
+        git_metadata.mkdir()
+
+        non_normalized = (
+            os.fspath(project.parent)
+            + os.sep
+            + "."
+            + os.sep
+            + project.name
+        )
+        invalid = (
+            non_normalized,
+            os.fspath(project) + os.sep,
+            os.fspath(Path(project.anchor)),
+            str(Path.home()),
+            str(portfolio / "missing"),
+            str(regular_file),
+            str(git_metadata),
+            str(coordination),
+        )
+        before = self.physical_snapshot(coordination)
+        project_before = self.physical_snapshot(project)
+        for candidate in invalid:
+            with self.subTest(candidate=candidate):
+                arguments = (
+                    "hq-init",
+                    "--root",
+                    str(coordination),
+                    "--front",
+                    "unsafe",
+                    "--name",
+                    "Unsafe",
+                    "--path",
+                    candidate,
+                    "--role",
+                    "Must not be registered",
+                    "--next",
+                    "Stop",
+                )
+                result = self.run_process(*arguments)
+                self.assertEqual(result.returncode, 2, result.stderr)
+                self.assertNotIn("Traceback", result.stderr)
+                self.assertEqual(before, self.physical_snapshot(coordination))
+                self.assertEqual(project_before, self.physical_snapshot(project))
+                self.assertFalse((coordination / MODULE.CONFIG_NAME).exists())
+                self.assertFalse((coordination / MODULE.LOCK_NAME).exists())
+                self.assertEqual([], list(coordination.glob(".cross-project-*")))
+
+    def test_physical_home_alias_is_rejected_without_coordination_writes(self) -> None:
+        home = Path.home().resolve(strict=True)
+        candidates = [
+            Path(os.sep).joinpath("System", "Volumes", "Data", *home.parts[1:]),
+            home.with_name(home.name.swapcase()),
+        ]
+        alias = next(
+            (
+                candidate
+                for candidate in candidates
+                if candidate != home
+                and candidate.is_dir()
+                and candidate.samefile(home)
+            ),
+            None,
+        )
+        if alias is None:
+            self.skipTest("no distinct link-free physical alias for the home directory")
+
+        portfolio = self.root / "home-alias"
+        coordination = portfolio / "coordination"
+        coordination.mkdir(parents=True)
+        before = self.physical_snapshot(coordination)
+        arguments = (
+            "hq-init",
+            "--root",
+            str(coordination),
+            "--front",
+            "unsafe-home",
+            "--name",
+            "Unsafe home",
+            "--path",
+            str(alias),
+            "--role",
+            "Must not be registered",
+            "--next",
+            "Stop",
+        )
+        result = self.run_process(*arguments)
+        self.assertEqual(result.returncode, 2, result.stderr)
+        self.assertIn("home directory must not be a project root", result.stderr)
+        self.assertNotIn("Traceback", result.stderr)
+        self.assertEqual(before, self.physical_snapshot(coordination))
+        self.assertFalse((coordination / MODULE.CONFIG_NAME).exists())
+        self.assertFalse((coordination / MODULE.LOCK_NAME).exists())
+        self.assertEqual([], list(coordination.glob(".cross-project-*")))
+
+    def test_absolute_project_root_link_is_rejected_without_writes(self) -> None:
+        portfolio = self.root / "absolute-link"
+        coordination = portfolio / "coordination"
+        project = portfolio / "project"
+        alias = portfolio / "project-alias"
+        project.mkdir(parents=True)
+        coordination.mkdir()
+        try:
+            alias.symlink_to(project, target_is_directory=True)
+        except (OSError, NotImplementedError):
+            self.skipTest("symbolic links unavailable")
+
+        before = self.physical_snapshot(coordination)
+        project_before = self.physical_snapshot(project)
+        arguments = (
+            "hq-init",
+            "--root",
+            str(coordination),
+            "--front",
+            "linked",
+            "--name",
+            "Linked",
+            "--path",
+            str(alias),
+            "--role",
+            "Must not be registered",
+            "--next",
+            "Stop",
+        )
+        result = self.run_process(*arguments)
+        self.assertEqual(result.returncode, 2, result.stderr)
+        self.assertIn("link-like", result.stderr)
+        self.assertEqual(before, self.physical_snapshot(coordination))
+        self.assertEqual(project_before, self.physical_snapshot(project))
+        self.assertFalse((coordination / MODULE.CONFIG_NAME).exists())
 
     def test_git_and_dangerous_roots_are_rejected(self) -> None:
         git = self.root / ".git"

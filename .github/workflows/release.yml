@@ -9,7 +9,7 @@ on:
       tag:
         description: Exact product release tag
         required: true
-        default: v0.2.1
+        default: v0.2.2
         type: string
       commit:
         description: Full lowercase source commit SHA

@@ -1,7 +1,7 @@
 # Workspace Harness — advanced reference
 
 - Package ID: `workspace-coordination`
-- Version: `0.2.1`
+- Version: `0.2.2`
 - Artifact status: implemented, published
 - Runtime: Python 3.10 or newer, standard library only
 
@@ -68,13 +68,13 @@ identical content is a no-op; reusing it with different content is a collision.
 From the source repository root:
 
 ```text
-<python> -B tools/package_manager.py install --package workspace-coordination --version 0.2.1 --root "<install-root>" --dry-run
-<python> -B tools/package_manager.py install --package workspace-coordination --version 0.2.1 --root "<install-root>" --apply
-<python> -B tools/package_manager.py verify --package workspace-coordination --version 0.2.1 --root "<install-root>"
+<python> -B tools/package_manager.py install --package workspace-coordination --version 0.2.2 --root "<install-root>" --dry-run
+<python> -B tools/package_manager.py install --package workspace-coordination --version 0.2.2 --root "<install-root>" --apply
+<python> -B tools/package_manager.py verify --package workspace-coordination --version 0.2.2 --root "<install-root>"
 ```
 
 The installed copy is
-`<install-root>/workspace-coordination-0.2.1/`. The common package manager does
+`<install-root>/workspace-coordination-0.2.2/`. The common package manager does
 not create a global command or invoke the runtime.
 
 ## Preflight
@@ -107,7 +107,7 @@ Verify runtime state from the installed package root:
 Verify installed package bytes from the source repository root:
 
 ```text
-<python> -B tools/package_manager.py verify --package workspace-coordination --version 0.2.1 --root "<install-root>"
+<python> -B tools/package_manager.py verify --package workspace-coordination --version 0.2.2 --root "<install-root>"
 ```
 
 Run package-local automated checks from the installed package root:
@@ -172,7 +172,7 @@ catchable later failure.
 
 ## Limitations
 
-- Version `0.2.1` supports one mutating writer per coordinator root; serialize
+- Version `0.2.2` supports one mutating writer per coordinator root; serialize
   writers externally.
 - Children must be explicitly registered and contained by one coordinator.
 - The harness does not execute child work or dispatch agents.
@@ -196,12 +196,12 @@ package version and commit.
 
 ## Version and immutable links
 
-Version `0.2.1` is bound to the immutable `v0.2.1` release tag.
+Version `0.2.2` is bound to the immutable `v0.2.2` release tag.
 
-- Immutable documentation URL: https://github.com/fabianomag/agent-harnesses/blob/v0.2.1/packages/workspace-coordination/README.md
-- Immutable install prompt: `Install this harness for me: https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.1/workspace-coordination-0.2.1.zip`
-- Immutable source URL: https://github.com/fabianomag/agent-harnesses/tree/v0.2.1/packages/workspace-coordination
-- Release URL: https://github.com/fabianomag/agent-harnesses/releases/tag/v0.2.1
+- Immutable documentation URL: https://github.com/fabianomag/agent-harnesses/blob/v0.2.2/packages/workspace-coordination/README.md
+- Immutable install prompt: `Install this harness for me: https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.2/workspace-coordination-0.2.2.zip`
+- Immutable source URL: https://github.com/fabianomag/agent-harnesses/tree/v0.2.2/packages/workspace-coordination
+- Release URL: https://github.com/fabianomag/agent-harnesses/releases/tag/v0.2.2
 - Installation report: https://github.com/fabianomag/agent-harnesses/issues/new?template=installation-report.yml
 
 Do not substitute a mutable branch URL for the version-bound fields.
@@ -209,7 +209,7 @@ Do not substitute a mutable branch URL for the version-bound fields.
 ## Diagrams
 
 - Graph ID: `workspace-coordination-flow`
-- Immutable spec: https://github.com/fabianomag/agent-harnesses/blob/v0.2.1/graphs/workspace-coordination.graph.json
+- Immutable spec: https://github.com/fabianomag/agent-harnesses/blob/v0.2.2/graphs/workspace-coordination.graph.json
 - Source-tree static asset: `assets/workspace-coordination.svg`
 - Interactive diagram: https://fabianomag.com/projects/agent-harnesses
 

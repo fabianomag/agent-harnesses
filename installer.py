@@ -50,7 +50,7 @@ PRODUCT = json.loads(r'''{
         "single-project",
         "project-harness"
       ],
-      "asset": "project-harness-0.2.1.zip",
+      "asset": "project-harness-0.2.2.zip",
       "complexity": {
         "en": "Low",
         "level": "low",
@@ -296,7 +296,7 @@ PRODUCT = json.loads(r'''{
         "workspace-harness",
         "workspace-coordination"
       ],
-      "asset": "workspace-coordination-0.2.1.zip",
+      "asset": "workspace-coordination-0.2.2.zip",
       "complexity": {
         "en": "Medium",
         "level": "medium",
@@ -370,8 +370,8 @@ PRODUCT = json.loads(r'''{
           {
             "command": "add",
             "effects": {
-              "en": "Updates only the coordinator index and the selected child's local coordination record.",
-              "ptBr": "Atualiza somente o índice do coordenador e o registro local de coordenação do projeto filho selecionado."
+              "en": "Updates only the coordinator manifest and generated index; validates the selected child's owner file and any existing local state without changing the child.",
+              "ptBr": "Atualiza somente o manifest do coordenador e o index gerado; valida o owner file e qualquer estado local existente do projeto filho selecionado sem alterar o projeto filho."
             },
             "example": "<python> -B workspace_coordination.py --root \"<coordinator-root>\" add --id \"<child-id>\" --path \"<child-path>\" --owner \"<owner-file>\" --dry-run",
             "inputs": [
@@ -500,8 +500,8 @@ PRODUCT = json.loads(r'''{
           {
             "command": "recover",
             "effects": {
-              "en": "Repairs derivable coordinator-managed state and never reconstructs missing child-owned facts.",
-              "ptBr": "Faz repair do estado derivável e gerenciado pelo coordenador sem reconstruir fatos ausentes pertencentes aos projetos filhos."
+              "en": "Repairs derivable coordinator files and canonicalizes existing harness-owned child-local state; it never creates missing child records or reconstructs facts.",
+              "ptBr": "Faz repair dos arquivos deriváveis do coordenador e canonicaliza o estado local existente dos projetos filhos pertencente ao harness; nunca cria registros locais ausentes nem reconstrói fatos."
             },
             "example": "<python> -B workspace_coordination.py --root \"<coordinator-root>\" recover --dry-run",
             "inputs": [
@@ -586,7 +586,7 @@ PRODUCT = json.loads(r'''{
         "cross-project",
         "cross"
       ],
-      "asset": "cross-project-0.2.1.zip",
+      "asset": "cross-project-0.2.2.zip",
       "complexity": {
         "en": "Medium",
         "level": "medium",
@@ -826,7 +826,7 @@ PRODUCT = json.loads(r'''{
         "control-plane-harness",
         "orchestration"
       ],
-      "asset": "orchestration-0.2.1.zip",
+      "asset": "orchestration-0.2.2.zip",
       "complexity": {
         "en": "High",
         "level": "high",
@@ -955,8 +955,8 @@ PRODUCT = json.loads(r'''{
           {
             "command": "digere",
             "effects": {
-              "en": "Transactionally records only the supplied reflection and moves the front to digested state.",
-              "ptBr": "Registra transacionalmente somente a reflexão fornecida e move a frente para o estado digested."
+              "en": "Transactionally records the supplied reflection and pending action, refreshes deterministic views and counters, and moves the front to digested state.",
+              "ptBr": "Registra transacionalmente a reflexão e a ação pendente fornecidas, atualiza views e counters determinísticos e move a frente para o estado digested."
             },
             "example": "<python> -B hq.py --root \"<workspace>\" --json digere --front \"<front-selector>\" --summary \"<summary>\" --pending \"<pending-action>\"",
             "inputs": [
@@ -1028,8 +1028,8 @@ PRODUCT = json.loads(r'''{
           {
             "command": "recover",
             "effects": {
-              "en": "Rolls back a recognized pre-commit transaction or completes verified cleanup after a durable commit; unknown bytes stop recovery.",
-              "ptBr": "Executa rollback de uma transação pre-commit reconhecida ou conclui cleanup verificado após commit durável; bytes desconhecidos interrompem recovery."
+              "en": "Rolls back a recognized pre-commit transaction or completes verified cleanup after a durable commit; unknown managed-target bytes stop recovery.",
+              "ptBr": "Executa rollback de uma transação pre-commit reconhecida ou conclui cleanup verificado após commit durável; bytes desconhecidos nos targets gerenciados interrompem recovery."
             },
             "example": "<python> -B hq.py --root \"<workspace>\" --json recover --dry-run",
             "inputs": [
@@ -1144,8 +1144,8 @@ PRODUCT = json.loads(r'''{
       "en": "https://fabianomag.com/projects/agent-harnesses",
       "ptBr": "https://fabianomag.com/pt-br/projetos/agent-harnesses"
     },
-    "tag": "v0.2.1",
-    "version": "0.2.1"
+    "tag": "v0.2.2",
+    "version": "0.2.2"
   },
   "schemaVersion": 2,
   "support": {
@@ -1205,6 +1205,7 @@ PRODUCT = json.loads(r'''{
   }
 }''')
 VERSION = PRODUCT["release"]["version"]
+UPGRADE_FROM_VERSION = "0.2.1"
 MARKERS = {
     "project-harness": Path(".project-harness/state.json"),
     "workspace-coordination": Path(".workspace-coordination/workspace.json"),
@@ -1284,8 +1285,8 @@ def _result(code, phase, message, remediation="", ready=False):
     }
 
 
-def _onboarding_paths(package_id):
-    base = (RUNTIME_RELATIVE / package_id / VERSION).as_posix()
+def _onboarding_paths(package_id, version=VERSION):
+    base = (RUNTIME_RELATIVE / package_id / version).as_posix()
     return {
         "operationsContract": "%s/operations.json" % base,
         "operatorGuides": {
@@ -1308,9 +1309,9 @@ def _onboarding_markers(package_id):
     )
 
 
-def _onboarding_block(package_id):
+def _onboarding_block(package_id, version=VERSION):
     begin, end = _onboarding_markers(package_id)
-    paths = _onboarding_paths(package_id)
+    paths = _onboarding_paths(package_id, version)
     return (
         begin
         + b"\n## Agent Harness operating contract\n\n"
@@ -1355,7 +1356,13 @@ def _onboarding_failure(code, phase, message, remediation):
     raise InstallerFailure(code, phase, message, remediation)
 
 
-def _inspect_onboarding(target, package_id, phase="downloaded", required=False):
+def _inspect_onboarding(
+    target,
+    package_id,
+    phase="downloaded",
+    required=False,
+    version=VERSION,
+):
     path = target / AGENTS_RELATIVE
     if not _lexists(path):
         if required:
@@ -1439,7 +1446,7 @@ def _inspect_onboarding(target, package_id, phase="downloaded", required=False):
             if first_id in {item["id"] for item in PRODUCT["packages"]}
             else "Remove the unknown managed block only after resolving its ownership.",
         )
-    expected = _onboarding_block(package_id)
+    expected = _onboarding_block(package_id, version)
     start = matches[0].start()
     end = start + len(expected)
     if data[start:end] != expected or matches[1].end() != end - 1:
@@ -1593,6 +1600,22 @@ def _recommend(package_id):
     return "%s (`%s`)" % (names[package_id], package_id)
 
 
+def _inspect_uninstalled_onboarding(target, package_id):
+    try:
+        return _inspect_onboarding(target, package_id)
+    except InstallerFailure as current_error:
+        if current_error.result["code"] != "E_CHECKSUM_MISMATCH":
+            raise
+        try:
+            return _inspect_onboarding(
+                target,
+                package_id,
+                version=UPGRADE_FROM_VERSION,
+            )
+        except InstallerFailure:
+            raise current_error
+
+
 def _doctor(package, target):
     marker_ids = _marker_ids(target)
     if len(marker_ids) > 1:
@@ -1611,11 +1634,6 @@ def _doctor(package, target):
             "Keep the target unchanged and use %s." % _recommend(observed),
         )
     destination = _runtime_destination(target, package["id"])
-    onboarding = _inspect_onboarding(
-        target,
-        package["id"],
-        phase="installed" if _lexists(destination) else "downloaded",
-    )
     _validate_managed_shapes(package, target)
     runtime_root = target / ".agent-harnesses"
     if _lexists(runtime_root) and (_is_link_like(runtime_root) or not runtime_root.is_dir()):
@@ -1625,16 +1643,22 @@ def _doctor(package, target):
             "The target-local runtime boundary is not a real directory.",
             "Resolve the .agent-harnesses collision without overwriting it.",
         )
-    if onboarding["packageId"] == package["id"] and not _lexists(destination):
-        raise InstallerFailure(
-            "E_INITIALIZATION_CONFLICT",
-            "downloaded",
-            "AGENTS.md contains an unreceipted onboarding block.",
-            "Keep it unchanged and resolve its ownership before installing this runtime.",
-        )
+    upgrade = None
     if _lexists(destination):
         receipt = _verify_runtime_files(destination, package["id"])
-        _verify_onboarding(target, package["id"], receipt)
+        onboarding = _verify_onboarding(target, package["id"], receipt)
+        _verify_upgrade_predecessor(target, package["id"], receipt, onboarding)
+    else:
+        upgrade = _upgrade_candidate(package, target)
+        if upgrade is None:
+            onboarding = _inspect_uninstalled_onboarding(target, package["id"])
+            if onboarding["packageId"] == package["id"]:
+                raise InstallerFailure(
+                    "E_INITIALIZATION_CONFLICT",
+                    "downloaded",
+                    "AGENTS.md contains an unreceipted onboarding block.",
+                    "Keep it unchanged and resolve its ownership before installing this runtime.",
+                )
     if package["id"] == "orchestration" and not marker_ids:
         master_like = any(
             _lexists(target / name)
@@ -1655,8 +1679,10 @@ def _doctor(package, target):
             )
     initialized = bool(marker_ids and marker_ids[0] == package["id"])
     message = "Preflight passed for the selected harness."
+    if upgrade is not None:
+        message = "Preflight passed for the receipt-owned v0.2.1 to v%s upgrade." % VERSION
     if initialized:
-        message = "Preflight passed; the target already has the selected harness marker."
+        message += " The target already has the selected harness marker."
     return _result("OK", "downloaded", message, ready=False)
 
 
@@ -1869,12 +1895,17 @@ def _local_source(package_id):
     return None
 
 
-def _runtime_destination(target, package_id):
-    return target / RUNTIME_RELATIVE / package_id / VERSION
+def _runtime_destination(target, package_id, version=VERSION):
+    return target / RUNTIME_RELATIVE / package_id / version
 
 
-def _onboarding_digest(package_id, agents_created, attachment_offset):
-    block = _onboarding_block(package_id)
+def _onboarding_digest(
+    package_id,
+    agents_created,
+    attachment_offset,
+    version=VERSION,
+):
+    block = _onboarding_block(package_id, version)
     if agents_created:
         return hashlib.sha256(block).hexdigest()
     anchored = (
@@ -1887,8 +1918,13 @@ def _onboarding_digest(package_id, agents_created, attachment_offset):
     return hashlib.sha256(anchored).hexdigest()
 
 
-def _onboarding_receipt(package_id, agents_created, attachment_offset):
-    value = _onboarding_paths(package_id)
+def _onboarding_receipt(
+    package_id,
+    agents_created,
+    attachment_offset,
+    version=VERSION,
+):
+    value = _onboarding_paths(package_id, version)
     value.update(
         {
             "agentsCreated": bool(agents_created),
@@ -1896,15 +1932,22 @@ def _onboarding_receipt(package_id, agents_created, attachment_offset):
                 package_id,
                 bool(agents_created),
                 attachment_offset,
+                version,
             ),
         }
     )
     return value
 
 
-def _receipt(package_id, inventory, agents_created, attachment_offset):
+def _receipt(
+    package_id,
+    inventory,
+    agents_created,
+    attachment_offset,
+    upgrade,
+):
     return {
-        "schemaVersion": 2,
+        "schemaVersion": 3,
         "package": {"id": package_id, "version": VERSION},
         "files": [{"path": path, "sha256": inventory[path]} for path in sorted(inventory)],
         "onboarding": _onboarding_receipt(
@@ -1912,6 +1955,7 @@ def _receipt(package_id, inventory, agents_created, attachment_offset):
             agents_created,
             attachment_offset,
         ),
+        "upgrade": upgrade,
     }
 
 
@@ -1919,7 +1963,7 @@ def _canonical_bytes(value):
     return (json.dumps(value, ensure_ascii=False, indent=2, sort_keys=True) + "\n").encode("utf-8")
 
 
-def _verify_runtime_files(destination, package_id):
+def _verify_runtime_files(destination, package_id, expected_version=VERSION):
     if not destination.is_dir() or _is_link_like(destination):
         raise InstallerFailure("E_NOT_READY", "downloaded", "The selected runtime is not installed.", "Run install --dry-run and install --apply first.")
     receipt_path = destination / RECEIPT_NAME
@@ -1931,18 +1975,22 @@ def _verify_runtime_files(destination, package_id):
         message="The installation receipt is unreadable or invalid.",
         remediation="Restore the exact receipt-owned runtime bytes before retrying.",
     )
+    schema_version = receipt.get("schemaVersion") if isinstance(receipt, dict) else None
+    expected_fields = {"schemaVersion", "package", "files", "onboarding"}
+    if schema_version == 3:
+        expected_fields.add("upgrade")
     if (
         not isinstance(receipt, dict)
-        or set(receipt) != {"schemaVersion", "package", "files", "onboarding"}
-        or type(receipt.get("schemaVersion")) is not int
-        or receipt.get("schemaVersion") != 2
+        or set(receipt) != expected_fields
+        or type(schema_version) is not int
+        or schema_version not in {2, 3}
         or not isinstance(receipt.get("package"), dict)
-        or receipt["package"] != {"id": package_id, "version": VERSION}
+        or receipt["package"] != {"id": package_id, "version": expected_version}
         or not isinstance(receipt.get("onboarding"), dict)
     ):
         raise InstallerFailure("E_CHECKSUM_MISMATCH", "installed", "The installation receipt is invalid.", "Do not overwrite it; use uninstall only after restoring receipt-owned bytes.")
     onboarding = receipt["onboarding"]
-    expected_onboarding_paths = _onboarding_paths(package_id)
+    expected_onboarding_paths = _onboarding_paths(package_id, expected_version)
     if (
         set(onboarding)
         != {
@@ -1960,6 +2008,17 @@ def _verify_runtime_files(destination, package_id):
         != expected_onboarding_paths["operatorGuides"]
     ):
         raise InstallerFailure("E_CHECKSUM_MISMATCH", "installed", "The installation receipt is invalid.", "Do not overwrite it; use uninstall only after restoring receipt-owned bytes.")
+    if schema_version == 3:
+        upgrade = receipt["upgrade"]
+        if upgrade is not None and (
+            not isinstance(upgrade, dict)
+            or set(upgrade) != {"fromVersion", "receiptSha256"}
+            or upgrade.get("fromVersion") != UPGRADE_FROM_VERSION
+            or not isinstance(upgrade.get("receiptSha256"), str)
+            or not re.fullmatch(r"[0-9a-f]{64}", upgrade["receiptSha256"])
+            or expected_version != VERSION
+        ):
+            raise InstallerFailure("E_CHECKSUM_MISMATCH", "installed", "The installation receipt is invalid.", "Do not overwrite it; use uninstall only after restoring receipt-owned bytes.")
     expected = _parse_inventory(receipt["files"], "installed")
     if set(ONBOARDING_PACKAGE_FILES) - set(expected):
         raise InstallerFailure(
@@ -2001,12 +2060,18 @@ def _verify_runtime_files(destination, package_id):
     return receipt
 
 
-def _verify_onboarding(target, package_id, receipt):
+def _verify_onboarding(
+    target,
+    package_id,
+    receipt,
+    version=VERSION,
+):
     state = _inspect_onboarding(
         target,
         package_id,
         phase="installed",
         required=True,
+        version=version,
     )
     agents_created = receipt["onboarding"]["agentsCreated"]
     attachment_start = state["start"]
@@ -2028,6 +2093,7 @@ def _verify_onboarding(target, package_id, receipt):
         package_id,
         agents_created,
         attachment_start,
+        version,
     )
     if receipt["onboarding"]["blockSha256"] != expected_digest:
         raise InstallerFailure(
@@ -2037,6 +2103,91 @@ def _verify_onboarding(target, package_id, receipt):
             "Restore the exact receipt-owned runtime and AGENTS.md attachment before retrying.",
         )
     return state
+
+
+def _upgrade_metadata(receipt):
+    return {
+        "fromVersion": UPGRADE_FROM_VERSION,
+        "receiptSha256": hashlib.sha256(_canonical_bytes(receipt)).hexdigest(),
+    }
+
+
+def _upgrade_candidate(package, target):
+    destination = _runtime_destination(
+        target,
+        package["id"],
+        UPGRADE_FROM_VERSION,
+    )
+    if not _lexists(destination):
+        return None
+    receipt = _verify_runtime_files(
+        destination,
+        package["id"],
+        UPGRADE_FROM_VERSION,
+    )
+    if receipt["schemaVersion"] != 2:
+        raise InstallerFailure(
+            "E_CHECKSUM_MISMATCH",
+            "installed",
+            "The previous runtime receipt is not an eligible v0.2.1 receipt.",
+            "Keep both runtimes unchanged and restore the canonical v0.2.1 receipt before upgrading.",
+        )
+    state = _verify_onboarding(
+        target,
+        package["id"],
+        receipt,
+        UPGRADE_FROM_VERSION,
+    )
+    return {
+        "destination": destination,
+        "receipt": receipt,
+        "state": state,
+        "metadata": _upgrade_metadata(receipt),
+    }
+
+
+def _verify_upgrade_predecessor(target, package_id, receipt, state):
+    upgrade = receipt.get("upgrade")
+    if upgrade is None:
+        return None
+    previous_version = upgrade["fromVersion"]
+    destination = _runtime_destination(target, package_id, previous_version)
+    previous_receipt = _verify_runtime_files(
+        destination,
+        package_id,
+        previous_version,
+    )
+    if (
+        previous_receipt["schemaVersion"] != 2
+        or upgrade["receiptSha256"]
+        != hashlib.sha256(_canonical_bytes(previous_receipt)).hexdigest()
+        or previous_receipt["onboarding"]["agentsCreated"]
+        != receipt["onboarding"]["agentsCreated"]
+    ):
+        raise InstallerFailure(
+            "E_CHECKSUM_MISMATCH",
+            "installed",
+            "The preserved v0.2.1 predecessor no longer matches the upgrade receipt.",
+            "Keep both runtimes unchanged and restore the exact receipt-owned v0.2.1 runtime before retrying.",
+        )
+    agents_created = receipt["onboarding"]["agentsCreated"]
+    attachment_start = state["start"]
+    if not agents_created:
+        attachment_start -= len(ONBOARDING_SEPARATOR)
+    expected_digest = _onboarding_digest(
+        package_id,
+        agents_created,
+        attachment_start,
+        previous_version,
+    )
+    if previous_receipt["onboarding"]["blockSha256"] != expected_digest:
+        raise InstallerFailure(
+            "E_CHECKSUM_MISMATCH",
+            "installed",
+            "The preserved v0.2.1 onboarding ownership does not match this target.",
+            "Keep AGENTS.md unchanged and restore the exact v0.2.1 attachment before retrying.",
+        )
+    return previous_receipt
 
 
 def _publish_no_replace(source, destination):
@@ -2241,7 +2392,28 @@ def _replace_agents_bytes(path, before, after, mode):
             pass
 
 
-def _onboarding_plan(target, package_id):
+def _onboarding_plan(target, package):
+    package_id = package["id"]
+    upgrade = _upgrade_candidate(package, target)
+    if upgrade is not None:
+        state = upgrade["state"]
+        before = state["data"]
+        replacement = _onboarding_block(package_id)
+        after = before[: state["start"]] + replacement + before[state["end"] :]
+        agents_created = upgrade["receipt"]["onboarding"]["agentsCreated"]
+        attachment_start = state["start"]
+        if not agents_created:
+            attachment_start -= len(ONBOARDING_SEPARATOR)
+        return {
+            "path": state["path"],
+            "before": before,
+            "after": after,
+            "mode": state["mode"],
+            "changed": True,
+            "agentsCreated": agents_created,
+            "attachmentStart": attachment_start,
+            "upgrade": upgrade["metadata"],
+        }
     state = _inspect_onboarding(target, package_id)
     if state["packageId"] == package_id:
         raise InstallerFailure(
@@ -2262,6 +2434,7 @@ def _onboarding_plan(target, package_id):
         "changed": True,
         "agentsCreated": not state["exists"],
         "attachmentStart": len(before or b""),
+        "upgrade": None,
     }
 
 
@@ -2297,7 +2470,8 @@ def _copy_install(source_root, inventory, destination, package_id):
     _doctor(package, target)
     if _lexists(destination):
         receipt = _verify_runtime_files(destination, package_id)
-        _verify_onboarding(target, package_id, receipt)
+        onboarding = _verify_onboarding(target, package_id, receipt)
+        _verify_upgrade_predecessor(target, package_id, receipt, onboarding)
         return "unchanged"
     lock, boundary, boundary_created = _acquire_onboarding_lock(target)
     runtime_root = destination.parents[2]
@@ -2311,9 +2485,10 @@ def _copy_install(source_root, inventory, destination, package_id):
         _doctor(package, target)
         if _lexists(destination):
             receipt = _verify_runtime_files(destination, package_id)
-            _verify_onboarding(target, package_id, receipt)
+            onboarding = _verify_onboarding(target, package_id, receipt)
+            _verify_upgrade_predecessor(target, package_id, receipt, onboarding)
             return "unchanged"
-        plan = _onboarding_plan(target, package_id)
+        plan = _onboarding_plan(target, package)
         current = destination.parent
         missing = []
         while not _lexists(current):
@@ -2349,6 +2524,7 @@ def _copy_install(source_root, inventory, destination, package_id):
                     expected,
                     plan["agentsCreated"],
                     plan["attachmentStart"],
+                    plan["upgrade"],
                 )
             )
         )
@@ -2366,7 +2542,8 @@ def _copy_install(source_root, inventory, destination, package_id):
             committed = True
         except FileExistsError:
             receipt = _verify_runtime_files(destination, package_id)
-            _verify_onboarding(target, package_id, receipt)
+            onboarding = _verify_onboarding(target, package_id, receipt)
+            _verify_upgrade_predecessor(target, package_id, receipt, onboarding)
             shutil.rmtree(stage)
             committed = True
             return "unchanged"
@@ -2400,7 +2577,13 @@ def _runtime_command(package_id, destination, target):
 def _verify_ready(package, target):
     destination = _runtime_destination(target, package["id"])
     receipt = _verify_runtime_files(destination, package["id"])
-    _verify_onboarding(target, package["id"], receipt)
+    onboarding = _verify_onboarding(target, package["id"], receipt)
+    _verify_upgrade_predecessor(
+        target,
+        package["id"],
+        receipt,
+        onboarding,
+    )
     marker_ids = _marker_ids(target)
     if not marker_ids:
         raise InstallerFailure(
@@ -2426,6 +2609,23 @@ def _verify_ready(package, target):
 
 def _onboarding_removal_plan(target, package_id, receipt):
     state = _verify_onboarding(target, package_id, receipt)
+    if receipt.get("upgrade") is not None:
+        _verify_upgrade_predecessor(target, package_id, receipt, state)
+        previous_block = _onboarding_block(
+            package_id,
+            receipt["upgrade"]["fromVersion"],
+        )
+        return {
+            "path": state["path"],
+            "before": state["data"],
+            "after": (
+                state["data"][: state["start"]]
+                + previous_block
+                + state["data"][state["end"] :]
+            ),
+            "mode": state["mode"],
+            "delete": False,
+        }
     before = state["data"]
     start = state["start"]
     if not receipt["onboarding"]["agentsCreated"]:
@@ -2568,8 +2768,11 @@ def _restore_runtime_backup(backup, destination, package_id):
 def _uninstall(package, target, apply):
     destination = _runtime_destination(target, package["id"])
     receipt = _verify_runtime_files(destination, package["id"])
-    _verify_onboarding(target, package["id"], receipt)
+    _onboarding_removal_plan(target, package["id"], receipt)
+    restores_previous = receipt.get("upgrade") is not None
     if not apply:
+        if restores_previous:
+            return _result("OK", "installed", "Uninstall dry-run passed; the v%s runtime would be removed and the exact receipt-owned v0.2.1 onboarding block would be restored." % VERSION, ready=False)
         return _result("OK", "installed", "Uninstall dry-run passed; only the exact onboarding block and receipt-owned unchanged runtime bytes would be removed.", ready=False)
     lock, boundary, boundary_created = _acquire_onboarding_lock(target)
     quarantine = destination.parent / (".remove-%s-%s" % (VERSION, uuid.uuid4().hex))
@@ -2612,6 +2815,8 @@ def _uninstall(package, target, apply):
             parent.rmdir()
         except OSError:
             break
+    if restores_previous:
+        return _result("OK", "installed", "The v%s runtime was removed and the exact receipt-owned v0.2.1 onboarding block was restored; the previous runtime and initialized target files were left untouched." % VERSION, ready=False)
     return _result("OK", "downloaded", "The exact onboarding block and receipt-owned runtime were removed; initialized target files were left untouched.", ready=False)
 
 
@@ -2685,6 +2890,8 @@ def main(argv=None):
                 receipt = _verify_runtime_files(destination, package["id"])
                 _verify_onboarding(target, package["id"], receipt)
                 message = "Install dry-run passed; source inventory, target-local onboarding, and the exact installed runtime are verified."
+            elif _upgrade_candidate(package, target) is not None:
+                message = "Install dry-run passed; source inventory and the exact receipt-owned v0.2.1 runtime plus onboarding block are verified for upgrade."
             else:
                 message = "Install dry-run passed; source inventory is verified and the selected runtime plus target-local onboarding block can be installed without initializing the target."
             result = _result("OK", "downloaded", message, ready=False)

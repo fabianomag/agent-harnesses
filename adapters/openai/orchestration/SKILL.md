@@ -6,7 +6,7 @@ description: Operate and verify a local Master plus registered execution fronts 
 # Orchestration
 
 Operate the already installed agent-agnostic runtime at
-`<target>/.agent-harnesses/runtime/orchestration/0.2.1/`. Treat that runtime's
+`<target>/.agent-harnesses/runtime/orchestration/0.2.2/`. Treat that runtime's
 `operations.json` as the machine-readable command authority and its operator
 guide as the user-facing contract. This optional adapter does not replace or
 install the runtime. Pass the intended existing workspace with `--root`; never
@@ -15,7 +15,7 @@ infer a different root from historical context.
 Use global flags before the command:
 
 ```text
-python3 -B <target>/.agent-harnesses/runtime/orchestration/0.2.1/hq.py --root <workspace> --json <command>
+python3 -B <target>/.agent-harnesses/runtime/orchestration/0.2.2/hq.py --root <workspace> --json <command>
 ```
 
 ## Open read-only
