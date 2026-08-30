@@ -1119,7 +1119,10 @@ def initialize(
     manifest = root / MANIFEST_PATH
     if manifest.exists() or _path_is_link_like(manifest):
         report = verify(root)
-        if report.ok:
+        if report.ok or all(
+            issue.code == "NO_REGISTERED_CHILDREN"
+            for issue in report.issues
+        ):
             return OperationResult("init", "noop", ())
         raise HarnessError(
             "NEEDS_RECOVERY",
@@ -1442,6 +1445,16 @@ def verify(root_value: str | os.PathLike[str]) -> VerificationReport:
             )
         )
 
+    if not workspace["children"]:
+        issues.append(
+            VerificationIssue(
+                code="NO_REGISTERED_CHILDREN",
+                path=MANIFEST_PATH.as_posix(),
+                message="coordinator has no registered children",
+                recoverable=False,
+            )
+        )
+
     for relative, expected in _derived_files(workspace).items():
         target = root / relative
         try:
@@ -1634,7 +1647,11 @@ def _build_parser() -> argparse.ArgumentParser:
     add_parser = commands.add_parser("add", help="register one explicit child")
     add_parser.add_argument("--id", required=True, dest="child_id")
     add_parser.add_argument("--path", required=True, dest="child_path")
-    add_parser.add_argument("--owner", required=True)
+    add_parser.add_argument(
+        "--owner",
+        required=True,
+        help="owner-file path relative to the selected child root",
+    )
     _mutation_mode(add_parser)
 
     remove_parser = commands.add_parser(

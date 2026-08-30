@@ -54,7 +54,7 @@ PROJECT_REQUIRED_FILES = (
     "NEXT.md",
     *PROJECT_LOG_FILES,
 )
-PACKAGE_VERSION = "0.2.2"
+PACKAGE_VERSION = "0.2.3"
 INSTALLER_ONBOARDING_START = (
     "<!-- agent-harnesses:onboarding:orchestration:start -->"
 )

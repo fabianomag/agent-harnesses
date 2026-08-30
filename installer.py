@@ -50,7 +50,7 @@ PRODUCT = json.loads(r'''{
         "single-project",
         "project-harness"
       ],
-      "asset": "project-harness-0.2.2.zip",
+      "asset": "project-harness-0.2.3.zip",
       "complexity": {
         "en": "Low",
         "level": "low",
@@ -296,7 +296,7 @@ PRODUCT = json.loads(r'''{
         "workspace-harness",
         "workspace-coordination"
       ],
-      "asset": "workspace-coordination-0.2.2.zip",
+      "asset": "workspace-coordination-0.2.3.zip",
       "complexity": {
         "en": "Medium",
         "level": "medium",
@@ -326,12 +326,12 @@ PRODUCT = json.loads(r'''{
           "en": [
             "The explicit target is the container workspace, not one of its child projects.",
             "The existing contained child projects to register are already known.",
-            "Each selected child has an explicit local owner file and its detailed state will remain locally owned."
+            "Each selected child has an explicit local owner file identified by a path relative to that child root, and its detailed state will remain locally owned."
           ],
           "ptBr": [
             "O target explícito é o workspace contêiner, não um de seus projetos filhos.",
             "Os projetos filhos existentes e contidos que serão registrados já são conhecidos.",
-            "Cada projeto filho selecionado tem um owner file local explícito e seu estado detalhado continuará sob ownership local."
+            "Cada projeto filho selecionado tem um owner file local explícito, identificado por um path relativo à raiz desse projeto filho, e seu estado detalhado continuará sob ownership local."
           ]
         },
         "memory": {
@@ -373,18 +373,18 @@ PRODUCT = json.loads(r'''{
               "en": "Updates only the coordinator manifest and generated index; validates the selected child's owner file and any existing local state without changing the child.",
               "ptBr": "Atualiza somente o manifest do coordenador e o index gerado; valida o owner file e qualquer estado local existente do projeto filho selecionado sem alterar o projeto filho."
             },
-            "example": "<python> -B workspace_coordination.py --root \"<coordinator-root>\" add --id \"<child-id>\" --path \"<child-path>\" --owner \"<owner-file>\" --dry-run",
+            "example": "<python> -B workspace_coordination.py --root \"<coordinator-root>\" add --id \"<child-id>\" --path \"<child-path>\" --owner \"<child-relative-owner-file>\" --dry-run",
             "inputs": [
               "<coordinator-root>",
               "<child-id>",
               "<child-path>",
-              "<owner-file>",
+              "<child-relative-owner-file>",
               "--dry-run|--apply"
             ],
             "kind": "write",
             "purpose": {
-              "en": "Register one existing contained child with its explicit owner file.",
-              "ptBr": "Registrar um projeto filho contido e existente com seu owner file explícito."
+              "en": "Register one existing contained child; --owner is the owner-file path relative to that child root.",
+              "ptBr": "Registrar um projeto filho contido e existente; --owner é o path do owner file relativo à raiz desse projeto filho."
             }
           },
           {
@@ -516,8 +516,8 @@ PRODUCT = json.loads(r'''{
           }
         ],
         "readiness": {
-          "en": "The coordinator is initialized, every registered child and owner path is explicit and valid, and canonical plus generated workspace state verifies cleanly.",
-          "ptBr": "O coordenador está inicializado, todos os projetos filhos e owner paths registrados são explícitos e válidos e o estado canônico e gerado do workspace passa em verify sem issues."
+          "en": "The coordinator is initialized with at least one registered child; every registered child path and child-relative owner path is explicit and valid; and canonical plus generated workspace state verifies cleanly.",
+          "ptBr": "O coordenador está inicializado com pelo menos um projeto filho registrado; cada path de projeto filho e owner path relativo à raiz desse projeto filho é explícito e válido; e o estado canônico e gerado do workspace passa em verify sem issues."
         },
         "workflows": {
           "closeResume": {
@@ -586,7 +586,7 @@ PRODUCT = json.loads(r'''{
         "cross-project",
         "cross"
       ],
-      "asset": "cross-project-0.2.2.zip",
+      "asset": "cross-project-0.2.3.zip",
       "complexity": {
         "en": "Medium",
         "level": "medium",
@@ -826,7 +826,7 @@ PRODUCT = json.loads(r'''{
         "control-plane-harness",
         "orchestration"
       ],
-      "asset": "orchestration-0.2.2.zip",
+      "asset": "orchestration-0.2.3.zip",
       "complexity": {
         "en": "High",
         "level": "high",
@@ -855,12 +855,12 @@ PRODUCT = json.loads(r'''{
         "installationReadiness": {
           "en": [
             "The explicit target is a deliberate new Master or control-plane root, not an existing coordination structure to adopt.",
-            "The initial fronts, their intended relative paths, and their boundaries are already known.",
+            "The initial fronts and their intended root-relative paths are known, and the user can state each front's semantic responsibility boundary. The harness will not infer that boundary.",
             "The work genuinely requires a transactional registry, validated mutations, rollback, and recovery rather than only project handoffs."
           ],
           "ptBr": [
             "O target explícito é uma nova raiz Master ou de control plane deliberada, não uma estrutura de coordenação existente a ser adotada.",
-            "As frentes iniciais, seus paths relativos pretendidos e seus boundaries já são conhecidos.",
+            "As frentes iniciais e seus paths relativos à raiz estão conhecidos, e o usuário consegue declarar o responsibility boundary semântico de cada frente. O harness não inferirá esse boundary.",
             "O trabalho realmente exige registry transacional, validated mutations, rollback e recovery, e não apenas handoffs entre projetos."
           ]
         },
@@ -869,8 +869,8 @@ PRODUCT = json.loads(r'''{
             ".orchestration/manifest.json"
           ],
           "description": {
-            "en": "The new control-plane root owns a transactional registry and lifecycle projections; registered fronts retain their bounded records below their confirmed paths.",
-            "ptBr": "A nova raiz do control plane mantém um registry transacional e projeções do ciclo de vida; as frentes registradas preservam seus registros delimitados nos paths confirmados."
+            "en": "The new control-plane root owns a transactional registry of root-relative front paths and lifecycle projections. Each front's semantic responsibility boundary remains user-owned context in <front-path>/ARCHITECTURE.md and is not certified by the runtime.",
+            "ptBr": "A nova raiz do control plane mantém um registry transacional de paths de frentes relativos à raiz e projeções do ciclo de vida. O responsibility boundary semântico de cada frente continua como contexto user-owned em <front-path>/ARCHITECTURE.md e não é certificado pelo runtime."
           },
           "projections": [
             "FRONTS.md",
@@ -948,8 +948,8 @@ PRODUCT = json.loads(r'''{
             ],
             "kind": "read",
             "purpose": {
-              "en": "Strictly validate registry, front boundaries, generated files, locks, and recovery state.",
-              "ptBr": "Validar estritamente o registry, os limites das frentes, os arquivos gerados, locks e o estado de recovery."
+              "en": "Strictly validate the registry, registered path containment, required and generated files, locks, and recovery state.",
+              "ptBr": "Validar estritamente o registry, a contenção dos paths registrados, os arquivos obrigatórios e gerados, locks e o estado de recovery."
             }
           },
           {
@@ -1011,8 +1011,8 @@ PRODUCT = json.loads(r'''{
           {
             "command": "repair-panel",
             "effects": {
-              "en": "Repairs only the generated panel after every registry and boundary check passes; it never repoints or merges fronts.",
-              "ptBr": "Faz repair somente do painel gerado depois que todas as verificações de registry e limites passam; nunca redireciona nem mescla frentes."
+              "en": "Repairs only the generated panel after every registry and registered-path containment check passes; it never repoints or merges fronts.",
+              "ptBr": "Faz repair somente do painel gerado depois que todas as verificações de registry e contenção dos paths registrados passam; nunca redireciona nem mescla frentes."
             },
             "example": "<python> -B hq.py --root \"<workspace>\" --json repair-panel --dry-run",
             "inputs": [
@@ -1045,8 +1045,8 @@ PRODUCT = json.loads(r'''{
           }
         ],
         "readiness": {
-          "en": "A new control plane has at least one explicit registered front, the registry and generated lifecycle files are coherent, no recovery is pending, and hq-sync reports clean state.",
-          "ptBr": "Um control plane novo contém ao menos uma frente registrada explicitamente, o registry e os arquivos gerados de ciclo de vida estão coerentes, não há recovery pendente e hq-sync informa estado limpo."
+          "en": "Technical readiness means at least one front is registered, every registered root-relative path is contained and safe, the registry and generated lifecycle files are coherent, no recovery is pending, and hq-sync is clean. It does not certify a front's semantic responsibility boundary.",
+          "ptBr": "Readiness técnica significa que ao menos uma frente está registrada, todo path registrado e relativo à raiz está contido e seguro, o registry e os arquivos gerados de ciclo de vida estão coerentes, não há recovery pendente e hq-sync informa estado limpo. Ela não certifica o responsibility boundary semântico de uma frente."
         },
         "workflows": {
           "closeResume": {
@@ -1144,8 +1144,8 @@ PRODUCT = json.loads(r'''{
       "en": "https://fabianomag.com/projects/agent-harnesses",
       "ptBr": "https://fabianomag.com/pt-br/projetos/agent-harnesses"
     },
-    "tag": "v0.2.2",
-    "version": "0.2.2"
+    "tag": "v0.2.3",
+    "version": "0.2.3"
   },
   "schemaVersion": 2,
   "support": {
@@ -1205,7 +1205,12 @@ PRODUCT = json.loads(r'''{
   }
 }''')
 VERSION = PRODUCT["release"]["version"]
-UPGRADE_FROM_VERSION = "0.2.1"
+UPGRADE_FROM_VERSION = "0.2.2"
+LEGACY_RECEIPT_VERSION = "0.2.1"
+RECEIPT_PREDECESSORS = {
+    "0.2.2": LEGACY_RECEIPT_VERSION,
+    VERSION: UPGRADE_FROM_VERSION,
+}
 MARKERS = {
     "project-harness": Path(".project-harness/state.json"),
     "workspace-coordination": Path(".workspace-coordination/workspace.json"),
@@ -1228,6 +1233,7 @@ ONBOARDING_PACKAGE_FILES = (
 ONBOARDING_SEPARATOR = b"\n\n"
 ONBOARDING_LOCK_NAME = ".onboarding.lock"
 ONBOARDING_LOCK_ATTEMPTS = 500
+UNRECEIPTED_ONBOARDING_MESSAGE = "AGENTS.md contains an unreceipted onboarding block."
 MANAGED_PATH_SHAPES = {
     "project-harness": {
         ".project-harness": "directory",
@@ -1616,7 +1622,7 @@ def _inspect_uninstalled_onboarding(target, package_id):
             raise current_error
 
 
-def _doctor(package, target):
+def _doctor_once(package, target):
     marker_ids = _marker_ids(target)
     if len(marker_ids) > 1:
         raise InstallerFailure(
@@ -1656,7 +1662,7 @@ def _doctor(package, target):
                 raise InstallerFailure(
                     "E_INITIALIZATION_CONFLICT",
                     "downloaded",
-                    "AGENTS.md contains an unreceipted onboarding block.",
+                    UNRECEIPTED_ONBOARDING_MESSAGE,
                     "Keep it unchanged and resolve its ownership before installing this runtime.",
                 )
     if package["id"] == "orchestration" and not marker_ids:
@@ -1680,10 +1686,77 @@ def _doctor(package, target):
     initialized = bool(marker_ids and marker_ids[0] == package["id"])
     message = "Preflight passed for the selected harness."
     if upgrade is not None:
-        message = "Preflight passed for the receipt-owned v0.2.1 to v%s upgrade." % VERSION
+        message = "Preflight passed for the receipt-owned v%s to v%s upgrade." % (
+            UPGRADE_FROM_VERSION,
+            VERSION,
+        )
     if initialized:
         message += " The target already has the selected harness marker."
     return _result("OK", "downloaded", message, ready=False)
+
+
+def _wait_for_onboarding_lock_release(target):
+    lock = target / RUNTIME_RELATIVE.parts[0] / ONBOARDING_LOCK_NAME
+    for _attempt in range(ONBOARDING_LOCK_ATTEMPTS):
+        if not _lexists(lock):
+            return
+        try:
+            metadata = lock.lstat()
+        except FileNotFoundError:
+            return
+        except OSError as error:
+            raise InstallerFailure(
+                "E_INITIALIZATION_CONFLICT",
+                "downloaded",
+                "The onboarding transaction lock cannot be inspected safely.",
+                "Keep it unchanged and resolve ownership before retrying.",
+            ) from error
+        attributes = getattr(metadata, "st_file_attributes", 0)
+        reparse = getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0)
+        link_like = stat.S_ISLNK(metadata.st_mode) or bool(
+            reparse and attributes & reparse
+        )
+        if link_like or not stat.S_ISDIR(metadata.st_mode):
+            raise InstallerFailure(
+                "E_INITIALIZATION_CONFLICT",
+                "downloaded",
+                "The onboarding transaction lock has an unsafe type.",
+                "Keep it unchanged and resolve ownership before retrying.",
+            )
+        time.sleep(0.01)
+    raise InstallerFailure(
+        "E_INITIALIZATION_CONFLICT",
+        "downloaded",
+        "Another onboarding transaction still owns this target.",
+        "Wait for the active installer to finish; do not remove an unknown lock.",
+    )
+
+
+def _doctor(package, target):
+    lock = target / RUNTIME_RELATIVE.parts[0] / ONBOARDING_LOCK_NAME
+    retried_without_lock = False
+    while True:
+        if _lexists(lock):
+            _wait_for_onboarding_lock_release(target)
+            retried_without_lock = False
+        try:
+            result = _doctor_once(package, target)
+        except InstallerFailure as error:
+            if _lexists(lock):
+                _wait_for_onboarding_lock_release(target)
+                retried_without_lock = False
+                continue
+            if retried_without_lock:
+                raise
+            # A cooperative writer may have released its lock after the failed
+            # read. Re-read once before treating any snapshot as authoritative.
+            retried_without_lock = True
+            continue
+        if _lexists(lock):
+            _wait_for_onboarding_lock_release(target)
+            retried_without_lock = False
+            continue
+        return result
 
 
 def _sha256(path):
@@ -2010,15 +2083,25 @@ def _verify_runtime_files(destination, package_id, expected_version=VERSION):
         raise InstallerFailure("E_CHECKSUM_MISMATCH", "installed", "The installation receipt is invalid.", "Do not overwrite it; use uninstall only after restoring receipt-owned bytes.")
     if schema_version == 3:
         upgrade = receipt["upgrade"]
-        if upgrade is not None and (
-            not isinstance(upgrade, dict)
-            or set(upgrade) != {"fromVersion", "receiptSha256"}
-            or upgrade.get("fromVersion") != UPGRADE_FROM_VERSION
-            or not isinstance(upgrade.get("receiptSha256"), str)
-            or not re.fullmatch(r"[0-9a-f]{64}", upgrade["receiptSha256"])
-            or expected_version != VERSION
+        expected_predecessor = RECEIPT_PREDECESSORS.get(expected_version)
+        if expected_predecessor is None or (
+            upgrade is not None
+            and (
+                not isinstance(upgrade, dict)
+                or set(upgrade) != {"fromVersion", "receiptSha256"}
+                or upgrade.get("fromVersion") != expected_predecessor
+                or not isinstance(upgrade.get("receiptSha256"), str)
+                or not re.fullmatch(r"[0-9a-f]{64}", upgrade["receiptSha256"])
+            )
         ):
             raise InstallerFailure("E_CHECKSUM_MISMATCH", "installed", "The installation receipt is invalid.", "Do not overwrite it; use uninstall only after restoring receipt-owned bytes.")
+    elif expected_version != LEGACY_RECEIPT_VERSION:
+        raise InstallerFailure(
+            "E_CHECKSUM_MISMATCH",
+            "installed",
+            "The installation receipt schema does not match its package version.",
+            "Restore the exact receipt-owned runtime bytes before retrying.",
+        )
     expected = _parse_inventory(receipt["files"], "installed")
     if set(ONBOARDING_PACKAGE_FILES) - set(expected):
         raise InstallerFailure(
@@ -2125,12 +2208,14 @@ def _upgrade_candidate(package, target):
         package["id"],
         UPGRADE_FROM_VERSION,
     )
-    if receipt["schemaVersion"] != 2:
+    if receipt["schemaVersion"] != 3:
         raise InstallerFailure(
             "E_CHECKSUM_MISMATCH",
             "installed",
-            "The previous runtime receipt is not an eligible v0.2.1 receipt.",
-            "Keep both runtimes unchanged and restore the canonical v0.2.1 receipt before upgrading.",
+            "The previous runtime receipt is not an eligible v%s receipt."
+            % UPGRADE_FROM_VERSION,
+            "Keep both runtimes unchanged and restore the canonical v%s receipt before upgrading."
+            % UPGRADE_FROM_VERSION,
         )
     state = _verify_onboarding(
         target,
@@ -2138,6 +2223,7 @@ def _upgrade_candidate(package, target):
         receipt,
         UPGRADE_FROM_VERSION,
     )
+    _verify_upgrade_predecessor(target, package["id"], receipt, state)
     return {
         "destination": destination,
         "receipt": receipt,
@@ -2146,19 +2232,37 @@ def _upgrade_candidate(package, target):
     }
 
 
-def _verify_upgrade_predecessor(target, package_id, receipt, state):
+def _verify_upgrade_predecessor(target, package_id, receipt, state, seen=None):
     upgrade = receipt.get("upgrade")
     if upgrade is None:
         return None
+    current_version = receipt["package"]["version"]
     previous_version = upgrade["fromVersion"]
+    if previous_version != RECEIPT_PREDECESSORS.get(current_version):
+        raise InstallerFailure(
+            "E_CHECKSUM_MISMATCH",
+            "installed",
+            "The preserved predecessor version does not match the receipt chain.",
+            "Keep all runtimes unchanged and restore the exact receipt-owned predecessor chain.",
+        )
+    seen = set() if seen is None else set(seen)
+    if current_version in seen or previous_version in seen:
+        raise InstallerFailure(
+            "E_CHECKSUM_MISMATCH",
+            "installed",
+            "The preserved predecessor receipt chain contains a cycle.",
+            "Keep all runtimes unchanged and restore the exact receipt-owned predecessor chain.",
+        )
+    seen.add(current_version)
     destination = _runtime_destination(target, package_id, previous_version)
     previous_receipt = _verify_runtime_files(
         destination,
         package_id,
         previous_version,
     )
+    expected_schema = 2 if previous_version == LEGACY_RECEIPT_VERSION else 3
     if (
-        previous_receipt["schemaVersion"] != 2
+        previous_receipt["schemaVersion"] != expected_schema
         or upgrade["receiptSha256"]
         != hashlib.sha256(_canonical_bytes(previous_receipt)).hexdigest()
         or previous_receipt["onboarding"]["agentsCreated"]
@@ -2167,8 +2271,10 @@ def _verify_upgrade_predecessor(target, package_id, receipt, state):
         raise InstallerFailure(
             "E_CHECKSUM_MISMATCH",
             "installed",
-            "The preserved v0.2.1 predecessor no longer matches the upgrade receipt.",
-            "Keep both runtimes unchanged and restore the exact receipt-owned v0.2.1 runtime before retrying.",
+            "The preserved v%s predecessor no longer matches the upgrade receipt."
+            % previous_version,
+            "Keep all runtimes unchanged and restore the exact receipt-owned v%s runtime before retrying."
+            % previous_version,
         )
     agents_created = receipt["onboarding"]["agentsCreated"]
     attachment_start = state["start"]
@@ -2184,9 +2290,18 @@ def _verify_upgrade_predecessor(target, package_id, receipt, state):
         raise InstallerFailure(
             "E_CHECKSUM_MISMATCH",
             "installed",
-            "The preserved v0.2.1 onboarding ownership does not match this target.",
-            "Keep AGENTS.md unchanged and restore the exact v0.2.1 attachment before retrying.",
+            "The preserved v%s onboarding ownership does not match this target."
+            % previous_version,
+            "Keep AGENTS.md unchanged and restore the exact v%s attachment before retrying."
+            % previous_version,
         )
+    _verify_upgrade_predecessor(
+        target,
+        package_id,
+        previous_receipt,
+        state,
+        seen,
+    )
     return previous_receipt
 
 
@@ -2482,7 +2597,7 @@ def _copy_install(source_root, inventory, destination, package_id):
     committed = False
     plan = None
     try:
-        _doctor(package, target)
+        _doctor_once(package, target)
         if _lexists(destination):
             receipt = _verify_runtime_files(destination, package_id)
             onboarding = _verify_onboarding(target, package_id, receipt)
@@ -2772,7 +2887,7 @@ def _uninstall(package, target, apply):
     restores_previous = receipt.get("upgrade") is not None
     if not apply:
         if restores_previous:
-            return _result("OK", "installed", "Uninstall dry-run passed; the v%s runtime would be removed and the exact receipt-owned v0.2.1 onboarding block would be restored." % VERSION, ready=False)
+            return _result("OK", "installed", "Uninstall dry-run passed; the v%s runtime would be removed and the exact receipt-owned v%s onboarding block would be restored." % (VERSION, UPGRADE_FROM_VERSION), ready=False)
         return _result("OK", "installed", "Uninstall dry-run passed; only the exact onboarding block and receipt-owned unchanged runtime bytes would be removed.", ready=False)
     lock, boundary, boundary_created = _acquire_onboarding_lock(target)
     quarantine = destination.parent / (".remove-%s-%s" % (VERSION, uuid.uuid4().hex))
@@ -2816,7 +2931,7 @@ def _uninstall(package, target, apply):
         except OSError:
             break
     if restores_previous:
-        return _result("OK", "installed", "The v%s runtime was removed and the exact receipt-owned v0.2.1 onboarding block was restored; the previous runtime and initialized target files were left untouched." % VERSION, ready=False)
+        return _result("OK", "installed", "The v%s runtime was removed and the exact receipt-owned v%s onboarding block was restored; the previous runtime and initialized target files were left untouched." % (VERSION, UPGRADE_FROM_VERSION), ready=False)
     return _result("OK", "downloaded", "The exact onboarding block and receipt-owned runtime were removed; initialized target files were left untouched.", ready=False)
 
 
@@ -2891,7 +3006,7 @@ def main(argv=None):
                 _verify_onboarding(target, package["id"], receipt)
                 message = "Install dry-run passed; source inventory, target-local onboarding, and the exact installed runtime are verified."
             elif _upgrade_candidate(package, target) is not None:
-                message = "Install dry-run passed; source inventory and the exact receipt-owned v0.2.1 runtime plus onboarding block are verified for upgrade."
+                message = "Install dry-run passed; source inventory and the exact receipt-owned v%s runtime plus onboarding block are verified for upgrade." % UPGRADE_FROM_VERSION
             else:
                 message = "Install dry-run passed; source inventory is verified and the selected runtime plus target-local onboarding block can be installed without initializing the target."
             result = _result("OK", "downloaded", message, ready=False)

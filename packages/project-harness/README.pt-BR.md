@@ -1,7 +1,7 @@
 <!-- BEGIN GENERATED:PRODUCT -->
 # Project Harness
 
-[English](README.md) · Versão `0.2.2`
+[English](README.md) · Versão `0.2.3`
 
 **Melhor opção para:** Um projeto explícito que precisa de checkpoints, closeout e retomada confiável.
 
@@ -24,7 +24,7 @@ Pontos fortes: **Checkpoints · Closeout e retomada · Configuração rápida**.
 Copie somente este prompt:
 
 ```text
-Instale Project Harness (`project-harness`) v0.2.2 a partir de https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.2/project-harness-0.2.2.zip.
+Instale Project Harness (`project-harness`) v0.2.3 a partir de https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.3/project-harness-0.2.3.zip.
 
 Antes de propor a execução, confirme cada fato de readiness do harness selecionado:
 - O target explícito é a raiz de um único projeto real.
@@ -54,7 +54,7 @@ O runtime instalado inclui `operations.json` e `OPERATOR_GUIDE.pt-BR.md`; após 
 
 Use como `<python>` o mesmo executável público do Python 3.10+ escolhido no
 prompt de instalação. No diretório do runtime instalado,
-`<raiz-do-projeto>/.agent-harnesses/runtime/project-harness/0.2.2`:
+`<raiz-do-projeto>/.agent-harnesses/runtime/project-harness/0.2.3`:
 
 ```text
 <python> -B project_harness.py init --root "<raiz-do-projeto>" --dry-run
@@ -69,7 +69,7 @@ guiada só termina quando `<python> -B installer.py verify project-harness
 `verify` na raiz do pacote ainda extraído; `installer.py` não é copiado para o
 runtime.
 
-Package version e state schema são independentes. O runtime `0.2.2` cria state
+Package version e state schema são independentes. O runtime `0.2.3` cria state
 schema `1` e lê e verifica o estado `0.1.0` sem reescrever `harnessVersion`;
 não há migração implícita. O harness é local ao projeto e não coordena roots
 irmãs nem serviços externos. Ele preserva texto existente fora de seus blocos
@@ -79,5 +79,5 @@ estado inicializados. O
 [guia operacional](OPERATOR_GUIDE.pt-BR.md) ensina o ciclo completo; a
 [referência avançada](docs/REFERENCE.md) preserva os contratos técnicos de
 colisão, rollback, recuperação e evidência. Consulte também o
-[catálogo imutável](https://github.com/fabianomag/agent-harnesses/blob/v0.2.2/catalog/harnesses.json)
-e o [diagrama](https://github.com/fabianomag/agent-harnesses/blob/v0.2.2/graphs/project-harness.graph.json).
+[catálogo imutável](https://github.com/fabianomag/agent-harnesses/blob/v0.2.3/catalog/harnesses.json)
+e o [diagrama](https://github.com/fabianomag/agent-harnesses/blob/v0.2.3/graphs/project-harness.graph.json).

@@ -30,7 +30,7 @@
       "status": "compatible",
       "verification": "pending",
       "verifiedEligible": false,
-      "scope": "The agent-agnostic CLI, operations contract, and Markdown guides are primary. Optional Codex adapters remain outside the core assets; a fresh walkthrough of the exact v0.2.2 release assets is still pending."
+      "scope": "The agent-agnostic CLI, operations contract, and Markdown guides are primary. Optional Codex adapters remain outside the core assets; a fresh walkthrough of the exact v0.2.3 release assets is still pending."
     },
     "otherAgents": {
       "status": "compatible",
@@ -43,7 +43,7 @@
     {
       "id": "project-harness",
       "displayName": "Project Harness",
-      "version": "0.2.2",
+      "version": "0.2.3",
       "license": "MIT",
       "artifactStatus": {
         "implementation": "implemented",
@@ -161,19 +161,19 @@
       "immutableLinks": {
         "documentation": {
           "status": "published",
-          "url": "https://github.com/fabianomag/agent-harnesses/blob/v0.2.2/packages/project-harness/README.md"
+          "url": "https://github.com/fabianomag/agent-harnesses/blob/v0.2.3/packages/project-harness/README.md"
         },
         "prompt": {
           "status": "published",
-          "url": "https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.2/project-harness-0.2.2.zip"
+          "url": "https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.3/project-harness-0.2.3.zip"
         },
         "source": {
           "status": "published",
-          "url": "https://github.com/fabianomag/agent-harnesses/tree/v0.2.2/packages/project-harness"
+          "url": "https://github.com/fabianomag/agent-harnesses/tree/v0.2.3/packages/project-harness"
         },
         "release": {
           "status": "published",
-          "url": "https://github.com/fabianomag/agent-harnesses/releases/tag/v0.2.2"
+          "url": "https://github.com/fabianomag/agent-harnesses/releases/tag/v0.2.3"
         },
         "interactiveDiagram": {
           "status": "planned",
@@ -209,39 +209,39 @@
       "files": [
         {
           "path": "OPERATOR_GUIDE.md",
-          "sha256": "f1789d4b71e18dc4e199c8e4ecda6e53dad02167b8562e7f856d85ea03f27bf3"
+          "sha256": "36abe9cad3894ca859e0c7ea36f06a8a8a7991c4a20f43c50104471690bcfe8d"
         },
         {
           "path": "OPERATOR_GUIDE.pt-BR.md",
-          "sha256": "26db1377bbd932e80c2693af7fc1e89d8534cf378cc2d31afa5ebc34bfd6fb74"
+          "sha256": "229f1bcf2902b6d52355a901d4e43ff42b057a64227ad446439d1cb1ec1b192e"
         },
         {
           "path": "README.md",
-          "sha256": "fa0430f2aaf3667d06f1d997183bcf8b7ed99d0a3545c0a6973cd1d5f4cf076d"
+          "sha256": "8e0fc39af27ea9560d748e6315d01e055a021ffa232082bb5a7d1a9b80796051"
         },
         {
           "path": "README.pt-BR.md",
-          "sha256": "10c19a241889b3e1a5703aedd6bff06d5258497b5e4ef3c73930f0c3f413acee"
+          "sha256": "607fef87b7f53bc118bffe71e38f229202925e573034a84232a561ff8b35ba3e"
         },
         {
           "path": "docs/REFERENCE.md",
-          "sha256": "780c3d7fe4cfdde60354797e6ac18edcd556220877558c0391b68e566214e2df"
+          "sha256": "54d4d13b6811f1a3226878320ad8ce721f332f9c55e3ca5725559680f0d8c299"
         },
         {
           "path": "harness.package.json",
-          "sha256": "a53db7868e09de2b0310f413c9f8094a7591efcf16586e8f5760308f714d3cd9"
+          "sha256": "3c37b5632c23b247628d9ef0af9a342fef2c442f585fe8fa3cad1fe1793ef0e7"
         },
         {
           "path": "operations.json",
-          "sha256": "47bc11dd6debf7c1ade9b8b6b031c3dccf21d015cdf79adc9a3ab553f1ed08c4"
+          "sha256": "af1ef85f1da727440e169765af986e47d61820788d543e10ee57528e4470ac95"
         },
         {
           "path": "project_harness.py",
-          "sha256": "a9c4a966367aa493e2faf61d8c51952b01d242a30ff03de520351e8cb80bcb69"
+          "sha256": "97d09161aba9da603beb2d29b29cad6cf9492ea1a5492767e079b0e742013eb0"
         },
         {
           "path": "tests/test_project_harness.py",
-          "sha256": "bf84591ebc4d54300152ed51e1eed929a18449092b616b98553cb7594297dda2"
+          "sha256": "2220cc4164df276464b7fd1f2b6534ad613b0f782cade5bebc163430c8e9a824"
         },
         {
           "path": "tests/validate_generated_fixture.py",
@@ -252,7 +252,7 @@
     {
       "id": "workspace-coordination",
       "displayName": "Workspace Harness",
-      "version": "0.2.2",
+      "version": "0.2.3",
       "license": "MIT",
       "artifactStatus": {
         "implementation": "implemented",
@@ -328,7 +328,7 @@
       "limitations": [
         "Independent repositories or a single project with no child coordination.",
         "It does not discover children, scan adjacent folders, dispatch agents, or execute child work.",
-        "Version 0.2.2 supports one mutating writer per coordinator root."
+        "Version 0.2.3 supports one mutating writer per coordinator root."
       ],
       "graph": {
         "id": "workspace-coordination-flow",
@@ -365,19 +365,19 @@
       "immutableLinks": {
         "documentation": {
           "status": "published",
-          "url": "https://github.com/fabianomag/agent-harnesses/blob/v0.2.2/packages/workspace-coordination/README.md"
+          "url": "https://github.com/fabianomag/agent-harnesses/blob/v0.2.3/packages/workspace-coordination/README.md"
         },
         "prompt": {
           "status": "published",
-          "url": "https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.2/workspace-coordination-0.2.2.zip"
+          "url": "https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.3/workspace-coordination-0.2.3.zip"
         },
         "source": {
           "status": "published",
-          "url": "https://github.com/fabianomag/agent-harnesses/tree/v0.2.2/packages/workspace-coordination"
+          "url": "https://github.com/fabianomag/agent-harnesses/tree/v0.2.3/packages/workspace-coordination"
         },
         "release": {
           "status": "published",
-          "url": "https://github.com/fabianomag/agent-harnesses/releases/tag/v0.2.2"
+          "url": "https://github.com/fabianomag/agent-harnesses/releases/tag/v0.2.3"
         },
         "interactiveDiagram": {
           "status": "planned",
@@ -414,31 +414,31 @@
       "files": [
         {
           "path": "OPERATOR_GUIDE.md",
-          "sha256": "2e7594ae778684c8ee5ed9dadee29211e17633a37324b31bbe473c9ecabefd87"
+          "sha256": "85ec7e13e233a919213a8eb619dee505ff1a20febd54145827918784dc5ddf89"
         },
         {
           "path": "OPERATOR_GUIDE.pt-BR.md",
-          "sha256": "75db948f462b9b9cae91133941871e1bea75d2e8c0cb10dbdce859b6e5c030b1"
+          "sha256": "685641ef536bc5152975c0148772aa95e9c6584a234f82f7a5da7d2b00b605a5"
         },
         {
           "path": "README.md",
-          "sha256": "1d60e358eb259fd7b11c38564153fdd9e0d5ee632082bb7a8026ce78fd865583"
+          "sha256": "7d535994eb9c3292553f31e19b0bb0084c4a7d2e9bb22274352a90c793c6c36b"
         },
         {
           "path": "README.pt-BR.md",
-          "sha256": "24cc5ddbdd550098d0e7275a49f48848a467ed94b5dd2c729b55b9230e4aef8c"
+          "sha256": "a1389184da6ccf02f31ed79b436f80eb8fe35c0d8bc9b418d085a525b0c6001d"
         },
         {
           "path": "docs/REFERENCE.md",
-          "sha256": "0e3767ff9fbe6b038ae2530551984be4b2b0e77275530f21c86b768f826cfeeb"
+          "sha256": "8e07398135e141a5df2f8147271529260cd22d2ec498d08a2bc33c3aa5f980fc"
         },
         {
           "path": "harness.package.json",
-          "sha256": "963418a5bd42a371de8215b55b7246c4e80b6626dbf4ddaeb0fbfbab8adb4c91"
+          "sha256": "89819d664b51dcbe31ad7df22f101980a410d01950bd5924f86fd8a041e8cf4b"
         },
         {
           "path": "operations.json",
-          "sha256": "2e04bbfea5d72b1a5754a51f19be6da6582b30bb1ab87b31c0a09efcf5bb0fcc"
+          "sha256": "b76682a6291db7aac558ea80dc6b296b20cffc79ddac83ce025146daa1091d7e"
         },
         {
           "path": "tests/fixtures/coordinator/child-alpha/AGENTS.md",
@@ -454,18 +454,18 @@
         },
         {
           "path": "tests/test_workspace_coordination.py",
-          "sha256": "2d652a809e87ca918de8ab62b9ebef551c504dc9632d9f8183fab4bc3ec97fd0"
+          "sha256": "e636675977955d5522f50124ec44ba9ae93a8b100a4eb44735b55c2ec80f9441"
         },
         {
           "path": "workspace_coordination.py",
-          "sha256": "45cadedc9393f574a20c426a146756556a55b82d6004fa20d9c887a1c018e5f7"
+          "sha256": "765d8d42e1f36d4c7be53d4c141fde3aa10561610d7d16fda1f9fba35c0a4b87"
         }
       ]
     },
     {
       "id": "cross-project",
       "displayName": "Multi-Project Harness",
-      "version": "0.2.2",
+      "version": "0.2.3",
       "license": "MIT",
       "artifactStatus": {
         "implementation": "implemented",
@@ -583,19 +583,19 @@
       "immutableLinks": {
         "documentation": {
           "status": "published",
-          "url": "https://github.com/fabianomag/agent-harnesses/blob/v0.2.2/packages/cross-project/README.md"
+          "url": "https://github.com/fabianomag/agent-harnesses/blob/v0.2.3/packages/cross-project/README.md"
         },
         "prompt": {
           "status": "published",
-          "url": "https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.2/cross-project-0.2.2.zip"
+          "url": "https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.3/cross-project-0.2.3.zip"
         },
         "source": {
           "status": "published",
-          "url": "https://github.com/fabianomag/agent-harnesses/tree/v0.2.2/packages/cross-project"
+          "url": "https://github.com/fabianomag/agent-harnesses/tree/v0.2.3/packages/cross-project"
         },
         "release": {
           "status": "published",
-          "url": "https://github.com/fabianomag/agent-harnesses/releases/tag/v0.2.2"
+          "url": "https://github.com/fabianomag/agent-harnesses/releases/tag/v0.2.3"
         },
         "interactiveDiagram": {
           "status": "planned",
@@ -632,35 +632,35 @@
       "files": [
         {
           "path": "OPERATOR_GUIDE.md",
-          "sha256": "352a8b94bdbb629579cd84d21d51fd4c5911daf79752844921122a995fa166a3"
+          "sha256": "f55a3715d78b998426dba104cc9d639f5b6de68fd8c569fbab23808600105f2d"
         },
         {
           "path": "OPERATOR_GUIDE.pt-BR.md",
-          "sha256": "6bb8c049f47fd32136f03fbc792ae07eb6a4b22c8a920e190630900e6c7ca044"
+          "sha256": "ec5a31d73efb18b66385c2f2d8b7f1f41e22d0063f8f8a55837b15632beacc20"
         },
         {
           "path": "README.md",
-          "sha256": "b421dc0a3355d0800f96d6e9b724608ae86a1e3ddfddd5a24f1d49b6177ed005"
+          "sha256": "22b46ced6899e654edb34cec4c1d5750b810706ecb559eb1a77cae58c3dabee3"
         },
         {
           "path": "README.pt-BR.md",
-          "sha256": "a5e8f419a3315db73d1adc7bcf482a314ee8a84652777c3ed328f114c64ae689"
+          "sha256": "b36f3c8b3947a1ccda1b8cf325c70cbaa0da6b449b1e10be246b968b46047d19"
         },
         {
           "path": "docs/REFERENCE.md",
-          "sha256": "e658c51da04f8f7acebb33d4f15dd216b19676d5c021695aadbdb3a5db157f10"
+          "sha256": "4fc14be4015f73ed9c87fe71b3d4dee275d8ef0757059f45540c8eddc11df3fa"
         },
         {
           "path": "harness.package.json",
-          "sha256": "3fe6ff21ae298336890a63d77c663e0643055e2fbed8cf14f907a33f083882cb"
+          "sha256": "7fa6af2dc2c222c87b840a98246584c91eb6ee6fdd94a9dc8049d1df7ee1bad9"
         },
         {
           "path": "operations.json",
-          "sha256": "fc2969cd347ad098901654d7e5e8df40f1fb35399577a118f1df3225a444a4b4"
+          "sha256": "10939a111f32edd6093ecbaa5f15eac03f9046cd674326b1c177453aa6c26223"
         },
         {
           "path": "scripts/cross_project.py",
-          "sha256": "db4335a0e258532b8ee47068329cbfd77e2691da09ee34d888df0c5d5e2074b4"
+          "sha256": "1da85d90cd7697175a68004cb21b586d68949db41c405fc34eeeea0cac4390ac"
         },
         {
           "path": "tests/manual_walkthrough.sh",
@@ -668,14 +668,14 @@
         },
         {
           "path": "tests/test_cross_project.py",
-          "sha256": "cb1e212840caa83c76403570e5257ba7cbccd47f42d51894b6ee9d1b0ebaadd6"
+          "sha256": "fea21e843324f923d66f7c6d4e80913b231bf0cdc6f2a12c37e2c38bb88289f5"
         }
       ]
     },
     {
       "id": "orchestration",
       "displayName": "Control Plane Harness",
-      "version": "0.2.2",
+      "version": "0.2.3",
       "license": "MIT",
       "artifactStatus": {
         "implementation": "implemented",
@@ -793,19 +793,19 @@
       "immutableLinks": {
         "documentation": {
           "status": "published",
-          "url": "https://github.com/fabianomag/agent-harnesses/blob/v0.2.2/packages/orchestration/README.md"
+          "url": "https://github.com/fabianomag/agent-harnesses/blob/v0.2.3/packages/orchestration/README.md"
         },
         "prompt": {
           "status": "published",
-          "url": "https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.2/orchestration-0.2.2.zip"
+          "url": "https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.3/orchestration-0.2.3.zip"
         },
         "source": {
           "status": "published",
-          "url": "https://github.com/fabianomag/agent-harnesses/tree/v0.2.2/packages/orchestration"
+          "url": "https://github.com/fabianomag/agent-harnesses/tree/v0.2.3/packages/orchestration"
         },
         "release": {
           "status": "published",
-          "url": "https://github.com/fabianomag/agent-harnesses/releases/tag/v0.2.2"
+          "url": "https://github.com/fabianomag/agent-harnesses/releases/tag/v0.2.3"
         },
         "interactiveDiagram": {
           "status": "planned",
@@ -843,27 +843,27 @@
       "files": [
         {
           "path": "OPERATOR_GUIDE.md",
-          "sha256": "c3e4e14ae847a0c5d0ed79e4befc3df173aab6fc5fc2d95131e376cf3b748d00"
+          "sha256": "f4fdd4198b32fe199a1a663e186d16e23264a117e99c2043e75b9ad03f349462"
         },
         {
           "path": "OPERATOR_GUIDE.pt-BR.md",
-          "sha256": "d280394fd8433ea0fb9b81e3460c796d2d0b83c5e3f3d84004050b309268d4c3"
+          "sha256": "c2bb100ba56f4e8f883f6e078019ac3734d910a8a1cac2baa553110387d660a9"
         },
         {
           "path": "README.md",
-          "sha256": "dc9e0924ba380b6c668c8ccd299fef2fa64dafd5414d0c6b5bb1aec8c35dd1b0"
+          "sha256": "f2c0a339f252404c34a7013e310cc2c5f1b2cec1b808ba0282ccac698c9433d3"
         },
         {
           "path": "README.pt-BR.md",
-          "sha256": "db5903d6f6380c5a2c262125a269b547c66683551273a5ddaa831a77f2fb3b6d"
+          "sha256": "ddef2ad634fefd0ed6045f777bfb48afcbfdc1ddbc5021e036bb29b3112a7779"
         },
         {
           "path": "docs/REFERENCE.md",
-          "sha256": "a88782039b406453a45de89ec70c04f7638681eb58d311cb432d2aa4aa1b936b"
+          "sha256": "add6f5ea8a7253b2c52b3eed5b789c44288141a2fe455f604e195200803918d0"
         },
         {
           "path": "harness.package.json",
-          "sha256": "2dbb01cff9f9cbc7efa19d417d40a1f0a5981827ed53dda52d93c33310ffa963"
+          "sha256": "91d996fbeabd2f4f497f183a44be80266f1a91bca0937053d12f5b7a9644bf55"
         },
         {
           "path": "hq.py",
@@ -871,11 +871,11 @@
         },
         {
           "path": "operations.json",
-          "sha256": "be6fb1bf17419542b79f1b9ec2fc32262ac6a3498526eed1e99c0b6e83081679"
+          "sha256": "2658479465cda838cb64971a47fbe631ee0925e58cfca1113a4bb58cf2af903e"
         },
         {
           "path": "orchestration_harness/__init__.py",
-          "sha256": "962250b141538dfb53edf57ba9eab9dec7751c9e863dd43ac27dd5ba8c70d83c"
+          "sha256": "dc2628ae4cf8e1f2fb59f37426a71653f7d2560ad7df82e277329b57309c653c"
         },
         {
           "path": "orchestration_harness/cli.py",
@@ -899,7 +899,7 @@
         },
         {
           "path": "orchestration_harness/service.py",
-          "sha256": "885470a7cb420f918314115dbe0c317df039f07ba9936a6e6aea8e404672ee74"
+          "sha256": "e449223ae56f2444e1bd911fbb2ee04679c49702686a9f15420064463475d372"
         },
         {
           "path": "orchestration_harness/transaction.py",
@@ -907,7 +907,7 @@
         },
         {
           "path": "orchestration_harness/verifier.py",
-          "sha256": "989f4129874ae04413bbfce879412fc0e64d3ecf591fe4404659e26112592522"
+          "sha256": "923b1e2bb8add6544ee8f07d2e04d5f55c4c7914921bdcfd3b555ba7d6ad4692"
         },
         {
           "path": "scripts/structural_check.py",
@@ -935,7 +935,7 @@
         },
         {
           "path": "templates/project/ARCHITECTURE.md",
-          "sha256": "8135c871b5c8cb30aaa773ada11841e8a87a6869dc82a53c2d25a1ce22f39bcb"
+          "sha256": "0c963f5a51b3ff29a68750dcca363e37065186fe78e2de2e7497b8d5ae8e8526"
         },
         {
           "path": "templates/project/RECORDS.md",
@@ -967,7 +967,7 @@
         },
         {
           "path": "tests/test_model.py",
-          "sha256": "6ceaf1c7cadf2ed04dd9833fa84321dfb71d6b347266cc15dec52b5e78255e0b"
+          "sha256": "d9d168661991606c2b67273038767fe2eb9f2d634d99af5c74b714de5e31666a"
         },
         {
           "path": "tests/test_transaction.py",
@@ -975,7 +975,7 @@
         },
         {
           "path": "tests/test_workflow.py",
-          "sha256": "1ad5d18fceb48f6b9bff6e2a37cc5c7c3f6baa8001e124a754f12aa7a7ff7025"
+          "sha256": "543a27e1344f78aada34b1767ea5558e44d09a87cc0644d3e6431ccce6ee6d5f"
         }
       ]
     }

@@ -3,7 +3,7 @@
   "schemaVersion": 1,
   "id": "workspace-coordination",
   "displayName": "Workspace Harness",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "license": "MIT",
   "status": "implemented",
   "readme": "README.md"

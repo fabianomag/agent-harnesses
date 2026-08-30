@@ -1,7 +1,7 @@
 <!-- BEGIN GENERATED:PRODUCT -->
 # Workspace Harness
 
-[English](README.md) · Versão `0.2.2`
+[English](README.md) · Versão `0.2.3`
 
 **Melhor opção para:** Projetos filhos no mesmo workspace que precisam de um pequeno índice compartilhado.
 
@@ -11,25 +11,25 @@
 
 Pontos fortes: **Índice dos projetos filhos · Limites de responsabilidade · Visão compartilhada do workspace**. Complexidade: média.
 
-**Readiness significa:** O coordenador está inicializado, todos os projetos filhos e owner paths registrados são explícitos e válidos e o estado canônico e gerado do workspace passa em verify sem issues.
+**Readiness significa:** O coordenador está inicializado com pelo menos um projeto filho registrado; cada path de projeto filho e owner path relativo à raiz desse projeto filho é explícito e válido; e o estado canônico e gerado do workspace passa em verify sem issues.
 
 **Antes da instalação, confirme:**
 
 - O target explícito é o workspace contêiner, não um de seus projetos filhos.
 - Os projetos filhos existentes e contidos que serão registrados já são conhecidos.
-- Cada projeto filho selecionado tem um owner file local explícito e seu estado detalhado continuará sob ownership local.
+- Cada projeto filho selecionado tem um owner file local explícito, identificado por um path relativo à raiz desse projeto filho, e seu estado detalhado continuará sob ownership local.
 
 ## Instalação
 
 Copie somente este prompt:
 
 ```text
-Instale Workspace Harness (`workspace-coordination`) v0.2.2 a partir de https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.2/workspace-coordination-0.2.2.zip.
+Instale Workspace Harness (`workspace-coordination`) v0.2.3 a partir de https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.3/workspace-coordination-0.2.3.zip.
 
 Antes de propor a execução, confirme cada fato de readiness do harness selecionado:
 - O target explícito é o workspace contêiner, não um de seus projetos filhos.
 - Os projetos filhos existentes e contidos que serão registrados já são conhecidos.
-- Cada projeto filho selecionado tem um owner file local explícito e seu estado detalhado continuará sob ownership local.
+- Cada projeto filho selecionado tem um owner file local explícito, identificado por um path relativo à raiz desse projeto filho, e seu estado detalhado continuará sob ownership local.
 Se algum fato for desconhecido ou falso, pare antes de downloads ou writes no target, explique o que precisa ser organizado primeiro e ofereça os contatos de suporte abaixo.
 
 Se o modo atual não puder executar, peça a mudança para um modo capaz de executar somente depois de apresentar o plano e receber a confirmação.
@@ -55,26 +55,27 @@ O runtime instalado inclui `operations.json` e `OPERATOR_GUIDE.pt-BR.md`; após 
 Use somente paths de projetos filhos e owner files já confirmados pelo usuário;
 não crie um workspace de exemplo nem infira projetos filhos. Use como
 `<python>` o mesmo executável público do Python 3.10+ escolhido no prompt de
-instalação. Use o runtime em
-`<raiz-coordenadora>/.agent-harnesses/runtime/workspace-coordination/0.2.2`:
+instalação. `--path` é relativo à raiz coordenadora; `--owner` é relativo à
+raiz do projeto filho selecionado. Use o runtime em
+`<raiz-coordenadora>/.agent-harnesses/runtime/workspace-coordination/0.2.3`:
 
 ```text
 <python> -B workspace_coordination.py --root "<raiz-coordenadora>" init --dry-run
 <python> -B workspace_coordination.py --root "<raiz-coordenadora>" init --apply
-<python> -B workspace_coordination.py --root "<raiz-coordenadora>" add --id "<id-do-projeto-filho>" --path "<path-do-projeto-filho>" --owner "<owner-file>" --dry-run
-<python> -B workspace_coordination.py --root "<raiz-coordenadora>" add --id "<id-do-projeto-filho>" --path "<path-do-projeto-filho>" --owner "<owner-file>" --apply
+<python> -B workspace_coordination.py --root "<raiz-coordenadora>" add --id "<id-do-projeto-filho>" --path "<path-do-projeto-filho>" --owner "<owner-file-relativo-ao-projeto-filho>" --dry-run
+<python> -B workspace_coordination.py --root "<raiz-coordenadora>" add --id "<id-do-projeto-filho>" --path "<path-do-projeto-filho>" --owner "<owner-file-relativo-ao-projeto-filho>" --apply
 <python> -B workspace_coordination.py --root "<raiz-coordenadora>" verify
 <python> -B workspace_coordination.py --root "<raiz-coordenadora>" open --child "<id-do-projeto-filho>"
 ```
 
 O coordenador não descobre projetos filhos nem executa o trabalho deles. A
-versão `0.2.2` exige um único writer de mutações (`single writer`) por raiz
+versão `0.2.3` exige um único writer de mutações (`single writer`) por raiz
 coordenadora; serialize os writers. O state schema permanece `1`. O
 [guia operacional](OPERATOR_GUIDE.pt-BR.md) ensina o ciclo completo; a
 [referência avançada](docs/REFERENCE.md) preserva os contratos de single
 writer, recuperação e evidência. Consulte também o
-[catálogo imutável](https://github.com/fabianomag/agent-harnesses/blob/v0.2.2/catalog/harnesses.json)
-e o [diagrama](https://github.com/fabianomag/agent-harnesses/blob/v0.2.2/graphs/workspace-coordination.graph.json).
+[catálogo imutável](https://github.com/fabianomag/agent-harnesses/blob/v0.2.3/catalog/harnesses.json)
+e o [diagrama](https://github.com/fabianomag/agent-harnesses/blob/v0.2.3/graphs/workspace-coordination.graph.json).
 Execute `<python> -B installer.py verify workspace-coordination --target
 "<raiz-coordenadora>" --json` na raiz do pacote ainda extraído;
 `installer.py` não é copiado para o runtime.

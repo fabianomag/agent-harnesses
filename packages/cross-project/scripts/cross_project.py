@@ -181,7 +181,7 @@ def _child_parts(value: str) -> tuple[str, ...]:
 def _project_path_syntax(value: str) -> Path | None:
     """Validate one stored project-root spelling without touching the filesystem.
 
-    Relative POSIX paths are the v0.1/v0.2.1 compatibility form and remain
+    Relative POSIX paths are the pre-v0.2.2 compatibility form and remain
     contained by the coordination root. New independent project roots may use
     normalized native absolute paths.
     """
@@ -436,6 +436,7 @@ def _fronts_body(state: Mapping[str, Any]) -> str:
     ]
     if not active:
         lines.append("| — | No reflected fronts yet | — | — | — | — |")
+    resumptions = []
     for front_id, front in active:
         fields = [
             front_id,
@@ -447,10 +448,12 @@ def _fronts_body(state: Mapping[str, Any]) -> str:
         ]
         safe = [str(field).replace("|", "&#124;").replace("\n", " ") for field in fields]
         lines.append("| " + " | ".join(safe) + " |")
-        lines.append(
-            f"\nResumption `{front_id}`: {front['next']} "
+        resumptions.append(
+            f"- `{front_id}` — {front['next']} "
             f"(reflect again when: {front['reflectWhen']})"
         )
+    if resumptions:
+        lines.extend(["", "## Resumption", "", *resumptions])
     return "\n".join(lines)
 
 

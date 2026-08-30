@@ -1,4 +1,4 @@
-"""Black-box and safety tests for the standalone v0.2.2 installer."""
+"""Black-box and safety tests for the standalone v0.2.3 installer."""
 
 from __future__ import annotations
 
@@ -11,6 +11,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import threading
 import unittest
 import zipfile
 from pathlib import Path
@@ -51,24 +52,18 @@ def _run(target: Path, *arguments: str) -> tuple[subprocess.CompletedProcess[str
     return process, json.loads(process.stdout)
 
 
-def _install_receipted_021_runtime(
+def _install_receipted_previous_runtime(
     target: Path,
     package_id: str,
     *,
     external_agents: bytes | None,
+    nested_legacy: bool = False,
 ) -> tuple[Path, dict[str, object]]:
     package = installer._package_for_selector(package_id)
     source = installer._local_source(package["id"])
     if source is None:
         raise AssertionError("checked-in package source is unavailable")
     inventory = installer._validate_inventory(source[0], source[1])
-    destination = installer._runtime_destination(
-        target,
-        package["id"],
-        installer.UPGRADE_FROM_VERSION,
-    )
-    destination.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copytree(source[0], destination)
     agents_created = external_agents is None
     attachment_start = len(external_agents or b"")
     agents = target / installer.AGENTS_RELATIVE
@@ -80,8 +75,45 @@ def _install_receipted_021_runtime(
             installer.UPGRADE_FROM_VERSION,
         )
     )
+    legacy_receipt: dict[str, object] | None = None
+    if nested_legacy:
+        legacy_destination = installer._runtime_destination(
+            target,
+            package["id"],
+            installer.LEGACY_RECEIPT_VERSION,
+        )
+        legacy_destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copytree(source[0], legacy_destination)
+        legacy_receipt = {
+            "schemaVersion": 2,
+            "package": {
+                "id": package["id"],
+                "version": installer.LEGACY_RECEIPT_VERSION,
+            },
+            "files": [
+                {"path": path, "sha256": inventory[path]}
+                for path in sorted(inventory)
+            ],
+            "onboarding": installer._onboarding_receipt(
+                package["id"],
+                agents_created,
+                attachment_start,
+                installer.LEGACY_RECEIPT_VERSION,
+            ),
+        }
+        (legacy_destination / installer.RECEIPT_NAME).write_bytes(
+            installer._canonical_bytes(legacy_receipt)
+        )
+
+    destination = installer._runtime_destination(
+        target,
+        package["id"],
+        installer.UPGRADE_FROM_VERSION,
+    )
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copytree(source[0], destination)
     receipt: dict[str, object] = {
-        "schemaVersion": 2,
+        "schemaVersion": 3,
         "package": {
             "id": package["id"],
             "version": installer.UPGRADE_FROM_VERSION,
@@ -96,6 +128,16 @@ def _install_receipted_021_runtime(
             attachment_start,
             installer.UPGRADE_FROM_VERSION,
         ),
+        "upgrade": (
+            {
+                "fromVersion": installer.LEGACY_RECEIPT_VERSION,
+                "receiptSha256": hashlib.sha256(
+                    installer._canonical_bytes(legacy_receipt)
+                ).hexdigest(),
+            }
+            if legacy_receipt is not None
+            else None
+        ),
     }
     (destination / installer.RECEIPT_NAME).write_bytes(
         installer._canonical_bytes(receipt)
@@ -105,11 +147,17 @@ def _install_receipted_021_runtime(
         package["id"],
         installer.UPGRADE_FROM_VERSION,
     )
-    installer._verify_onboarding(
+    onboarding = installer._verify_onboarding(
         target,
         package["id"],
         receipt,
         installer.UPGRADE_FROM_VERSION,
+    )
+    installer._verify_upgrade_predecessor(
+        target,
+        package["id"],
+        receipt,
+        onboarding,
     )
     return destination, receipt
 
@@ -169,6 +217,72 @@ class ProductContractTests(unittest.TestCase):
         for relative in ("README.md", "README.pt-BR.md", "INSTALL_FROM_RELEASE.md"):
             text = (REPOSITORY_ROOT / relative).read_text(encoding="utf-8")
             self.assertIn("`package/README.md`", text)
+
+    def test_workspace_owner_and_control_boundary_contracts_are_unambiguous(self) -> None:
+        packages = product.package_map(product.load_product(REPOSITORY_ROOT))
+        workspace = packages["workspace-coordination"]["operator"]
+        self.assertIn("at least one registered child", workspace["readiness"]["en"])
+        self.assertIn("pelo menos um projeto filho", workspace["readiness"]["ptBr"])
+        add = next(
+            operation
+            for operation in workspace["operations"]
+            if operation["command"] == "add"
+        )
+        self.assertIn("relative to that child root", add["purpose"]["en"])
+        self.assertIn("relativo à raiz desse projeto filho", add["purpose"]["ptBr"])
+        self.assertIn("<child-relative-owner-file>", add["inputs"])
+
+        control = packages["orchestration"]["operator"]
+        self.assertIn(
+            "does not certify a front's semantic responsibility boundary",
+            control["readiness"]["en"],
+        )
+        self.assertIn(
+            "não certifica o responsibility boundary semântico",
+            control["readiness"]["ptBr"],
+        )
+        sync = next(
+            operation
+            for operation in control["operations"]
+            if operation["command"] == "hq-sync"
+        )
+        self.assertIn("registered path containment", sync["purpose"]["en"])
+        self.assertNotIn("front boundaries", sync["purpose"]["en"])
+        init = next(
+            operation
+            for operation in control["operations"]
+            if operation["command"] == "init"
+        )
+        self.assertEqual(
+            [
+                "<workspace>",
+                "<front-id>",
+                "<front-name>",
+                "<front-path>",
+                "<alias?>",
+                "--dry-run|--apply",
+            ],
+            init["inputs"],
+        )
+
+    def test_markdown_guides_quote_placeholders_without_polluting_snapshot_copy(self) -> None:
+        value = product.load_product(REPOSITORY_ROOT)
+        control = product.package_map(value)["orchestration"]
+        canonical = control["operator"]["memory"]["description"]["en"]
+        self.assertIn("<front-path>/ARCHITECTURE.md", canonical)
+        self.assertNotIn("`<front-path>/ARCHITECTURE.md`", canonical)
+
+        guide = product.operator_guide(value, control, "en")
+        self.assertIn("`<front-path>/ARCHITECTURE.md`", guide)
+        snapshot = next(
+            package
+            for package in product.site_snapshot(value)["packages"]
+            if package["id"] == "orchestration"
+        )
+        self.assertEqual(
+            canonical,
+            snapshot["operator"]["memory"]["description"]["en"],
+        )
 
     def test_public_commands_reuse_python_placeholder_and_quote_paths(self) -> None:
         relatives = [
@@ -324,10 +438,37 @@ class InstallerSafetyTests(unittest.TestCase):
         lock.write_bytes(b"external lock owner\n")
         before = _snapshot(self.target)
 
-        process, result = _run(self.target, "install", "project", "--apply")
+        for arguments in (
+            ("doctor", "project"),
+            ("install", "project", "--dry-run"),
+            ("install", "project", "--apply"),
+        ):
+            with self.subTest(arguments=arguments):
+                process, result = _run(self.target, *arguments)
 
-        self.assertEqual(2, process.returncode)
-        self.assertEqual("E_INITIALIZATION_CONFLICT", result["code"])
+                self.assertEqual(2, process.returncode)
+                self.assertEqual("E_INITIALIZATION_CONFLICT", result["code"])
+                self.assertIn("unsafe type", result["message"])
+                self.assertEqual(before, _snapshot(self.target))
+
+    def test_doctor_times_out_on_stale_safe_onboarding_lock_without_writes(self) -> None:
+        boundary = self.target / ".agent-harnesses"
+        boundary.mkdir()
+        lock = boundary / installer.ONBOARDING_LOCK_NAME
+        lock.mkdir()
+        before = _snapshot(self.target)
+        package = installer._package_for_selector("project")
+
+        with mock.patch.object(installer, "ONBOARDING_LOCK_ATTEMPTS", 2), mock.patch.object(
+            installer.time,
+            "sleep",
+            return_value=None,
+        ):
+            with self.assertRaises(installer.InstallerFailure) as raised:
+                installer._doctor(package, self.target)
+
+        self.assertEqual("E_INITIALIZATION_CONFLICT", raised.exception.result["code"])
+        self.assertIn("still owns", raised.exception.result["message"])
         self.assertEqual(before, _snapshot(self.target))
 
     def test_doctor_rejects_linked_marker_parent_without_writes(self) -> None:
@@ -528,6 +669,71 @@ class InstallerSafetyTests(unittest.TestCase):
         self.assertEqual("installed", verified_result["phase"])
         self.assertFalse(verified_result["ready"])
 
+    def test_workspace_init_without_child_is_not_ready_until_add(self) -> None:
+        installed, _result = _run(self.target, "install", "workspace", "--apply")
+        self.assertEqual(0, installed.returncode)
+        runtime = (
+            self.target
+            / f".agent-harnesses/runtime/workspace-coordination/{installer.VERSION}/workspace_coordination.py"
+        )
+        initialized = subprocess.run(
+            [
+                sys.executable,
+                "-B",
+                str(runtime),
+                "--root",
+                str(self.target),
+                "init",
+                "--apply",
+            ],
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        self.assertEqual(
+            0,
+            initialized.returncode,
+            initialized.stdout + initialized.stderr,
+        )
+
+        unready, unready_result = _run(self.target, "verify", "workspace")
+
+        self.assertEqual(2, unready.returncode)
+        self.assertEqual("E_NOT_READY", unready_result["code"])
+        self.assertEqual("initialized", unready_result["phase"])
+        self.assertFalse(unready_result["ready"])
+
+        child = self.target / "service"
+        child.mkdir()
+        (child / "OWNER.md").write_text("# Service owner\n", encoding="utf-8")
+        added = subprocess.run(
+            [
+                sys.executable,
+                "-B",
+                str(runtime),
+                "--root",
+                str(self.target),
+                "add",
+                "--id",
+                "service",
+                "--path",
+                "service",
+                "--owner",
+                "OWNER.md",
+                "--apply",
+            ],
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        self.assertEqual(0, added.returncode, added.stdout + added.stderr)
+
+        ready, ready_result = _run(self.target, "verify", "workspace")
+
+        self.assertEqual(0, ready.returncode)
+        self.assertEqual("ready", ready_result["phase"])
+        self.assertTrue(ready_result["ready"])
+
     def test_install_preserves_unrelated_documentation_and_confines_receipt(self) -> None:
         documentation = {
             "AGENTS.md": b"# Existing agent instructions\n",
@@ -574,7 +780,7 @@ class InstallerSafetyTests(unittest.TestCase):
         self.assertIn("unchanged", second_result["message"])
         self.assertEqual(before, _snapshot(self.target))
 
-    def test_022_install_and_uninstall_preserve_existing_020_runtime_and_state(self) -> None:
+    def test_current_install_and_uninstall_preserve_existing_020_runtime_and_state(self) -> None:
         old_runtime = (
             self.target
             / ".agent-harnesses"
@@ -616,26 +822,29 @@ class InstallerSafetyTests(unittest.TestCase):
         self.assertEqual(marker_before, marker.read_bytes())
         self.assertEqual(old_agents, agents.read_bytes())
 
-    def test_receipted_021_upgrade_is_read_only_until_apply_and_reversible(self) -> None:
+    def test_receipted_previous_upgrade_is_read_only_nested_and_reversible(self) -> None:
         external = b"# Existing owner\r\nPRIVATE-EXTERNAL-CONTENT"
-        old_runtime, old_receipt = _install_receipted_021_runtime(
+        old_runtime, old_receipt = _install_receipted_previous_runtime(
             self.target,
             "project-harness",
             external_agents=external,
+            nested_legacy=True,
         )
         agents = self.target / "AGENTS.md"
         agents.chmod(0o600)
         original_mode = agents.stat().st_mode & 0o777
         marker = self.target / ".project-harness" / "state.json"
         marker.parent.mkdir()
-        marker.write_bytes(b'{"harnessVersion":"0.2.1","state":"synthetic"}\n')
+        marker.write_bytes(
+            ('{"harnessVersion":"%s","state":"synthetic"}\n' % installer.UPGRADE_FROM_VERSION).encode("ascii")
+        )
         old_runtime_before = _snapshot(old_runtime)
         marker_before = marker.read_bytes()
         before = _snapshot(self.target)
 
         checked, checked_result = _run(self.target, "doctor", "project")
         self.assertEqual(0, checked.returncode)
-        self.assertIn("v0.2.1", checked_result["message"])
+        self.assertIn("v%s" % installer.UPGRADE_FROM_VERSION, checked_result["message"])
         self.assertEqual(before, _snapshot(self.target))
 
         previewed, preview_result = _run(
@@ -675,7 +884,7 @@ class InstallerSafetyTests(unittest.TestCase):
         self.assertEqual(3, current_receipt["schemaVersion"])
         self.assertEqual(
             {
-                "fromVersion": "0.2.1",
+                "fromVersion": installer.UPGRADE_FROM_VERSION,
                 "receiptSha256": hashlib.sha256(
                     installer._canonical_bytes(old_receipt)
                 ).hexdigest(),
@@ -728,7 +937,7 @@ class InstallerSafetyTests(unittest.TestCase):
         )
         self.assertEqual(original_mode, agents.stat().st_mode & 0o777)
 
-    def test_unreceipted_021_block_is_a_zero_write_conflict(self) -> None:
+    def test_unreceipted_previous_block_is_a_zero_write_conflict(self) -> None:
         agents = self.target / "AGENTS.md"
         agents.write_bytes(
             installer._onboarding_block(
@@ -749,9 +958,9 @@ class InstallerSafetyTests(unittest.TestCase):
                 self.assertEqual("E_INITIALIZATION_CONFLICT", result["code"])
                 self.assertEqual(before, _snapshot(self.target))
 
-    def test_failed_021_upgrade_restores_exact_old_bytes_and_mode(self) -> None:
+    def test_failed_previous_upgrade_restores_exact_old_bytes_and_mode(self) -> None:
         external = b"# Existing owner\n"
-        old_runtime, _old_receipt = _install_receipted_021_runtime(
+        old_runtime, _old_receipt = _install_receipted_previous_runtime(
             self.target,
             "project-harness",
             external_agents=external,
@@ -775,7 +984,7 @@ class InstallerSafetyTests(unittest.TestCase):
         with mock.patch.object(
             installer,
             "_publish_no_replace",
-            side_effect=OSError("synthetic v0.2.2 publish failure"),
+            side_effect=OSError("synthetic v0.2.3 publish failure"),
         ):
             with self.assertRaises(OSError):
                 installer._copy_install(
@@ -836,8 +1045,99 @@ class InstallerSafetyTests(unittest.TestCase):
             self.assertEqual("OK", json.loads(stdout)["code"])
         destination = self.target / f".agent-harnesses/runtime/project-harness/{installer.VERSION}"
         installer._verify_runtime_files(destination, "project-harness")
-        runtime_root = self.target / ".agent-harnesses/runtime"
-        self.assertEqual([], list(runtime_root.glob(".install-*")))
+        boundary = self.target / ".agent-harnesses"
+        self.assertEqual([], list(boundary.glob(".install-*")))
+        self.assertFalse((boundary / installer.ONBOARDING_LOCK_NAME).exists())
+        self.assertEqual([], list(self.target.glob(".agent-harnesses-agents-*")))
+        agents = (self.target / "AGENTS.md").read_bytes()
+        begin, end = installer._onboarding_markers("project-harness")
+        self.assertEqual(1, agents.count(begin))
+        self.assertEqual(1, agents.count(end))
+
+    def test_doctor_waits_for_cooperative_install_publication(self) -> None:
+        package = installer._package_for_selector("project")
+        source = installer._local_source(package["id"])
+        self.assertIsNotNone(source)
+        original_publish = installer._publish_no_replace
+        original_wait = installer._wait_for_onboarding_lock_release
+
+        for upgrade in (False, True):
+            with self.subTest(upgrade=upgrade):
+                target = self.target / ("upgrade" if upgrade else "fresh")
+                target.mkdir()
+                if upgrade:
+                    _install_receipted_previous_runtime(
+                        target,
+                        package["id"],
+                        external_agents=None,
+                        nested_legacy=True,
+                    )
+                destination = installer._runtime_destination(target, package["id"])
+                publish_entered = threading.Event()
+                release_publish = threading.Event()
+                wait_entered = threading.Event()
+                writer_errors: list[BaseException] = []
+                doctor_errors: list[BaseException] = []
+                doctor_results: list[dict[str, object]] = []
+
+                def blocked_publish(stage: Path, final: Path) -> None:
+                    publish_entered.set()
+                    if not release_publish.wait(timeout=10):
+                        raise RuntimeError("test publish gate timed out")
+                    original_publish(stage, final)
+
+                def observed_wait(observed_target: Path) -> None:
+                    wait_entered.set()
+                    original_wait(observed_target)
+
+                def install_runtime() -> None:
+                    try:
+                        installer._copy_install(
+                            source[0],
+                            source[1],
+                            destination,
+                            package["id"],
+                        )
+                    except BaseException as error:  # pragma: no cover - asserted below
+                        writer_errors.append(error)
+
+                def run_doctor() -> None:
+                    try:
+                        doctor_results.append(installer._doctor(package, target))
+                    except BaseException as error:  # pragma: no cover - asserted below
+                        doctor_errors.append(error)
+
+                with mock.patch.object(
+                    installer,
+                    "_publish_no_replace",
+                    side_effect=blocked_publish,
+                ), mock.patch.object(
+                    installer,
+                    "_wait_for_onboarding_lock_release",
+                    side_effect=observed_wait,
+                ):
+                    writer = threading.Thread(target=install_runtime)
+                    writer.start()
+                    self.assertTrue(publish_entered.wait(timeout=10))
+                    self.assertTrue((target / "AGENTS.md").exists())
+                    self.assertFalse(destination.exists())
+
+                    reader = threading.Thread(target=run_doctor)
+                    reader.start()
+                    self.assertTrue(wait_entered.wait(timeout=10))
+                    release_publish.set()
+                    writer.join(timeout=10)
+                    reader.join(timeout=10)
+
+                self.assertFalse(writer.is_alive())
+                self.assertFalse(reader.is_alive())
+                self.assertEqual([], writer_errors)
+                self.assertEqual([], doctor_errors)
+                self.assertEqual("OK", doctor_results[0]["code"])
+                installer._verify_runtime_files(destination, package["id"])
+                boundary = target / ".agent-harnesses"
+                self.assertFalse((boundary / installer.ONBOARDING_LOCK_NAME).exists())
+                self.assertEqual([], list(boundary.glob(".install-*")))
 
     def test_ready_requires_operational_runtime_verification(self) -> None:
         installed, _result = _run(self.target, "install", "project", "--apply")
@@ -1181,13 +1481,13 @@ class InstallerSafetyTests(unittest.TestCase):
         mutations.append(("invalid-block-digest", invalid_block_digest, False))
         invalid_upgrade_version = json.loads(canonical)
         invalid_upgrade_version["upgrade"] = {
-            "fromVersion": "0.2.0",
+            "fromVersion": installer.LEGACY_RECEIPT_VERSION,
             "receiptSha256": "0" * 64,
         }
         mutations.append(("invalid-upgrade-version", invalid_upgrade_version, False))
         invalid_upgrade_shape = json.loads(canonical)
         invalid_upgrade_shape["upgrade"] = {
-            "fromVersion": "0.2.1",
+            "fromVersion": installer.UPGRADE_FROM_VERSION,
             "receiptSha256": "0" * 64,
             "externalBytes": "must-not-be-accepted",
         }

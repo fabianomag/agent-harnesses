@@ -10,7 +10,7 @@ project. Do not use it to coordinate a workspace, sibling projects, external
 systems, releases, or publication.
 
 Operate the already installed agent-agnostic runtime at
-`<target>/.agent-harnesses/runtime/project-harness/0.2.2/`. Treat that
+`<target>/.agent-harnesses/runtime/project-harness/0.2.3/`. Treat that
 runtime's `operations.json` as the machine-readable command authority and its
 operator guide as the user-facing contract. This optional adapter does not
 replace or install the runtime.

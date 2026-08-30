@@ -1,7 +1,7 @@
 # Multi-Project Harness — advanced reference
 
 - Package ID: `cross-project`
-- Version: `0.2.2`
+- Version: `0.2.3`
 - Artifact status: implemented, published
 - Runtime: Python 3.10 or newer, standard library only
 
@@ -62,12 +62,12 @@ remains with each local project owner.
 From the source repository root:
 
 ```text
-<python> -B tools/package_manager.py install --package cross-project --version 0.2.2 --root "<install-root>" --dry-run
-<python> -B tools/package_manager.py install --package cross-project --version 0.2.2 --root "<install-root>" --apply
-<python> -B tools/package_manager.py verify --package cross-project --version 0.2.2 --root "<install-root>"
+<python> -B tools/package_manager.py install --package cross-project --version 0.2.3 --root "<install-root>" --dry-run
+<python> -B tools/package_manager.py install --package cross-project --version 0.2.3 --root "<install-root>" --apply
+<python> -B tools/package_manager.py verify --package cross-project --version 0.2.3 --root "<install-root>"
 ```
 
-The installed copy is `<install-root>/cross-project-0.2.2/`. The common
+The installed copy is `<install-root>/cross-project-0.2.3/`. The common
 package manager does not create a global command or invoke the runtime.
 
 ## Preflight
@@ -104,7 +104,7 @@ root:
 Verify installed package bytes from the source repository root:
 
 ```text
-<python> -B tools/package_manager.py verify --package cross-project --version 0.2.2 --root "<install-root>"
+<python> -B tools/package_manager.py verify --package cross-project --version 0.2.3 --root "<install-root>"
 ```
 
 Run package-local automated checks from the installed package root:
@@ -188,13 +188,13 @@ package version and commit.
 
 ## Version and immutable links
 
-Version `0.2.2` is bound to the immutable `v0.2.2` release tag and supersedes
+Version `0.2.3` is bound to the immutable `v0.2.3` release tag and supersedes
 the immutable `v0.2.0` collection release without rewriting it.
 
-- Immutable documentation URL: https://github.com/fabianomag/agent-harnesses/blob/v0.2.2/packages/cross-project/README.md
-- Immutable install prompt: `Install this harness for me: https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.2/cross-project-0.2.2.zip`
-- Immutable source URL: https://github.com/fabianomag/agent-harnesses/tree/v0.2.2/packages/cross-project
-- Release URL: https://github.com/fabianomag/agent-harnesses/releases/tag/v0.2.2
+- Immutable documentation URL: https://github.com/fabianomag/agent-harnesses/blob/v0.2.3/packages/cross-project/README.md
+- Immutable install prompt: `Install this harness for me: https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.3/cross-project-0.2.3.zip`
+- Immutable source URL: https://github.com/fabianomag/agent-harnesses/tree/v0.2.3/packages/cross-project
+- Release URL: https://github.com/fabianomag/agent-harnesses/releases/tag/v0.2.3
 - Installation report: https://github.com/fabianomag/agent-harnesses/issues/new?template=installation-report.yml
 
 Do not substitute a mutable branch URL for the version-bound fields.
@@ -202,7 +202,7 @@ Do not substitute a mutable branch URL for the version-bound fields.
 ## Diagrams
 
 - Graph ID: `cross-project-flow`
-- Immutable spec: https://github.com/fabianomag/agent-harnesses/blob/v0.2.2/graphs/cross-project.graph.json
+- Immutable spec: https://github.com/fabianomag/agent-harnesses/blob/v0.2.3/graphs/cross-project.graph.json
 - Source-tree static asset: `assets/cross-project.svg`
 - Interactive diagram: https://fabianomag.com/projects/agent-harnesses
 

@@ -196,8 +196,8 @@ class ReleaseAssetTests(unittest.TestCase):
                 f"download/{value['release']['tag']}/release-manifest.json"
             )
             self.assertEqual(2, snapshot["schemaVersion"])
-            self.assertEqual("0.2.2", snapshot["release"]["version"])
-            self.assertEqual("v0.2.2", snapshot["release"]["tag"])
+            self.assertEqual("0.2.3", snapshot["release"]["version"])
+            self.assertEqual("v0.2.3", snapshot["release"]["tag"])
             self.assertEqual(expected, snapshot["releaseManifest"]["url"])
             self.assertTrue(snapshot["tutorial"]["requiredAfterReady"])
             self.assertEqual("conversation", snapshot["tutorial"]["delivery"])
@@ -224,7 +224,7 @@ class ReleaseAssetTests(unittest.TestCase):
                 skill = (adapter / "SKILL.md").read_text(encoding="utf-8")
                 self.assertIn("operations.json", skill)
                 self.assertIn(
-                    f".agent-harnesses/runtime/{package_id}/0.2.2/",
+                    f".agent-harnesses/runtime/{package_id}/0.2.3/",
                     skill,
                 )
                 self.assertIn("optional adapter", skill.lower())

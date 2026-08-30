@@ -9,7 +9,7 @@ Keep project-local detail in each child. Store only role, coordination state,
 next action, blocker, reflection summary, and reflection trigger in the root.
 
 Operate the already installed agent-agnostic runtime at
-`<target>/.agent-harnesses/runtime/cross-project/0.2.2/`. Treat that runtime's
+`<target>/.agent-harnesses/runtime/cross-project/0.2.3/`. Treat that runtime's
 `operations.json` as the machine-readable command authority and its operator
 guide as the user-facing contract. This optional adapter does not replace or
 install the runtime.

@@ -118,7 +118,7 @@ class InitializationTests(TemporaryProjectTestCase):
         harness.initialize(self.root)
         state_path = self.root / harness.STATE_PATH
         state = json.loads(state_path.read_text(encoding="utf-8"))
-        for prior_version in ("0.1.0", "0.2.0", "0.2.1"):
+        for prior_version in ("0.1.0", "0.2.0", "0.2.1", "0.2.2"):
             with self.subTest(prior_version=prior_version):
                 state["harnessVersion"] = prior_version
                 state_path.write_bytes(harness._state_bytes(state))
@@ -126,7 +126,7 @@ class InitializationTests(TemporaryProjectTestCase):
 
                 self.assertEqual([], harness.verify_root(self.root))
                 self.assertEqual(
-                    "0.2.2",
+                    "0.2.3",
                     harness.status_snapshot(self.root)["harnessVersion"],
                 )
                 _root, plan = harness.plan_init(self.root)

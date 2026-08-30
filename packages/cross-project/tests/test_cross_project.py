@@ -252,6 +252,50 @@ class CrossProjectTests(unittest.TestCase):
         for project, before in project_snapshots.items():
             self.assertEqual(before, self.physical_snapshot(project))
 
+        for front_id, role, next_action, reflect_when in (
+            (
+                "alpha",
+                "Produces the service API",
+                "Publish the confirmed contract",
+                "The API contract changes",
+            ),
+            (
+                "beta",
+                "Consumes the service API",
+                "Validate the handoff",
+                "The client contract changes",
+            ),
+        ):
+            self.run_cli(
+                "encerra",
+                "--root",
+                str(coordination),
+                "--front",
+                front_id,
+                "--role",
+                role,
+                "--state",
+                "ready",
+                "--next",
+                next_action,
+                "--summary",
+                "Confirmed project handoff",
+                "--reflect-when",
+                reflect_when,
+            )
+        fronts = (coordination / "FRONTS.md").read_text(encoding="utf-8")
+        table, resumptions = fronts.split("\n\n## Resumption\n\n", maxsplit=1)
+        self.assertIn("| alpha | Alpha service |", table)
+        self.assertIn("| beta | Beta client |", table)
+        self.assertNotIn("Resumption", table)
+        self.assertIn("- `alpha` — Publish the confirmed contract", resumptions)
+        self.assertIn("- `beta` — Validate the handoff", resumptions)
+        self.assertTrue(
+            self.run_cli("hq-sync", "--root", str(coordination))["consistent"]
+        )
+        for project, before in project_snapshots.items():
+            self.assertEqual(before, self.physical_snapshot(project))
+
     def test_absolute_project_root_cannot_be_owned_by_two_front_ids(self) -> None:
         portfolio = self.root / "absolute-alias"
         coordination = portfolio / "coordination"

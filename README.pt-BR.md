@@ -7,7 +7,7 @@ Quatro harnesses locais para quatro limites de coordenação diferentes. Escolha
 
 Guia interativo: https://fabianomag.com/pt-br/projetos/agent-harnesses
 
-Requisitos: Python 3.10 ou mais recente, um diretório-alvo existente e explícito e um único ZIP da release `v0.2.2` com seu checksum sidecar correspondente. Cada ZIP instala o runtime completo baseado apenas na biblioteca padrão do Python, o inventário de comandos e o guia operacional agent-agnostic de um harness. O instalador não altera `PATH`, não edita `.gitignore` e não exige uma Skill global.
+Requisitos: Python 3.10 ou mais recente, um diretório-alvo existente e explícito e um único ZIP da release `v0.2.3` com seu checksum sidecar correspondente. Cada ZIP instala o runtime completo baseado apenas na biblioteca padrão do Python, o inventário de comandos e o guia operacional agent-agnostic de um harness. O instalador não altera `PATH`, não edita `.gitignore` e não exige uma Skill global.
 
 ## O que você precisa coordenar?
 
@@ -27,7 +27,7 @@ Cada bloco abaixo contém somente um harness, uma versão e um ZIP. Copie apenas
 ### Project Harness
 
 ```text
-Instale Project Harness (`project-harness`) v0.2.2 a partir de https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.2/project-harness-0.2.2.zip.
+Instale Project Harness (`project-harness`) v0.2.3 a partir de https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.3/project-harness-0.2.3.zip.
 
 Antes de propor a execução, confirme cada fato de readiness do harness selecionado:
 - O target explícito é a raiz de um único projeto real.
@@ -53,12 +53,12 @@ Entregue o tutorial no idioma do usuário e na conversa sem criar documentação
 ### Workspace Harness
 
 ```text
-Instale Workspace Harness (`workspace-coordination`) v0.2.2 a partir de https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.2/workspace-coordination-0.2.2.zip.
+Instale Workspace Harness (`workspace-coordination`) v0.2.3 a partir de https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.3/workspace-coordination-0.2.3.zip.
 
 Antes de propor a execução, confirme cada fato de readiness do harness selecionado:
 - O target explícito é o workspace contêiner, não um de seus projetos filhos.
 - Os projetos filhos existentes e contidos que serão registrados já são conhecidos.
-- Cada projeto filho selecionado tem um owner file local explícito e seu estado detalhado continuará sob ownership local.
+- Cada projeto filho selecionado tem um owner file local explícito, identificado por um path relativo à raiz desse projeto filho, e seu estado detalhado continuará sob ownership local.
 Se algum fato for desconhecido ou falso, pare antes de downloads ou writes no target, explique o que precisa ser organizado primeiro e ofereça os contatos de suporte abaixo.
 
 Se o modo atual não puder executar, peça a mudança para um modo capaz de executar somente depois de apresentar o plano e receber a confirmação.
@@ -79,7 +79,7 @@ Entregue o tutorial no idioma do usuário e na conversa sem criar documentação
 ### Multi-Project Harness
 
 ```text
-Instale Multi-Project Harness (`cross-project`) v0.2.2 a partir de https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.2/cross-project-0.2.2.zip.
+Instale Multi-Project Harness (`cross-project`) v0.2.3 a partir de https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.3/cross-project-0.2.3.zip.
 
 Antes de propor a execução, confirme cada fato de readiness do harness selecionado:
 - A coordination root e as raízes independentes dos projetos existentes estão explícitas.
@@ -105,11 +105,11 @@ Entregue o tutorial no idioma do usuário e na conversa sem criar documentação
 ### Control Plane Harness
 
 ```text
-Instale Control Plane Harness (`orchestration`) v0.2.2 a partir de https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.2/orchestration-0.2.2.zip.
+Instale Control Plane Harness (`orchestration`) v0.2.3 a partir de https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.3/orchestration-0.2.3.zip.
 
 Antes de propor a execução, confirme cada fato de readiness do harness selecionado:
 - O target explícito é uma nova raiz Master ou de control plane deliberada, não uma estrutura de coordenação existente a ser adotada.
-- As frentes iniciais, seus paths relativos pretendidos e seus boundaries já são conhecidos.
+- As frentes iniciais e seus paths relativos à raiz estão conhecidos, e o usuário consegue declarar o responsibility boundary semântico de cada frente. O harness não inferirá esse boundary.
 - O trabalho realmente exige registry transacional, validated mutations, rollback e recovery, e não apenas handoffs entre projetos.
 Se algum fato for desconhecido ou falso, pare antes de downloads ou writes no target, explique o que precisa ser organizado primeiro e ofereça os contatos de suporte abaixo.
 
@@ -170,7 +170,7 @@ coding agent lê o contrato operacional instalado e ensina o usuário; o
 instalador não finge medir se essa explicação aconteceu.
 
 O runtime selecionado fica em
-`<diretório-alvo>/.agent-harnesses/runtime/<id>/0.2.2`.
+`<diretório-alvo>/.agent-harnesses/runtime/<id>/0.2.3`.
 
 Para remover somente o bloco de onboarding gerenciado exato e os arquivos
 inalterados registrados no receipt do runtime, sem apagar o estado inicializado
@@ -193,7 +193,7 @@ Integrações nativas opcionais de plataformas ficam em
 [`adapters/`](adapters/) e nunca fazem parte dos quatro ZIPs centrais nem da
 instalação padrão.
 
-A release `v0.2.2` contém quatro ZIPs determinísticos, cada um com somente um
+A release `v0.2.3` contém quatro ZIPs determinísticos, cada um com somente um
 pacote, além de um arquivo de soma por artefato, o instalador independente, o
 manifest da release, o registro fixado do site e o histórico de mudanças. As
 versões `0.1.x` e a release imutável `v0.2.0` permanecem disponíveis e estão

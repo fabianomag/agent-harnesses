@@ -15,9 +15,9 @@ from pathlib import Path, PurePosixPath
 from typing import Any, Callable, Mapping, Sequence
 
 
-HARNESS_VERSION = "0.2.2"
+HARNESS_VERSION = "0.2.3"
 READABLE_HARNESS_VERSIONS = frozenset(
-    ("0.1.0", "0.2.0", "0.2.1", HARNESS_VERSION)
+    ("0.1.0", "0.2.0", "0.2.1", "0.2.2", HARNESS_VERSION)
 )
 STATE_SCHEMA_VERSION = 1
 STATE_DIRECTORY = PurePosixPath(".project-harness")
