@@ -60,6 +60,22 @@ class InitializationTests(unittest.TestCase):
             self.assertEqual(1, manifest.revision)
             self.assertEqual("sample-front", manifest.active_focus)
 
+    def test_front_architecture_is_user_owned_and_not_sync_canonical(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            control = initialize(root)
+            architecture = root / "fronts" / "sample-front" / "ARCHITECTURE.md"
+            architecture.write_text(
+                "# Front Architecture\n\n"
+                "Responsibility boundary: owns the synthetic API only.\n",
+                encoding="utf-8",
+            )
+
+            sync = control.sync()
+
+            self.assertTrue(sync["clean"], sync["issues"])
+            self.assertEqual([], sync["issues"])
+
     def test_first_init_preserves_exact_installer_onboarding_block(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

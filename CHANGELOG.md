@@ -3,6 +3,24 @@
 All notable public changes to Agent Harnesses are recorded here. Historical
 `0.1.x` package tags remain immutable; collection releases begin at `v0.2.0`.
 
+## [0.2.3] - 2026-08-29
+
+- Keep every Multi-Project row inside the `FRONTS.md` table and render all
+  closeout resumption notes in a separate deterministic section.
+- Require Workspace Harness to contain at least one explicitly registered
+  child before operational verification can report `ready=true`.
+- Clarify that Workspace `--owner` is relative to the selected child root.
+- Distinguish the Control Plane's verified root-relative path containment from
+  semantic responsibility boundaries, which remain explicit user-owned
+  context and are never inferred or certified by `hq-sync`.
+- Preserve reversible receipt-owned upgrades from immutable `v0.2.2`,
+  including installations that themselves preserved a `v0.2.1` predecessor.
+- Serialize concurrent exact installs without misclassifying a cooperatively
+  managed onboarding block as unreceipted, while keeping mismatch preflight
+  read-only.
+- Supersede immutable `v0.2.2` after public copied-prompt smoke testing exposed
+  the Multi-Project projection and empty-Workspace readiness defects.
+
 ## [0.2.2] - 2026-08-29
 
 - Allow Multi-Project Harness to coordinate confirmed independent project

@@ -1,7 +1,7 @@
 <!-- BEGIN GENERATED:PRODUCT -->
 # Workspace Harness
 
-[Português do Brasil](README.pt-BR.md) · Version `0.2.2`
+[Português do Brasil](README.pt-BR.md) · Version `0.2.3`
 
 **Best for:** Contained child projects that share one workspace boundary and a small shared index.
 
@@ -11,25 +11,25 @@
 
 Strengths: **Child index · Ownership boundaries · Shared workspace view**. Complexity: medium.
 
-**Ready means:** The coordinator is initialized, every registered child and owner path is explicit and valid, and canonical plus generated workspace state verifies cleanly.
+**Ready means:** The coordinator is initialized with at least one registered child; every registered child path and child-relative owner path is explicit and valid; and canonical plus generated workspace state verifies cleanly.
 
 **Before installation, confirm:**
 
 - The explicit target is the container workspace, not one of its child projects.
 - The existing contained child projects to register are already known.
-- Each selected child has an explicit local owner file and its detailed state will remain locally owned.
+- Each selected child has an explicit local owner file identified by a path relative to that child root, and its detailed state will remain locally owned.
 
 ## Installation
 
 Copy only this prompt:
 
 ```text
-Install Workspace Harness (`workspace-coordination`) v0.2.2 from https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.2/workspace-coordination-0.2.2.zip.
+Install Workspace Harness (`workspace-coordination`) v0.2.3 from https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.3/workspace-coordination-0.2.3.zip.
 
 Before proposing execution, confirm every selected-harness readiness fact:
 - The explicit target is the container workspace, not one of its child projects.
 - The existing contained child projects to register are already known.
-- Each selected child has an explicit local owner file and its detailed state will remain locally owned.
+- Each selected child has an explicit local owner file identified by a path relative to that child root, and its detailed state will remain locally owned.
 If any fact is unknown or false, stop before downloads or target writes, explain what must be organized first, and offer the support contacts below.
 
 If the current mode cannot execute, request a switch to an execution-capable mode only after presenting the plan and receiving confirmation.
@@ -54,16 +54,17 @@ The installed runtime includes `operations.json` plus `OPERATOR_GUIDE.md`; after
 
 Use only child paths and owner files already confirmed by the user; do not
 create a sample workspace or infer children. Use the same public Python 3.10+
-executable resolved by the install prompt as `<python>`. From the installed
-runtime directory:
+executable resolved by the install prompt as `<python>`. `--path` is relative
+to the coordinator root; `--owner` is relative to the selected child root.
+From the installed runtime directory:
 
-`<coordinator-root>/.agent-harnesses/runtime/workspace-coordination/0.2.2`
+`<coordinator-root>/.agent-harnesses/runtime/workspace-coordination/0.2.3`
 
 ```text
 <python> -B workspace_coordination.py --root "<coordinator-root>" init --dry-run
 <python> -B workspace_coordination.py --root "<coordinator-root>" init --apply
-<python> -B workspace_coordination.py --root "<coordinator-root>" add --id "<child-id>" --path "<child-path>" --owner "<owner-file>" --dry-run
-<python> -B workspace_coordination.py --root "<coordinator-root>" add --id "<child-id>" --path "<child-path>" --owner "<owner-file>" --apply
+<python> -B workspace_coordination.py --root "<coordinator-root>" add --id "<child-id>" --path "<child-path>" --owner "<child-relative-owner-file>" --dry-run
+<python> -B workspace_coordination.py --root "<coordinator-root>" add --id "<child-id>" --path "<child-path>" --owner "<child-relative-owner-file>" --apply
 <python> -B workspace_coordination.py --root "<coordinator-root>" verify
 <python> -B workspace_coordination.py --root "<coordinator-root>" open --child "<child-id>"
 ```
@@ -75,8 +76,8 @@ true` is success. `installer.py` is not copied into the runtime.
 ## Recovery and limitations
 
 The coordinator never discovers children or executes their work. Version
-`0.2.2` supports one mutating writer per coordinator root; serialize writers.
+`0.2.3` supports one mutating writer per coordinator root; serialize writers.
 State schema remains `1`. See the [operator guide](OPERATOR_GUIDE.md),
 [advanced reference](docs/REFERENCE.md),
-[catalog](https://github.com/fabianomag/agent-harnesses/blob/v0.2.2/catalog/harnesses.json),
-and [graph](https://github.com/fabianomag/agent-harnesses/blob/v0.2.2/graphs/workspace-coordination.graph.json).
+[catalog](https://github.com/fabianomag/agent-harnesses/blob/v0.2.3/catalog/harnesses.json),
+and [graph](https://github.com/fabianomag/agent-harnesses/blob/v0.2.3/graphs/workspace-coordination.graph.json).

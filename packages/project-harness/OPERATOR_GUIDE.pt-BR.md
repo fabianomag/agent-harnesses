@@ -3,7 +3,7 @@
 Este é o contrato operacional completo e agent-agnostic do runtime instalado. Ele não exige uma Skill formal nem uma API específica de agente. Use um único executável público do Python 3.10+ e o entrypoint local ao target indicado abaixo.
 
 - Entrypoint: `project_harness.py`
-- Package: `project-harness` v`0.2.2`
+- Package: `project-harness` v`0.2.3`
 
 ## Memória operacional
 
@@ -110,8 +110,8 @@ Executar verify primeiro; quando o estado canônico estiver válido mas as proje
 
 ## Receipt de instalação, rollback, update e uninstall
 
-- Receipt: path relativo ao target `.agent-harnesses/runtime/project-harness/0.2.2/.agent-harness-receipt.json`.
-- A partir de um bundle `0.2.2` com checksum verificado, antecipe a remoção do package com `<python> -B installer.py uninstall project-harness --target "<target>" --dry-run --json`; após a revisão, aplique-a com `<python> -B installer.py uninstall project-harness --target "<target>" --apply --json`.
+- Receipt: path relativo ao target `.agent-harnesses/runtime/project-harness/0.2.3/.agent-harness-receipt.json`.
+- A partir de um bundle `0.2.3` com checksum verificado, antecipe a remoção do package com `<python> -B installer.py uninstall project-harness --target "<target>" --dry-run --json`; após a revisão, aplique-a com `<python> -B installer.py uninstall project-harness --target "<target>" --apply --json`.
 - Uninstall remove somente o runtime pertencente ao receipt e o bloco de onboarding gerenciado pelo installer. Ele nunca remove o estado operacional inicializado.
 - Se uma etapa falhar após o apply do package, primeiro execute o workflow de verify ou recovery deste package. Se o target ainda não estiver ready, antecipe e depois aplique o uninstall para executar rollback do package. Preserve e informe qualquer estado inicializado residual; nunca o apague automaticamente.
 - Para update, baixe o ZIP e o checksum sidecar correspondentes à nova versão, verifique o checksum, leia as migration notes e então execute doctor, install --dry-run e install --apply com o novo bundle. Não edite um runtime versionado in-place; mantenha a versão anterior até a nova chegar a ready=true.

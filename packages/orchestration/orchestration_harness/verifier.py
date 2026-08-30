@@ -78,7 +78,7 @@ def verify_package(package_root: Path | None = None) -> list[str]:
                 "id": "orchestration",
                 "license": "MIT",
                 "status": "implemented",
-                "version": "0.2.2",
+                "version": "0.2.3",
             }
             if not isinstance(manifest, dict) or any(
                 manifest.get(key) != value for key, value in expected.items()

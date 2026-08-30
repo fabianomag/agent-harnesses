@@ -9,7 +9,7 @@ from typing import Any
 
 
 PRODUCT_PATH = Path("product/harnesses.json")
-SITE_SNAPSHOT_PATH = Path("catalog/site-harnesses.v0.2.2.json")
+SITE_SNAPSHOT_PATH = Path("catalog/site-harnesses.v0.2.3.json")
 PACKAGE_IDS = (
     "project-harness",
     "workspace-coordination",
@@ -64,6 +64,9 @@ IDENTIFIER = re.compile(r"^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$")
 VERSION_TOKEN = re.compile(r"(?<![0-9])v?([0-9]+\.[0-9]+\.[0-9]+)(?![0-9])")
 ASSET_TOKEN = re.compile(r"[a-z][a-z0-9-]*-[0-9]+\.[0-9]+\.[0-9]+\.zip")
 PLACEHOLDER = re.compile(r"<[^<>\n]+>")
+MARKDOWN_PLACEHOLDER = re.compile(
+    r"<[^<>\n]+>(?:/[A-Za-z0-9._-]+)*"
+)
 FORBIDDEN_PUBLIC_NAMES = re.compile(r"\b(?:alpha|beta)\b", re.IGNORECASE)
 
 
@@ -152,7 +155,7 @@ def load_product(repository_root: Path) -> dict[str, Any]:
         raise ProductContractError("release fields do not match the contract")
     version = _nonempty(release["version"], "release.version")
     if (
-        version != "0.2.2"
+        version != "0.2.3"
         or SEMVER.fullmatch(version) is None
         or release["tag"] != f"v{version}"
     ):
@@ -772,6 +775,15 @@ def _markdown_cell(value: str) -> str:
     return value.replace("|", "&#124;").replace("\n", " ")
 
 
+def _markdown_prose(value: str) -> str:
+    """Render product placeholders as code without changing canonical copy."""
+
+    return MARKDOWN_PLACEHOLDER.sub(
+        lambda match: f"`{match.group(0)}`",
+        value,
+    )
+
+
 def operator_guide(
     value: dict[str, Any], package: dict[str, Any], language: str
 ) -> str:
@@ -882,7 +894,7 @@ def operator_guide(
         "",
         f"## {labels['memory']}",
         "",
-        operator["memory"]["description"][language],
+        _markdown_prose(operator["memory"]["description"][language]),
         "",
         f"- {labels['canonical']}: "
         + ", ".join(f"`{path}`" for path in operator["memory"]["canonical"]),
@@ -892,13 +904,13 @@ def operator_guide(
         f"## {labels['installReady']}",
         "",
         *(
-            f"- {item}"
+            f"- {_markdown_prose(item)}"
             for item in operator["installationReadiness"][language]
         ),
         "",
         f"## {labels['ready']}",
         "",
-        operator["readiness"][language],
+        _markdown_prose(operator["readiness"][language]),
         "",
         f"## {labels['plan']}",
         "",
@@ -918,8 +930,8 @@ def operator_guide(
         )
         lines.append(
             f"| `{operation['command']}` | `{operation['kind']}` | "
-            f"{_markdown_cell(operation['purpose'][language])} | {inputs} | "
-            f"{_markdown_cell(operation['effects'][language])} |"
+            f"{_markdown_cell(_markdown_prose(operation['purpose'][language]))} | {inputs} | "
+            f"{_markdown_cell(_markdown_prose(operation['effects'][language]))} |"
         )
 
     lines.extend(["", f"## {labels['examples']}"])

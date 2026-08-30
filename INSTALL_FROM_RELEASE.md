@@ -1,13 +1,13 @@
 # Install one harness from an immutable release
 
-Choose exactly one `v0.2.2` package asset:
+Choose exactly one `v0.2.3` package asset:
 
 | Public name | Selector | Asset |
 | --- | --- | --- |
-| Project Harness | `project-harness` | `project-harness-0.2.2.zip` |
-| Workspace Harness | `workspace-coordination` | `workspace-coordination-0.2.2.zip` |
-| Multi-Project Harness | `cross-project` | `cross-project-0.2.2.zip` |
-| Control Plane Harness | `orchestration` | `orchestration-0.2.2.zip` |
+| Project Harness | `project-harness` | `project-harness-0.2.3.zip` |
+| Workspace Harness | `workspace-coordination` | `workspace-coordination-0.2.3.zip` |
+| Multi-Project Harness | `cross-project` | `cross-project-0.2.3.zip` |
+| Control Plane Harness | `orchestration` | `orchestration-0.2.3.zip` |
 
 Download that ZIP and only its matching `<asset>.sha256` sidecar into an
 isolated temporary directory. Verify the recorded SHA-256 before extracting or
@@ -33,7 +33,7 @@ commands with one selector and one explicit, existing target:
 
 Stop on any nonzero result. A mismatch recommends another harness but never
 substitutes it or writes to the target. Package installation places the runtime
-at `<target>/.agent-harnesses/runtime/<id>/0.2.2`; it does not initialize the
+at `<target>/.agent-harnesses/runtime/<id>/0.2.3`; it does not initialize the
 target and is not success by itself. It creates or updates only the bounded
 Agent Harness onboarding block in target-root `AGENTS.md`.
 

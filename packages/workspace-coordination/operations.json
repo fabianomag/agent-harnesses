@@ -21,12 +21,12 @@
     "en": [
       "The explicit target is the container workspace, not one of its child projects.",
       "The existing contained child projects to register are already known.",
-      "Each selected child has an explicit local owner file and its detailed state will remain locally owned."
+      "Each selected child has an explicit local owner file identified by a path relative to that child root, and its detailed state will remain locally owned."
     ],
     "ptBr": [
       "O target explícito é o workspace contêiner, não um de seus projetos filhos.",
       "Os projetos filhos existentes e contidos que serão registrados já são conhecidos.",
-      "Cada projeto filho selecionado tem um owner file local explícito e seu estado detalhado continuará sob ownership local."
+      "Cada projeto filho selecionado tem um owner file local explícito, identificado por um path relativo à raiz desse projeto filho, e seu estado detalhado continuará sob ownership local."
     ]
   },
   "memory": {
@@ -68,18 +68,18 @@
         "en": "Updates only the coordinator manifest and generated index; validates the selected child's owner file and any existing local state without changing the child.",
         "ptBr": "Atualiza somente o manifest do coordenador e o index gerado; valida o owner file e qualquer estado local existente do projeto filho selecionado sem alterar o projeto filho."
       },
-      "example": "<python> -B workspace_coordination.py --root \"<coordinator-root>\" add --id \"<child-id>\" --path \"<child-path>\" --owner \"<owner-file>\" --dry-run",
+      "example": "<python> -B workspace_coordination.py --root \"<coordinator-root>\" add --id \"<child-id>\" --path \"<child-path>\" --owner \"<child-relative-owner-file>\" --dry-run",
       "inputs": [
         "<coordinator-root>",
         "<child-id>",
         "<child-path>",
-        "<owner-file>",
+        "<child-relative-owner-file>",
         "--dry-run|--apply"
       ],
       "kind": "write",
       "purpose": {
-        "en": "Register one existing contained child with its explicit owner file.",
-        "ptBr": "Registrar um projeto filho contido e existente com seu owner file explícito."
+        "en": "Register one existing contained child; --owner is the owner-file path relative to that child root.",
+        "ptBr": "Registrar um projeto filho contido e existente; --owner é o path do owner file relativo à raiz desse projeto filho."
       }
     },
     {
@@ -214,11 +214,11 @@
     "displayName": "Workspace Harness",
     "entrypoint": "workspace_coordination.py",
     "id": "workspace-coordination",
-    "version": "0.2.2"
+    "version": "0.2.3"
   },
   "readiness": {
-    "en": "The coordinator is initialized, every registered child and owner path is explicit and valid, and canonical plus generated workspace state verifies cleanly.",
-    "ptBr": "O coordenador está inicializado, todos os projetos filhos e owner paths registrados são explícitos e válidos e o estado canônico e gerado do workspace passa em verify sem issues."
+    "en": "The coordinator is initialized with at least one registered child; every registered child path and child-relative owner path is explicit and valid; and canonical plus generated workspace state verifies cleanly.",
+    "ptBr": "O coordenador está inicializado com pelo menos um projeto filho registrado; cada path de projeto filho e owner path relativo à raiz desse projeto filho é explícito e válido; e o estado canônico e gerado do workspace passa em verify sem issues."
   },
   "schemaVersion": 1,
   "support": {

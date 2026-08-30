@@ -4,7 +4,7 @@
   "package": {
     "id": "project-harness",
     "displayName": "Project Harness",
-    "version": "0.2.2",
+    "version": "0.2.3",
     "artifactStatus": {
       "implementation": "implemented",
       "publication": "published"

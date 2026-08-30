@@ -371,7 +371,7 @@ PACKAGE_PROFILES: dict[str, dict[str, Any]] = {
                 "dispatch agents, or execute child work."
             ),
             (
-                "Version 0.2.2 supports one mutating writer per coordinator "
+                "Version 0.2.3 supports one mutating writer per coordinator "
                 "root."
             ),
         ],
@@ -1106,7 +1106,7 @@ def _agent_compatibility() -> dict[str, Any]:
             "scope": (
                 "The agent-agnostic CLI, operations contract, and Markdown "
                 "guides are primary. Optional Codex adapters remain outside "
-                "the core assets; a fresh walkthrough of the exact v0.2.2 "
+                "the core assets; a fresh walkthrough of the exact v0.2.3 "
                 "release assets is still pending."
             ),
         },

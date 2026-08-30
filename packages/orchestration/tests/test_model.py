@@ -101,6 +101,18 @@ class ManifestTests(unittest.TestCase):
         parsed = parse_manifest(render_manifest(manifest))
         self.assertEqual(manifest, parsed)
 
+    def test_schema_one_keeps_semantic_boundary_out_of_manifest(self) -> None:
+        manifest = Manifest.create(self._front(), transaction_id="a" * 32)
+        value = manifest.to_dict()
+
+        self.assertEqual(1, value["schemaVersion"])
+        self.assertNotIn("responsibilityBoundary", value["fronts"][0])
+        self.assertEqual(manifest, parse_manifest(json.dumps(value)))
+
+        value["fronts"][0]["responsibilityBoundary"] = "Synthetic API only"
+        with self.assertRaises(ValidationError):
+            parse_manifest(json.dumps(value))
+
     def test_manifest_rejects_extra_field(self) -> None:
         manifest = Manifest.create(self._front(), transaction_id="b" * 32)
         value = manifest.to_dict()

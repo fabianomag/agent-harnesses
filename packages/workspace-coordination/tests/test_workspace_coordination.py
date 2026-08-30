@@ -96,12 +96,18 @@ class InitializationTests(CoordinatorTestCase):
             set(result.changed),
         )
 
-    def test_clean_init_creates_verified_coordinator(self) -> None:
+    def test_clean_init_requires_one_registered_child_for_readiness(self) -> None:
         self.initialize()
 
         self.assertTrue((self.root / harness.MANIFEST_PATH).is_file())
         self.assertTrue((self.root / harness.INDEX_PATH).is_file())
-        self.assertTrue(harness.verify(self.root).ok)
+        report = harness.verify(self.root)
+        self.assertFalse(report.ok)
+        self.assertEqual(
+            {"NO_REGISTERED_CHILDREN"},
+            {issue.code for issue in report.issues},
+        )
+        self.assertTrue(all(not issue.recoverable for issue in report.issues))
 
     def test_init_is_byte_idempotent(self) -> None:
         self.initialize()
@@ -110,6 +116,24 @@ class InitializationTests(CoordinatorTestCase):
         result = harness.initialize(self.root, apply=True)
 
         self.assertEqual("noop", result.mode)
+        self.assertEqual(before, _tree_snapshot(self.root))
+        self.assertEqual(
+            {"NO_REGISTERED_CHILDREN"},
+            {issue.code for issue in harness.verify(self.root).issues},
+        )
+
+    def test_empty_init_with_real_drift_still_requires_recovery(self) -> None:
+        self.initialize()
+        (self.root / harness.INDEX_PATH).write_text(
+            "synthetic drift\n",
+            encoding="utf-8",
+        )
+        before = _tree_snapshot(self.root)
+
+        with self.assertRaises(harness.HarnessError) as context:
+            harness.initialize(self.root, apply=True)
+
+        self.assertEqual("NEEDS_RECOVERY", context.exception.code)
         self.assertEqual(before, _tree_snapshot(self.root))
 
     def test_collision_preserves_existing_file_and_creates_nothing(self) -> None:
@@ -286,6 +310,16 @@ class ChildManifestTests(CoordinatorTestCase):
                 apply=True,
             ).mode,
         )
+        report = harness.verify(self.root)
+        self.assertFalse(report.ok)
+        self.assertEqual(
+            {"NO_REGISTERED_CHILDREN"},
+            {issue.code for issue in report.issues},
+        )
+
+        self.add_alpha()
+
+        self.assertTrue(harness.verify(self.root).ok)
 
     def test_re_registration_cannot_claim_another_child_local_state(self) -> None:
         self.add_alpha()
@@ -870,11 +904,43 @@ class CliTests(CoordinatorTestCase):
         apply_exit, _stdout, apply_stderr = self._run_cli(
             ["--root", str(physical_root), "init", "--apply"]
         )
+        unready_exit, unready_stdout, unready_stderr = self._run_cli(
+            ["--root", str(physical_root), "--json", "verify"]
+        )
+        add_exit, _stdout, add_stderr = self._run_cli(
+            [
+                "--root",
+                str(physical_root),
+                "add",
+                "--id",
+                "alpha",
+                "--path",
+                "child-alpha",
+                "--owner",
+                "AGENTS.md",
+                "--apply",
+            ]
+        )
         verify_exit, _stdout, verify_stderr = self._run_cli(
             ["--root", str(physical_root), "verify"]
         )
         self.assertEqual(0, apply_exit, apply_stderr)
+        self.assertEqual(1, unready_exit, unready_stderr)
+        self.assertIn("NO_REGISTERED_CHILDREN", unready_stdout)
+        self.assertEqual(0, add_exit, add_stderr)
         self.assertEqual(0, verify_exit, verify_stderr)
+
+    def test_add_help_defines_owner_relative_to_child_root(self) -> None:
+        stdout = io.StringIO()
+        with contextlib.redirect_stdout(stdout):
+            with self.assertRaises(SystemExit) as context:
+                harness.run_cli(["add", "--help"])
+
+        self.assertEqual(0, context.exception.code)
+        self.assertIn(
+            "owner-file path relative to the selected child root",
+            stdout.getvalue(),
+        )
 
     def test_json_cli_cycle_and_explicit_mode(self) -> None:
         stdout = io.StringIO()

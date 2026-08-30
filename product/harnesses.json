@@ -1,8 +1,8 @@
 {
   "schemaVersion": 2,
   "release": {
-    "version": "0.2.2",
-    "tag": "v0.2.2",
+    "version": "0.2.3",
+    "tag": "v0.2.3",
     "minimumPython": "3.10",
     "repository": "https://github.com/fabianomag/agent-harnesses",
     "site": {
@@ -117,7 +117,7 @@
       "id": "project-harness",
       "displayName": "Project Harness",
       "aliases": ["project", "single-project", "project-harness"],
-      "asset": "project-harness-0.2.2.zip",
+      "asset": "project-harness-0.2.3.zip",
       "complexity": {
         "level": "low",
         "en": "Low",
@@ -239,7 +239,7 @@
       "id": "workspace-coordination",
       "displayName": "Workspace Harness",
       "aliases": ["workspace", "workspace-harness", "workspace-coordination"],
-      "asset": "workspace-coordination-0.2.2.zip",
+      "asset": "workspace-coordination-0.2.3.zip",
       "complexity": {
         "level": "medium",
         "en": "Medium",
@@ -279,17 +279,17 @@
           "en": [
             "The explicit target is the container workspace, not one of its child projects.",
             "The existing contained child projects to register are already known.",
-            "Each selected child has an explicit local owner file and its detailed state will remain locally owned."
+            "Each selected child has an explicit local owner file identified by a path relative to that child root, and its detailed state will remain locally owned."
           ],
           "ptBr": [
             "O target explícito é o workspace contêiner, não um de seus projetos filhos.",
             "Os projetos filhos existentes e contidos que serão registrados já são conhecidos.",
-            "Cada projeto filho selecionado tem um owner file local explícito e seu estado detalhado continuará sob ownership local."
+            "Cada projeto filho selecionado tem um owner file local explícito, identificado por um path relativo à raiz desse projeto filho, e seu estado detalhado continuará sob ownership local."
           ]
         },
         "readiness": {
-          "en": "The coordinator is initialized, every registered child and owner path is explicit and valid, and canonical plus generated workspace state verifies cleanly.",
-          "ptBr": "O coordenador está inicializado, todos os projetos filhos e owner paths registrados são explícitos e válidos e o estado canônico e gerado do workspace passa em verify sem issues."
+          "en": "The coordinator is initialized with at least one registered child; every registered child path and child-relative owner path is explicit and valid; and canonical plus generated workspace state verifies cleanly.",
+          "ptBr": "O coordenador está inicializado com pelo menos um projeto filho registrado; cada path de projeto filho e owner path relativo à raiz desse projeto filho é explícito e válido; e o estado canônico e gerado do workspace passa em verify sem issues."
         },
         "operations": [
           {
@@ -303,10 +303,10 @@
           {
             "command": "add",
             "kind": "write",
-            "purpose": {"en": "Register one existing contained child with its explicit owner file.", "ptBr": "Registrar um projeto filho contido e existente com seu owner file explícito."},
-            "inputs": ["<coordinator-root>", "<child-id>", "<child-path>", "<owner-file>", "--dry-run|--apply"],
+            "purpose": {"en": "Register one existing contained child; --owner is the owner-file path relative to that child root.", "ptBr": "Registrar um projeto filho contido e existente; --owner é o path do owner file relativo à raiz desse projeto filho."},
+            "inputs": ["<coordinator-root>", "<child-id>", "<child-path>", "<child-relative-owner-file>", "--dry-run|--apply"],
             "effects": {"en": "Updates only the coordinator manifest and generated index; validates the selected child's owner file and any existing local state without changing the child.", "ptBr": "Atualiza somente o manifest do coordenador e o index gerado; valida o owner file e qualquer estado local existente do projeto filho selecionado sem alterar o projeto filho."},
-            "example": "<python> -B workspace_coordination.py --root \"<coordinator-root>\" add --id \"<child-id>\" --path \"<child-path>\" --owner \"<owner-file>\" --dry-run"
+            "example": "<python> -B workspace_coordination.py --root \"<coordinator-root>\" add --id \"<child-id>\" --path \"<child-path>\" --owner \"<child-relative-owner-file>\" --dry-run"
           },
           {
             "command": "remove",
@@ -377,7 +377,7 @@
       "id": "cross-project",
       "displayName": "Multi-Project Harness",
       "aliases": ["multi-project", "cross-project", "cross"],
-      "asset": "cross-project-0.2.2.zip",
+      "asset": "cross-project-0.2.3.zip",
       "complexity": {
         "level": "medium",
         "en": "Medium",
@@ -491,7 +491,7 @@
       "id": "orchestration",
       "displayName": "Control Plane Harness",
       "aliases": ["control-plane", "control-plane-harness", "orchestration"],
-      "asset": "orchestration-0.2.2.zip",
+      "asset": "orchestration-0.2.3.zip",
       "complexity": {
         "level": "high",
         "en": "High",
@@ -523,25 +523,25 @@
           "canonical": [".orchestration/manifest.json"],
           "projections": ["FRONTS.md", "NEXT.md", "<front-path>/REFLECTIONS.md", "<front-path>/RECORDS.md", "<front-path>/SESSIONS.md"],
           "description": {
-            "en": "The new control-plane root owns a transactional registry and lifecycle projections; registered fronts retain their bounded records below their confirmed paths.",
-            "ptBr": "A nova raiz do control plane mantém um registry transacional e projeções do ciclo de vida; as frentes registradas preservam seus registros delimitados nos paths confirmados."
+            "en": "The new control-plane root owns a transactional registry of root-relative front paths and lifecycle projections. Each front's semantic responsibility boundary remains user-owned context in <front-path>/ARCHITECTURE.md and is not certified by the runtime.",
+            "ptBr": "A nova raiz do control plane mantém um registry transacional de paths de frentes relativos à raiz e projeções do ciclo de vida. O responsibility boundary semântico de cada frente continua como contexto user-owned em <front-path>/ARCHITECTURE.md e não é certificado pelo runtime."
           }
         },
         "installationReadiness": {
           "en": [
             "The explicit target is a deliberate new Master or control-plane root, not an existing coordination structure to adopt.",
-            "The initial fronts, their intended relative paths, and their boundaries are already known.",
+            "The initial fronts and their intended root-relative paths are known, and the user can state each front's semantic responsibility boundary. The harness will not infer that boundary.",
             "The work genuinely requires a transactional registry, validated mutations, rollback, and recovery rather than only project handoffs."
           ],
           "ptBr": [
             "O target explícito é uma nova raiz Master ou de control plane deliberada, não uma estrutura de coordenação existente a ser adotada.",
-            "As frentes iniciais, seus paths relativos pretendidos e seus boundaries já são conhecidos.",
+            "As frentes iniciais e seus paths relativos à raiz estão conhecidos, e o usuário consegue declarar o responsibility boundary semântico de cada frente. O harness não inferirá esse boundary.",
             "O trabalho realmente exige registry transacional, validated mutations, rollback e recovery, e não apenas handoffs entre projetos."
           ]
         },
         "readiness": {
-          "en": "A new control plane has at least one explicit registered front, the registry and generated lifecycle files are coherent, no recovery is pending, and hq-sync reports clean state.",
-          "ptBr": "Um control plane novo contém ao menos uma frente registrada explicitamente, o registry e os arquivos gerados de ciclo de vida estão coerentes, não há recovery pendente e hq-sync informa estado limpo."
+          "en": "Technical readiness means at least one front is registered, every registered root-relative path is contained and safe, the registry and generated lifecycle files are coherent, no recovery is pending, and hq-sync is clean. It does not certify a front's semantic responsibility boundary.",
+          "ptBr": "Readiness técnica significa que ao menos uma frente está registrada, todo path registrado e relativo à raiz está contido e seguro, o registry e os arquivos gerados de ciclo de vida estão coerentes, não há recovery pendente e hq-sync informa estado limpo. Ela não certifica o responsibility boundary semântico de uma frente."
         },
         "operations": [
           {
@@ -571,7 +571,7 @@
           {
             "command": "hq-sync",
             "kind": "read",
-            "purpose": {"en": "Strictly validate registry, front boundaries, generated files, locks, and recovery state.", "ptBr": "Validar estritamente o registry, os limites das frentes, os arquivos gerados, locks e o estado de recovery."},
+            "purpose": {"en": "Strictly validate the registry, registered path containment, required and generated files, locks, and recovery state.", "ptBr": "Validar estritamente o registry, a contenção dos paths registrados, os arquivos obrigatórios e gerados, locks e o estado de recovery."},
             "inputs": ["<workspace>"],
             "effects": {"en": "Reports clean state or bounded issues without repair.", "ptBr": "Informa estado limpo ou issues delimitadas sem repair."},
             "example": "<python> -B hq.py --root \"<workspace>\" --json hq-sync"
@@ -605,7 +605,7 @@
             "kind": "repair",
             "purpose": {"en": "Preview or repair only a derivable generated pending-panel mismatch.", "ptBr": "Fazer preview ou repair somente de uma divergência derivável no painel gerado de pendências."},
             "inputs": ["<workspace>", "--dry-run|--apply"],
-            "effects": {"en": "Repairs only the generated panel after every registry and boundary check passes; it never repoints or merges fronts.", "ptBr": "Faz repair somente do painel gerado depois que todas as verificações de registry e limites passam; nunca redireciona nem mescla frentes."},
+            "effects": {"en": "Repairs only the generated panel after every registry and registered-path containment check passes; it never repoints or merges fronts.", "ptBr": "Faz repair somente do painel gerado depois que todas as verificações de registry e contenção dos paths registrados passam; nunca redireciona nem mescla frentes."},
             "example": "<python> -B hq.py --root \"<workspace>\" --json repair-panel --dry-run"
           },
           {

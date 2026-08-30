@@ -1,7 +1,7 @@
 <!-- BEGIN GENERATED:PRODUCT -->
 # Control Plane Harness
 
-[Português do Brasil](README.pt-BR.md) · Version `0.2.2`
+[Português do Brasil](README.pt-BR.md) · Version `0.2.3`
 
 **Best for:** A new control plane whose registry and lifecycle mutations justify transactions and recovery.
 
@@ -11,12 +11,12 @@
 
 Strengths: **Strict registry · Transactions · Recovery**. Complexity: high.
 
-**Ready means:** A new control plane has at least one explicit registered front, the registry and generated lifecycle files are coherent, no recovery is pending, and hq-sync reports clean state.
+**Ready means:** Technical readiness means at least one front is registered, every registered root-relative path is contained and safe, the registry and generated lifecycle files are coherent, no recovery is pending, and hq-sync is clean. It does not certify a front's semantic responsibility boundary.
 
 **Before installation, confirm:**
 
 - The explicit target is a deliberate new Master or control-plane root, not an existing coordination structure to adopt.
-- The initial fronts, their intended relative paths, and their boundaries are already known.
+- The initial fronts and their intended root-relative paths are known, and the user can state each front's semantic responsibility boundary. The harness will not infer that boundary.
 - The work genuinely requires a transactional registry, validated mutations, rollback, and recovery rather than only project handoffs.
 
 ## Installation
@@ -24,11 +24,11 @@ Strengths: **Strict registry · Transactions · Recovery**. Complexity: high.
 Copy only this prompt:
 
 ```text
-Install Control Plane Harness (`orchestration`) v0.2.2 from https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.2/orchestration-0.2.2.zip.
+Install Control Plane Harness (`orchestration`) v0.2.3 from https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.3/orchestration-0.2.3.zip.
 
 Before proposing execution, confirm every selected-harness readiness fact:
 - The explicit target is a deliberate new Master or control-plane root, not an existing coordination structure to adopt.
-- The initial fronts, their intended relative paths, and their boundaries are already known.
+- The initial fronts and their intended root-relative paths are known, and the user can state each front's semantic responsibility boundary. The harness will not infer that boundary.
 - The work genuinely requires a transactional registry, validated mutations, rollback, and recovery rather than only project handoffs.
 If any fact is unknown or false, stop before downloads or target writes, explain what must be organized first, and offer the support contacts below.
 
@@ -60,7 +60,7 @@ adopt an existing structure or create sample fronts. Use the same public Python
 3.10+ executable resolved by the install prompt as `<python>`. From the
 installed runtime directory:
 
-`<workspace>/.agent-harnesses/runtime/orchestration/0.2.2`
+`<workspace>/.agent-harnesses/runtime/orchestration/0.2.3`
 
 ```text
 <python> -B hq.py --root "<workspace>" --json bom-dia
@@ -79,5 +79,5 @@ Schema `1` remains supported. Mutations use a journal and explicit recovery,
 but the harness never executes registered projects. See the
 [advanced reference](docs/REFERENCE.md),
 [operator guide](OPERATOR_GUIDE.md),
-[catalog](https://github.com/fabianomag/agent-harnesses/blob/v0.2.2/catalog/harnesses.json),
-and [graph](https://github.com/fabianomag/agent-harnesses/blob/v0.2.2/graphs/orchestration.graph.json).
+[catalog](https://github.com/fabianomag/agent-harnesses/blob/v0.2.3/catalog/harnesses.json),
+and [graph](https://github.com/fabianomag/agent-harnesses/blob/v0.2.3/graphs/orchestration.graph.json).

@@ -10,7 +10,7 @@ folders and the task is to choose a child, preserve its local ownership, or
 reflect a small shared boundary delta.
 
 Operate the already installed agent-agnostic runtime at
-`<target>/.agent-harnesses/runtime/workspace-coordination/0.2.2/`. Treat its
+`<target>/.agent-harnesses/runtime/workspace-coordination/0.2.3/`. Treat its
 `operations.json` as the machine-readable command authority and its operator
 guide as the user-facing contract. This optional adapter does not replace or
 install the runtime.

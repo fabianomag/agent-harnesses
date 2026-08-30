@@ -1,7 +1,7 @@
 <!-- BEGIN GENERATED:PRODUCT -->
 # Control Plane Harness
 
-[English](README.md) · Versão `0.2.2`
+[English](README.md) · Versão `0.2.3`
 
 **Melhor opção para:** Um control plane novo em que o cadastro central e as mudanças de ciclo de vida justificam transações e recuperação.
 
@@ -11,12 +11,12 @@
 
 Pontos fortes: **Cadastro central com validação estrita · Transações · Recuperação**. Complexidade: alta.
 
-**Readiness significa:** Um control plane novo contém ao menos uma frente registrada explicitamente, o registry e os arquivos gerados de ciclo de vida estão coerentes, não há recovery pendente e hq-sync informa estado limpo.
+**Readiness significa:** Readiness técnica significa que ao menos uma frente está registrada, todo path registrado e relativo à raiz está contido e seguro, o registry e os arquivos gerados de ciclo de vida estão coerentes, não há recovery pendente e hq-sync informa estado limpo. Ela não certifica o responsibility boundary semântico de uma frente.
 
 **Antes da instalação, confirme:**
 
 - O target explícito é uma nova raiz Master ou de control plane deliberada, não uma estrutura de coordenação existente a ser adotada.
-- As frentes iniciais, seus paths relativos pretendidos e seus boundaries já são conhecidos.
+- As frentes iniciais e seus paths relativos à raiz estão conhecidos, e o usuário consegue declarar o responsibility boundary semântico de cada frente. O harness não inferirá esse boundary.
 - O trabalho realmente exige registry transacional, validated mutations, rollback e recovery, e não apenas handoffs entre projetos.
 
 ## Instalação
@@ -24,11 +24,11 @@ Pontos fortes: **Cadastro central com validação estrita · Transações · Rec
 Copie somente este prompt:
 
 ```text
-Instale Control Plane Harness (`orchestration`) v0.2.2 a partir de https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.2/orchestration-0.2.2.zip.
+Instale Control Plane Harness (`orchestration`) v0.2.3 a partir de https://github.com/fabianomag/agent-harnesses/releases/download/v0.2.3/orchestration-0.2.3.zip.
 
 Antes de propor a execução, confirme cada fato de readiness do harness selecionado:
 - O target explícito é uma nova raiz Master ou de control plane deliberada, não uma estrutura de coordenação existente a ser adotada.
-- As frentes iniciais, seus paths relativos pretendidos e seus boundaries já são conhecidos.
+- As frentes iniciais e seus paths relativos à raiz estão conhecidos, e o usuário consegue declarar o responsibility boundary semântico de cada frente. O harness não inferirá esse boundary.
 - O trabalho realmente exige registry transacional, validated mutations, rollback e recovery, e não apenas handoffs entre projetos.
 Se algum fato for desconhecido ou falso, pare antes de downloads ou writes no target, explique o que precisa ser organizado primeiro e ofereça os contatos de suporte abaixo.
 
@@ -60,7 +60,7 @@ Use uma nova raiz deliberada de control plane e somente valores confirmados das
 frentes. Não adote uma estrutura existente nem crie frentes de exemplo. Use
 como `<python>` o mesmo executável público do Python 3.10+ escolhido no prompt
 de instalação. Use o runtime em
-`<workspace>/.agent-harnesses/runtime/orchestration/0.2.2`:
+`<workspace>/.agent-harnesses/runtime/orchestration/0.2.3`:
 
 ```text
 <python> -B hq.py --root "<workspace>" --json bom-dia
@@ -74,8 +74,8 @@ explícito, mas o harness nunca executa os projetos cadastrados. A
 [referência avançada](docs/REFERENCE.md) preserva os contratos de transações,
 bloqueio, recuperação e evidência; o
 [guia operacional](OPERATOR_GUIDE.pt-BR.md) ensina o ciclo completo. Consulte também o
-[catálogo imutável](https://github.com/fabianomag/agent-harnesses/blob/v0.2.2/catalog/harnesses.json)
-e o [diagrama](https://github.com/fabianomag/agent-harnesses/blob/v0.2.2/graphs/orchestration.graph.json).
+[catálogo imutável](https://github.com/fabianomag/agent-harnesses/blob/v0.2.3/catalog/harnesses.json)
+e o [diagrama](https://github.com/fabianomag/agent-harnesses/blob/v0.2.3/graphs/orchestration.graph.json).
 Execute `<python> -B installer.py verify orchestration --target "<workspace>"
 --json` na raiz do pacote ainda extraído; `installer.py` não é copiado para o
 runtime.
